@@ -14,7 +14,7 @@ export async function Header() {
       </Link>
       <IconSeparator />
       <Link
-        href="/genui"
+        href="/about"
         className={cn(
           buttonVariants({ variant: "link" }),
           "mr-auto font-normal"
