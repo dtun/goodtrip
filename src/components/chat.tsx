@@ -49,7 +49,7 @@ export default function Chat() {
 
   return (
     <div className="group w-full overflow-auto px-2">
-      <div className="max-w-xl mx-auto mt-10 mb-24">
+      <div className="max-w-xl mx-auto mt-10">
         {messages.map((message, index) => (
           <div key={index} className="whitespace-pre-wrap flex mb-5">
             <div
@@ -85,10 +85,10 @@ export default function Chat() {
         )}
       </div>
       {!messages.length && (
-        <div className="w-full max-w-xl mx-auto">
-          <TripPlannerForm formData={formData} setFormData={setFormData} />
-          <Card className="my-4 p-2">
-            <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
+          <div className="w-full max-w-xl mx-auto">
+            <TripPlannerForm formData={formData} setFormData={setFormData} />
+            <Card className="my-4 p-2">
               <div className="flex">
                 <Input
                   type="text"
@@ -103,9 +103,9 @@ export default function Chat() {
                   <IconArrowUp />
                 </Button>
               </div>
-            </form>
-          </Card>
-        </div>
+            </Card>
+          </div>
+        </form>
       )}
     </div>
   );
