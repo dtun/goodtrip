@@ -32,7 +32,10 @@ Create a [duration]-day family-friendly itinerary for [destination] with these s
 	- Mobility requirements: [any limitations]
 	- Preferred pace: [relaxed/moderate/active]
 	- Season of travel: [season]
+
 Include daily schedules with kid-friendly restaurants, rest breaks, and backup indoor activities for weather changes.
+
+Include emojis for visual appeal and use a friendly, conversational tone.
 `;
 
 // Gen UIs
