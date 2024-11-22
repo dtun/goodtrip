@@ -1,25 +1,22 @@
-'use server';
+"use server";
 
-import { createStreamableValue } from 'ai/rsc';
-import { CoreMessage, streamText } from 'ai';
-import { openai } from '@ai-sdk/openai';
-import { Weather } from '@/components/weather';
-import { generateText } from 'ai';
-import { createStreamableUI } from 'ai/rsc';
-import { ReactNode } from 'react';
-import { z } from 'zod';
+import { createStreamableValue } from "ai/rsc";
+import { CoreMessage, streamText } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { generateText } from "ai";
+import { createStreamableUI } from "ai/rsc";
+import { ReactNode } from "react";
 
 export interface Message {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   display?: ReactNode;
 }
 
-
-// Streaming Chat 
+// Streaming Chat
 export async function continueTextConversation(messages: CoreMessage[]) {
   const result = await streamText({
-    model: openai('gpt-4-turbo'),
+    model: openai("gpt-3.5-turbo"),
     messages,
   });
 
@@ -27,38 +24,33 @@ export async function continueTextConversation(messages: CoreMessage[]) {
   return stream.value;
 }
 
-// Gen UIs 
+const SYSTEM_PROMPT = `
+Create a [duration]-day family-friendly itinerary for [destination] with these specifications:
+	- Budget level: [budget/night for accommodations]
+  - Children's ages: [ages]
+	- Must-have activities: [preferences]
+	- Mobility requirements: [any limitations]
+	- Preferred pace: [relaxed/moderate/active]
+	- Season of travel: [season]
+Include daily schedules with kid-friendly restaurants, rest breaks, and backup indoor activities for weather changes.
+`;
+
+// Gen UIs
 export async function continueConversation(history: Message[]) {
   const stream = createStreamableUI();
 
-  const { text, toolResults } = await generateText({
-    model: openai('gpt-3.5-turbo'),
-    system: 'You are a friendly weather assistant!',
+  const { text } = await generateText({
+    model: openai("gpt-4o-mini"),
+    system: SYSTEM_PROMPT,
     messages: history,
-    tools: {
-      showWeather: {
-        description: 'Show the weather for a given location.',
-        parameters: z.object({
-          city: z.string().describe('The city to show the weather for.'),
-          unit: z
-            .enum(['F'])
-            .describe('The unit to display the temperature in'),
-        }),
-        execute: async ({ city, unit }) => {
-          stream.done(<Weather city={city} unit={unit} />);
-          return `Here's the weather for ${city}!`; 
-        },
-      },
-    },
   });
 
   return {
     messages: [
       ...history,
       {
-        role: 'assistant' as const,
-        content:
-          text || toolResults.map(toolResult => toolResult.result).join(),
+        role: "assistant" as const,
+        content: text,
         display: stream.value,
       },
     ],

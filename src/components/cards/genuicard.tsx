@@ -12,16 +12,26 @@ export default function GenUICard() {
     <div className="max-w-xl mx-auto mt-10">
       <Card>
         <CardHeader>
-          <CardTitle>Next AI SDK Lite</CardTitle>
-          <CardDescription>Start streaming UI Components!</CardDescription>
+          <CardTitle>GoodTrip</CardTitle>
+          <CardDescription>Your Family Adventure, AI Perfected</CardDescription>
         </CardHeader>
-        <CardContent className="text-sm text-muted-foreground/90 leading-normal prose"> 
-          <p className="mb-3">A simple prompt based way to enter into streaming components./</p>
-          <p className="mb-3">Try asking for the weather in any American city and see what returns. </p>
-          <p className="mb-3">Notice when the component returns you can interact with it! </p>
-          <p><Link href="https://github.com/mattjared/nextjs-ai-lite" className="underline">Fork the repo and get hacking</Link> </p>
+        <CardContent className="text-sm text-muted-foreground/90 leading-normal prose">
+          <p className="mb-3">
+            {`Planning a family vacation shouldn't feel like work. GoodTrip uses
+            AI to craft personalized USA travel itineraries that balance
+            everyone's needs - from kid-friendly activities to parent-approved
+            schedules. Just tell us your preferences, and we'll create a
+            detailed day-by-day plan with restaurants, attractions, and built-in
+            downtime. No more endless research or stressful planning - just
+            quality family time.`}
+          </p>
+          <p>
+            <Link href="/" className="underline">
+              {`Let's do this thing.`}
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
