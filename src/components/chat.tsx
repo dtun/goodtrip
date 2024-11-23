@@ -29,11 +29,22 @@ export default function Chat() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const newMessages: CoreMessage[] = [
       ...messages,
-      { content: JSON.stringify({ input, formData }), role: "user" },
+      {
+        role: "user",
+        content: JSON.stringify(
+          {
+            input,
+            formData,
+          },
+          null,
+          2
+        ), // Pretty print JSON for better readability
+      },
     ];
-    // setMessages(newMessages);
+
     setInput("");
     const result = await continueTextConversation(newMessages);
     for await (const content of readStreamableValue(result)) {
