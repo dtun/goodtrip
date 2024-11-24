@@ -9,10 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { IconArrowUp } from "@/components/ui/icons";
 import { TripFormData, TripPlannerForm } from "./TripPlannerForm";
-export const maxDuration = 30;
+
+export let maxDuration = 30;
 
 export default function Chat() {
-  const [formData, setFormData] = useState<TripFormData>({
+  let [formData, setFormData] = useState<TripFormData>({
     destination: "",
     duration: "",
     numChildren: "",
@@ -24,10 +25,10 @@ export default function Chat() {
     activities: "",
   });
 
-  const [messages, setMessages] = useState<CoreMessage[]>([]);
-  const [input, setInput] = useState<string>("");
-  const clearMessages = () => setMessages([]);
-  const clearFormData = () =>
+  let [messages, setMessages] = useState<CoreMessage[]>([]);
+  let [input, setInput] = useState<string>("");
+  let clearMessages = () => setMessages([]);
+  let clearFormData = () =>
     setFormData({
       destination: "",
       duration: "",
@@ -40,10 +41,10 @@ export default function Chat() {
       activities: "",
     });
 
-  const handleSubmit = async (e?: React.FormEvent) => {
+  let handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
-    const newMessages: CoreMessage[] = [
+    let newMessages: CoreMessage[] = [
       ...messages,
       {
         role: "user",
@@ -59,8 +60,8 @@ export default function Chat() {
     ];
 
     setInput("");
-    const result = await continueTextConversation(newMessages);
-    for await (const content of readStreamableValue(result)) {
+    let result = await continueTextConversation(newMessages);
+    for await (let content of readStreamableValue(result)) {
       setMessages([
         // ...newMessages,
         {
