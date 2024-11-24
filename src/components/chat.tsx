@@ -26,9 +26,22 @@ export default function Chat() {
 
   const [messages, setMessages] = useState<CoreMessage[]>([]);
   const [input, setInput] = useState<string>("");
+  const clearMessages = () => setMessages([]);
+  const clearFormData = () =>
+    setFormData({
+      destination: "",
+      duration: "",
+      numChildren: "",
+      childrenAges: "",
+      budget: "",
+      pace: "",
+      season: "",
+      mobility: "",
+      activities: "",
+    });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
 
     const newMessages: CoreMessage[] = [
       ...messages,
@@ -75,24 +88,17 @@ export default function Chat() {
           </div>
         ))}
         {!!messages.length && (
-          <Button
-            onClick={() => {
-              setMessages([]);
-              setFormData({
-                destination: "",
-                duration: "",
-                numChildren: "",
-                childrenAges: "",
-                budget: "",
-                pace: "",
-                season: "",
-                mobility: "",
-                activities: "",
-              });
-            }}
-          >
-            Try again
-          </Button>
+          <div className="flex gap-4 w-full justify-end">
+            <Button onClick={handleSubmit}>Regenerate</Button>
+            <Button
+              onClick={() => {
+                clearMessages();
+                clearFormData();
+              }}
+            >
+              Reset
+            </Button>
+          </div>
         )}
       </div>
       {!messages.length && (
