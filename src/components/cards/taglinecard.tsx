@@ -1,4 +1,4 @@
-export default function AboutCard() {
+export default function TaglineCard() {
   return (
     <div className="max-w-xl my-2 mx-4">
       <p className="text-sm text-muted-foreground">
