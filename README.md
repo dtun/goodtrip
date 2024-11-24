@@ -1,5 +1,15 @@
+# GoodTrip AI Travel Planner
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) and designed to be fun and easy to get your hands dirty with the AI SDK.
+GoodTrip is an AI-powered travel planning assistant that creates detailed, family-friendly itineraries for destinations across the USA. Built with Next.js and OpenAI's GPT-4, it generates personalized travel plans based on your specific needs and preferences.
+
+## Features
+
+- **AI-Powered Itineraries**: Detailed day-by-day travel plans generated using GPT-4
+- **Family-Focused**: Tailored suggestions for families with children of all ages
+- **Customizable Plans**: Adjust for budget, pace, season, and mobility requirements
+- **Weather-Ready**: Includes backup indoor activities for weather changes
+- **Restaurant Recommendations**: Specific dining suggestions with kid-friendly features
+- **Accessibility Conscious**: Considers mobility requirements in planning
 
 ## Getting Started
 
