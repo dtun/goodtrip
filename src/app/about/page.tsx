@@ -1,10 +1,6 @@
-// import Chat from "@/components/chat";
-"use client";
-
 import GenUICard from "@/components/cards/genuicard";
-export const maxDuration = 30;
 
-export default function GenUI() {
+export default function About() {
   return (
     <div className="relative flex h-[calc(100vh_-_theme(spacing.16))] overflow-hidden pb-10 flex-col p-2">
       <div className="group w-full overflow-auto">
