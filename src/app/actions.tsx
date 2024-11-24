@@ -83,7 +83,7 @@ Remember:
 
 // Streaming Chat
 export async function continueTextConversation(messages: CoreMessage[]) {
-  const result = await streamText({
+  let result = await streamText({
     model: openai("gpt-4o-mini"),
     messages: [
       {
@@ -94,12 +94,12 @@ export async function continueTextConversation(messages: CoreMessage[]) {
     ],
   });
 
-  const stream = createStreamableValue(result.textStream);
+  let stream = createStreamableValue(result.textStream);
   return stream.value;
 }
 
 // Utils
 export async function checkAIAvailability() {
-  const envVarExists = !!process.env.OPENAI_API_KEY;
+  let envVarExists = !!process.env.OPENAI_API_KEY;
   return envVarExists;
 }
