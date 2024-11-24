@@ -20,13 +20,13 @@ interface FormProps {
   handleSubmit?: (e: FormEvent) => void;
 }
 
-export const TripPlannerForm = ({ formData, setFormData }: FormProps) => {
-  const handleChange = (
+export function TripPlannerForm({ formData, setFormData }: FormProps) {
+  let handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -245,4 +245,4 @@ export const TripPlannerForm = ({ formData, setFormData }: FormProps) => {
       </div>
     </div>
   );
-};
+}
