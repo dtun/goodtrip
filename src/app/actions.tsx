@@ -4,6 +4,7 @@ import { createStreamableValue } from "ai/rsc";
 import { CoreMessage, streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { ReactNode } from "react";
+import { randomBoolean } from "@/lib/utils";
 
 export interface Message {
   role: "user" | "assistant";
@@ -96,10 +97,6 @@ Remember:
 - ALL times must be specific
 - EVERY activity must have a weather backup
 - EVERY restaurant must be a real place`;
-
-function randomBoolean(threshold: number = 0.5) {
-  return Math.random() < threshold;
-}
 
 // Streaming Chat
 export async function continueTextConversation(messages: CoreMessage[]) {
