@@ -22,8 +22,13 @@ Ages: {childrenAges}
 Pace: {pace}
 Budget: {budget}
 
-🌟 QUICK TIPS
-[List 3 specific tips about weather, packing, and timing for this destination/season]
+${
+  // Add a quick tips section if random condition is met
+  randomBoolean()
+    ? `🌟 QUICK TIPS
+[List 3 specific tips about weather, packing, and timing for this destination/season]`
+    : ""
+}
 
 Then for EACH DAY you MUST use this EXACT format:
 
@@ -53,8 +58,13 @@ Then for EACH DAY you MUST use this EXACT format:
   - Duration: [X hours]
 • Weather Backup: [Specific indoor alternative]
 
-😴 REST BREAK (3:30PM-4:30PM):
-[Specific location or activity for downtime]
+${
+  // Add a rest break if random condition is met
+  randomBoolean()
+    ? `😴 REST BREAK (3:30PM-4:30PM):
+[Specific location or activity for downtime]`
+    : ""
+}
 
 🍽️ DINNER (6PM-7:30PM):
 • Recommended: [Specific restaurant name]
@@ -63,10 +73,16 @@ Then for EACH DAY you MUST use this EXACT format:
   - Reservation Needed: [Yes/No]
 • Casual Alternative: [Different restaurant name]
 
-💡 TODAY'S PRO TIPS:
+${
+  // Add a pro tip if random condition is met
+  randomBoolean()
+    ? `💡 TODAY'S PRO TIPS:
 1. [Specific timing or money-saving tip]
 2. [Specific kid-focused tip]
-3. [Specific weather-related tip]
+3. [Specific weather-related tip]`
+    : ""
+}
+
 
 [Repeat this EXACT format for each day]
 
@@ -80,6 +96,10 @@ Remember:
 - ALL times must be specific
 - EVERY activity must have a weather backup
 - EVERY restaurant must be a real place`;
+
+function randomBoolean(threshold: number = 0.5) {
+  return Math.random() < threshold;
+}
 
 // Streaming Chat
 export async function continueTextConversation(messages: CoreMessage[]) {
