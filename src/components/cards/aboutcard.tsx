@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 
-export default function GenUICard() {
+export default function AboutCard() {
   return (
     <div className="max-w-xl mx-auto mt-10">
       <Card>
