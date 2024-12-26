@@ -37,7 +37,7 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
     <div className="w-full">
       <div className="max-w-2xl mx-auto">
         {/* Basic Trip Details */}
-        <div className="border-b-4 border-gray-900 p-8">
+        <div className="py-8">
           <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase">
             Basic Trip Details
           </h2>
@@ -66,27 +66,60 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
               >
                 Trip Duration*
               </label>
-              <select
-                id="duration"
-                name="duration"
-                required
-                value={formData.duration}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-900 focus:border-blue-600 focus:ring-0 text-lg"
-              >
-                <option value="">Select duration</option>
+              <div className="space-y-2">
                 {[2, 3, 4, 5, 6, 7, 10, 14].map((days) => (
-                  <option key={days} value={days}>
-                    {days} days
-                  </option>
+                  <div key={days} className="flex items-center">
+                    <input
+                      type="radio"
+                      id={`duration-${days}`}
+                      name="duration"
+                      value={days}
+                      checked={formData.duration === days.toString()}
+                      onChange={handleChange}
+                      className="sr-only"
+                    />
+                    <div className="relative flex items-center">
+                      <div
+                        className={`
+                        w-5 h-5 border-2 border-gray-900 mr-2
+                        ${
+                          formData.duration === days.toString()
+                            ? "bg-gray-900"
+                            : "bg-white"
+                        }
+                        flex items-center justify-center
+                      `}
+                      >
+                        {formData.duration === days.toString() && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <label
+                        htmlFor={`duration-${days}`}
+                        className="cursor-pointer"
+                      >
+                        {days} days
+                      </label>
+                    </div>
+                  </div>
                 ))}
-              </select>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Travel Group */}
-        <div className="border-b-4 border-gray-900 p-8">
+        <div className="py-8">
           <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase">
             Travel Group
           </h2>
@@ -130,7 +163,7 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
         </div>
 
         {/* Preferences */}
-        <div className="border-b-4 border-gray-900 p-8">
+        <div className="py-8">
           <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase">
             Trip Preferences
           </h2>
@@ -142,19 +175,58 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
               >
                 Budget*
               </label>
-              <select
-                id="budget"
-                name="budget"
-                required
-                value={formData.budget}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-900 focus:border-blue-600 focus:ring-0 text-lg"
-              >
-                <option value="">Select budget range</option>
-                <option value="budget">Budget ($50-150)</option>
-                <option value="moderate">Moderate ($150-300)</option>
-                <option value="luxury">Luxury ($300+)</option>
-              </select>
+              <div className="space-y-2">
+                {[
+                  { value: "budget", label: "Budget ($50-150)" },
+                  { value: "moderate", label: "Moderate ($150-300)" },
+                  { value: "luxury", label: "Luxury ($300+)" },
+                ].map((option) => (
+                  <div key={option.value} className="flex items-center">
+                    <input
+                      type="radio"
+                      id={`budget-${option.value}`}
+                      name="budget"
+                      value={option.value}
+                      checked={formData.budget === option.value}
+                      onChange={handleChange}
+                      className="sr-only"
+                    />
+                    <div className="relative flex items-center">
+                      <div
+                        className={`
+                        w-5 h-5 border-2 border-gray-900 mr-2
+                        ${
+                          formData.budget === option.value
+                            ? "bg-gray-900"
+                            : "bg-white"
+                        }
+                        flex items-center justify-center
+                      `}
+                      >
+                        {formData.budget === option.value && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <label
+                        htmlFor={`budget-${option.value}`}
+                        className="cursor-pointer"
+                      >
+                        {option.label}
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
             <div>
               <label
@@ -163,19 +235,61 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
               >
                 Pace*
               </label>
-              <select
-                id="pace"
-                name="pace"
-                required
-                value={formData.pace}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-900 focus:border-blue-600 focus:ring-0 text-lg"
-              >
-                <option value="">Select pace</option>
-                <option value="relaxed">Relaxed - Plenty of downtime</option>
-                <option value="moderate">Moderate - Balanced activities</option>
-                <option value="active">Active - Packed schedule</option>
-              </select>
+              <div className="space-y-2">
+                {[
+                  { value: "relaxed", label: "Relaxed - Plenty of downtime" },
+                  {
+                    value: "moderate",
+                    label: "Moderate - Balanced activities",
+                  },
+                  { value: "active", label: "Active - Packed schedule" },
+                ].map((option) => (
+                  <div key={option.value} className="flex items-center">
+                    <input
+                      type="radio"
+                      id={`pace-${option.value}`}
+                      name="pace"
+                      value={option.value}
+                      checked={formData.pace === option.value}
+                      onChange={handleChange}
+                      className="sr-only"
+                    />
+                    <div className="relative flex items-center">
+                      <div
+                        className={`
+                        w-5 h-5 border-2 border-gray-900 mr-2
+                        ${
+                          formData.pace === option.value
+                            ? "bg-gray-900"
+                            : "bg-white"
+                        }
+                        flex items-center justify-center
+                      `}
+                      >
+                        {formData.pace === option.value && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <label
+                        htmlFor={`pace-${option.value}`}
+                        className="cursor-pointer"
+                      >
+                        {option.label}
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
             <div>
               <label
@@ -184,26 +298,60 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
               >
                 Season*
               </label>
-              <select
-                id="season"
-                name="season"
-                required
-                value={formData.season}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-900 focus:border-blue-600 focus:ring-0 text-lg"
-              >
-                <option value="">Select season</option>
-                <option value="spring">Spring</option>
-                <option value="summer">Summer</option>
-                <option value="fall">Fall</option>
-                <option value="winter">Winter</option>
-              </select>
+              <div className="space-y-2">
+                {["spring", "summer", "fall", "winter"].map((season) => (
+                  <div key={season} className="flex items-center">
+                    <input
+                      type="radio"
+                      id={`season-${season}`}
+                      name="season"
+                      value={season}
+                      checked={formData.season === season}
+                      onChange={handleChange}
+                      className="sr-only"
+                    />
+                    <div className="relative flex items-center">
+                      <div
+                        className={`
+                        w-5 h-5 border-2 border-gray-900 mr-2
+                        ${
+                          formData.season === season
+                            ? "bg-gray-900"
+                            : "bg-white"
+                        }
+                        flex items-center justify-center
+                      `}
+                      >
+                        {formData.season === season && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <label
+                        htmlFor={`season-${season}`}
+                        className="cursor-pointer"
+                      >
+                        {season.charAt(0).toUpperCase() + season.slice(1)}
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Additional Information */}
-        <div className="p-8">
+        <div className="py-8">
           <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase">
             Additional Details
           </h2>
