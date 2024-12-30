@@ -1,6 +1,6 @@
 "use client";
-// Form.tsx
-import React, { FormEvent } from "react";
+
+import React from "react";
 
 export interface TripFormData {
   destination: string;
@@ -17,7 +17,6 @@ export interface TripFormData {
 interface FormProps {
   formData: TripFormData;
   setFormData: React.Dispatch<React.SetStateAction<TripFormData>>;
-  handleSubmit?: (e: FormEvent) => void;
 }
 
 export function TripPlannerForm({ formData, setFormData }: FormProps) {
