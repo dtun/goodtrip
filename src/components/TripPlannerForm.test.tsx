@@ -4,9 +4,9 @@ import { TripPlannerForm } from "./TripPlannerForm";
 import type { TripFormData } from "./TripPlannerForm";
 
 describe("TripPlannerForm", () => {
-  const mockSetFormData = vi.fn();
-  const mockHandleSubmit = vi.fn();
-  const defaultFormData: TripFormData = {
+  let mockSetFormData = vi.fn();
+  let mockHandleSubmit = vi.fn();
+  let defaultFormData: TripFormData = {
     destination: "",
     duration: "",
     numChildren: "",
@@ -47,7 +47,7 @@ describe("TripPlannerForm", () => {
       />
     );
 
-    const destinationInput = screen.getByLabelText(
+    let destinationInput = screen.getByLabelText(
       "Destination (US City/State)*"
     );
     fireEvent.change(destinationInput, { target: { value: "New York" } });
@@ -57,10 +57,10 @@ describe("TripPlannerForm", () => {
     expect(mockSetFormData).toHaveBeenCalledOnce();
 
     // Get the function that was passed to mockSetFormData
-    const updaterFn = mockSetFormData.mock.calls[0][0];
+    let updaterFn = mockSetFormData.mock.calls[0][0];
 
     // Call the updater function with the previous state
-    const newState = updaterFn(defaultFormData);
+    let newState = updaterFn(defaultFormData);
 
     // Now we can make assertions about the new state
     expect(newState).toEqual({
@@ -78,7 +78,7 @@ describe("TripPlannerForm", () => {
       />
     );
 
-    const durationOption = screen.getByLabelText("7 days");
+    let durationOption = screen.getByLabelText("7 days");
     fireEvent.click(durationOption);
 
     expect(mockSetFormData).toHaveBeenCalledOnce();
@@ -93,7 +93,7 @@ describe("TripPlannerForm", () => {
       />
     );
 
-    const budgetOption = screen.getByLabelText("Moderate ($150-300)");
+    let budgetOption = screen.getByLabelText("Moderate ($150-300)");
     fireEvent.click(budgetOption);
 
     expect(mockSetFormData).toHaveBeenCalledOnce();
@@ -108,7 +108,7 @@ describe("TripPlannerForm", () => {
       />
     );
 
-    const mobilityTextarea = screen.getByLabelText("Mobility Requirements");
+    let mobilityTextarea = screen.getByLabelText("Mobility Requirements");
     fireEvent.change(mobilityTextarea, {
       target: { value: "Wheelchair accessible" },
     });
@@ -118,7 +118,7 @@ describe("TripPlannerForm", () => {
 
   it("correctly updates form state", () => {
     let currentFormData = { ...defaultFormData };
-    const setFormData = vi.fn((updater) => {
+    let setFormData = vi.fn((updater) => {
       if (typeof updater === "function") {
         currentFormData = updater(currentFormData);
       } else {
@@ -135,7 +135,7 @@ describe("TripPlannerForm", () => {
     );
 
     // Test destination update
-    const destinationInput = screen.getByLabelText(
+    let destinationInput = screen.getByLabelText(
       "Destination (US City/State)*"
     );
     fireEvent.change(destinationInput, { target: { value: "New York" } });
@@ -143,7 +143,7 @@ describe("TripPlannerForm", () => {
   });
 
   it("handles form submission correctly", () => {
-    const mockEvent = { preventDefault: vi.fn() };
+    let mockEvent = { preventDefault: vi.fn() };
     render(
       <TripPlannerForm
         formData={defaultFormData}
