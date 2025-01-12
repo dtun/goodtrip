@@ -26,7 +26,6 @@ export default function Chat() {
   });
 
   let [messages, setMessages] = useState<CoreMessage[]>([]);
-  let [input, setInput] = useState<string>("");
   let clearMessages = () => setMessages([]);
   let clearFormData = () =>
     setFormData({
@@ -61,7 +60,6 @@ export default function Chat() {
       },
     ];
 
-    setInput("");
     let result = await continueTextConversation(newMessages);
     for await (let content of readStreamableValue(result)) {
       setMessages([
