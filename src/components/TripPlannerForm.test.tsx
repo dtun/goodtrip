@@ -5,7 +5,7 @@ import type { TripFormData } from "./TripPlannerForm";
 
 describe("TripPlannerForm", () => {
   const mockSetFormData = vi.fn();
-
+  const mockHandleSubmit = vi.fn();
   const defaultFormData: TripFormData = {
     destination: "",
     duration: "",
@@ -16,6 +16,7 @@ describe("TripPlannerForm", () => {
     season: "",
     mobility: "",
     activities: "",
+    additionalInfo: "",
   };
 
   beforeEach(() => {
@@ -26,6 +27,7 @@ describe("TripPlannerForm", () => {
     render(
       <TripPlannerForm
         formData={defaultFormData}
+        handleSubmit={mockHandleSubmit}
         setFormData={mockSetFormData}
       />
     );
@@ -40,6 +42,7 @@ describe("TripPlannerForm", () => {
     render(
       <TripPlannerForm
         formData={defaultFormData}
+        handleSubmit={mockHandleSubmit}
         setFormData={mockSetFormData}
       />
     );
@@ -70,6 +73,7 @@ describe("TripPlannerForm", () => {
     render(
       <TripPlannerForm
         formData={defaultFormData}
+        handleSubmit={mockHandleSubmit}
         setFormData={mockSetFormData}
       />
     );
@@ -84,6 +88,7 @@ describe("TripPlannerForm", () => {
     render(
       <TripPlannerForm
         formData={defaultFormData}
+        handleSubmit={mockHandleSubmit}
         setFormData={mockSetFormData}
       />
     );
@@ -98,6 +103,7 @@ describe("TripPlannerForm", () => {
     render(
       <TripPlannerForm
         formData={defaultFormData}
+        handleSubmit={mockHandleSubmit}
         setFormData={mockSetFormData}
       />
     );
@@ -121,7 +127,11 @@ describe("TripPlannerForm", () => {
     });
 
     render(
-      <TripPlannerForm formData={currentFormData} setFormData={setFormData} />
+      <TripPlannerForm
+        formData={currentFormData}
+        handleSubmit={mockHandleSubmit}
+        setFormData={setFormData}
+      />
     );
 
     // Test destination update
@@ -130,5 +140,21 @@ describe("TripPlannerForm", () => {
     );
     fireEvent.change(destinationInput, { target: { value: "New York" } });
     expect(setFormData).toHaveBeenCalled();
+  });
+
+  it("handles form submission correctly", () => {
+    const mockEvent = { preventDefault: vi.fn() };
+    render(
+      <TripPlannerForm
+        formData={defaultFormData}
+        handleSubmit={mockHandleSubmit}
+        setFormData={mockSetFormData}
+      />
+    );
+
+    fireEvent.submit(screen.getByRole("form"));
+
+    expect(mockHandleSubmit).toHaveBeenCalledOnce();
+    expect(mockEvent.preventDefault).toHaveBeenCalledTimes(0); // The preventDefault is handled internally
   });
 });
