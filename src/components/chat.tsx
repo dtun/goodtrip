@@ -42,19 +42,11 @@ export default function Chat() {
   let handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
-    let { additionalInfo, ...formDataWithoutAdditionalInfo } = formData;
     let newMessages: CoreMessage[] = [
       ...messages,
       {
         role: "user",
-        content: JSON.stringify(
-          {
-            input: additionalInfo,
-            formData: formDataWithoutAdditionalInfo,
-          },
-          null,
-          2
-        ), // Pretty print JSON for better readability
+        content: JSON.stringify({ formData }, null, 2), // Pretty print JSON for better readability
       },
     ];
 
