@@ -1,21 +1,19 @@
-"use client";
-
-import React from "react";
+import { type FormEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { IconArrowUp } from "@/components/ui/icons";
 
-interface FormProps {
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}
-
-export function TripPlannerForm({ handleSubmit }: FormProps) {
+export function TripPlannerForm({
+  handleSubmit,
+}: {
+  handleSubmit: (e: FormEvent<HTMLFormElement>) => void;
+}) {
   return (
     <form
       className="w-full max-w-xl mx-auto"
+      id="tripPlannerForm"
       onSubmit={handleSubmit}
       role="form"
-      id="tripPlannerForm"
     >
       <div className="w-full">
         <div className="max-w-2xl mx-auto">
