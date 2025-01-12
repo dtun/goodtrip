@@ -5,47 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { IconArrowUp } from "@/components/ui/icons";
 
-export interface TripFormData {
-  destination: string;
-  duration: string;
-  numChildren: string;
-  childrenAges: string;
-  budget: string;
-  pace: string;
-  season: string;
-  mobility: string;
-  activities: string;
-  additionalInfo: string;
-}
-
 interface FormProps {
-  formData: TripFormData;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  setFormData: React.Dispatch<React.SetStateAction<TripFormData>>;
 }
 
-export function TripPlannerForm({
-  formData,
-  handleSubmit,
-  setFormData,
-}: FormProps) {
-  let handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    let { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
+export function TripPlannerForm({ handleSubmit }: FormProps) {
   return (
     <form
       className="w-full max-w-xl mx-auto"
       onSubmit={handleSubmit}
       role="form"
+      id="tripPlannerForm"
     >
       <div className="w-full">
         <div className="max-w-2xl mx-auto">
@@ -67,8 +37,6 @@ export function TripPlannerForm({
                   id="destination"
                   name="destination"
                   required
-                  value={formData.destination}
-                  onChange={handleChange}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
               </div>
@@ -79,7 +47,7 @@ export function TripPlannerForm({
                 >
                   Trip Duration*
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-2 px-2">
                   {[2, 3, 4, 5, 6, 7, 10, 14].map((days) => (
                     <div key={days} className="flex items-center">
                       <input
@@ -87,43 +55,14 @@ export function TripPlannerForm({
                         id={`duration-${days}`}
                         name="duration"
                         value={days}
-                        checked={formData.duration === days.toString()}
-                        onChange={handleChange}
-                        className="sr-only"
+                        className="w-4 h-4 rounded-sm border border-input mr-2 accent-foreground"
                       />
-                      <div className="relative flex items-center">
-                        <div
-                          className={`
-                        w-5 h-5 rounded-sm border border-input mr-2
-                        ${
-                          formData.duration === days.toString()
-                            ? "bg-primary border-primary"
-                            : "bg-background"
-                        }
-                        flex items-center justify-center
-                      `}
-                        >
-                          {formData.duration === days.toString() && (
-                            <svg
-                              className="w-3 h-3 text-primary-foreground"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                        <label
-                          htmlFor={`duration-${days}`}
-                          className="text-sm text-foreground cursor-pointer"
-                        >
-                          {days} days
-                        </label>
-                      </div>
+                      <label
+                        htmlFor={`duration-${days}`}
+                        className="text-sm text-foreground cursor-pointer"
+                      >
+                        {days} days
+                      </label>
                     </div>
                   ))}
                 </div>
@@ -150,8 +89,6 @@ export function TripPlannerForm({
                   name="numChildren"
                   min="0"
                   max="10"
-                  value={formData.numChildren}
-                  onChange={handleChange}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
               </div>
@@ -167,8 +104,6 @@ export function TripPlannerForm({
                   id="childrenAges"
                   name="childrenAges"
                   placeholder="e.g., 5, 8, 12"
-                  value={formData.childrenAges}
-                  onChange={handleChange}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
               </div>
@@ -188,7 +123,7 @@ export function TripPlannerForm({
                 >
                   Budget*
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-2 px-2">
                   {[
                     { value: "budget", label: "Budget ($50-150)" },
                     { value: "moderate", label: "Moderate ($150-300)" },
@@ -200,43 +135,14 @@ export function TripPlannerForm({
                         id={`budget-${option.value}`}
                         name="budget"
                         value={option.value}
-                        checked={formData.budget === option.value}
-                        onChange={handleChange}
-                        className="sr-only"
+                        className="w-4 h-4 rounded-sm border border-input mr-2 accent-foreground"
                       />
-                      <div className="relative flex items-center">
-                        <div
-                          className={`
-                        w-5 h-5 rounded-sm border border-input mr-2
-                        ${
-                          formData.budget === option.value
-                            ? "bg-primary border-primary"
-                            : "bg-background"
-                        }
-                        flex items-center justify-center
-                      `}
-                        >
-                          {formData.budget === option.value && (
-                            <svg
-                              className="w-3 h-3 text-primary-foreground"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                        <label
-                          htmlFor={`budget-${option.value}`}
-                          className="text-sm text-foreground cursor-pointer"
-                        >
-                          {option.label}
-                        </label>
-                      </div>
+                      <label
+                        htmlFor={`budget-${option.value}`}
+                        className="text-sm text-foreground cursor-pointer"
+                      >
+                        {option.label}
+                      </label>
                     </div>
                   ))}
                 </div>
@@ -248,7 +154,7 @@ export function TripPlannerForm({
                 >
                   Pace*
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-2 px-2">
                   {[
                     { value: "relaxed", label: "Relaxed - Plenty of downtime" },
                     {
@@ -263,43 +169,14 @@ export function TripPlannerForm({
                         id={`pace-${option.value}`}
                         name="pace"
                         value={option.value}
-                        checked={formData.pace === option.value}
-                        onChange={handleChange}
-                        className="sr-only"
+                        className="w-4 h-4 rounded-sm border border-input mr-2 accent-foreground"
                       />
-                      <div className="relative flex items-center">
-                        <div
-                          className={`
-                        w-5 h-5 rounded-sm border border-input mr-2
-                        ${
-                          formData.pace === option.value
-                            ? "bg-primary border-primary"
-                            : "bg-background"
-                        }
-                        flex items-center justify-center
-                      `}
-                        >
-                          {formData.pace === option.value && (
-                            <svg
-                              className="w-3 h-3 text-primary-foreground"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                        <label
-                          htmlFor={`pace-${option.value}`}
-                          className="text-sm text-foreground cursor-pointer"
-                        >
-                          {option.label}
-                        </label>
-                      </div>
+                      <label
+                        htmlFor={`pace-${option.value}`}
+                        className="text-sm text-foreground cursor-pointer"
+                      >
+                        {option.label}
+                      </label>
                     </div>
                   ))}
                 </div>
@@ -311,7 +188,7 @@ export function TripPlannerForm({
                 >
                   Season*
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-2 px-2">
                   {["spring", "summer", "fall", "winter"].map((season) => (
                     <div key={season} className="flex items-center">
                       <input
@@ -319,43 +196,14 @@ export function TripPlannerForm({
                         id={`season-${season}`}
                         name="season"
                         value={season}
-                        checked={formData.season === season}
-                        onChange={handleChange}
-                        className="sr-only"
+                        className="w-4 h-4 rounded-sm border border-input mr-2 accent-foreground"
                       />
-                      <div className="relative flex items-center">
-                        <div
-                          className={`
-                        w-5 h-5 rounded-sm border border-input mr-2
-                        ${
-                          formData.season === season
-                            ? "bg-primary border-primary"
-                            : "bg-background"
-                        }
-                        flex items-center justify-center
-                      `}
-                        >
-                          {formData.season === season && (
-                            <svg
-                              className="w-3 h-3 text-primary-foreground"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                        <label
-                          htmlFor={`season-${season}`}
-                          className="text-sm text-foreground cursor-pointer"
-                        >
-                          {season.charAt(0).toUpperCase() + season.slice(1)}
-                        </label>
-                      </div>
+                      <label
+                        htmlFor={`season-${season}`}
+                        className="text-sm text-foreground cursor-pointer"
+                      >
+                        {season.charAt(0).toUpperCase() + season.slice(1)}
+                      </label>
                     </div>
                   ))}
                 </div>
@@ -380,8 +228,6 @@ export function TripPlannerForm({
                   id="mobility"
                   name="mobility"
                   placeholder="Any mobility considerations?"
-                  value={formData.mobility}
-                  onChange={handleChange}
                   className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
               </div>
@@ -396,8 +242,6 @@ export function TripPlannerForm({
                   id="activities"
                   name="activities"
                   placeholder="What activities would you like?"
-                  value={formData.activities}
-                  onChange={handleChange}
                   className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
               </div>
@@ -410,8 +254,6 @@ export function TripPlannerForm({
           id="additionalInfo"
           name="additionalInfo"
           type="text"
-          value={formData.additionalInfo}
-          onChange={handleChange}
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mr-2"
           placeholder={`Anything else?`}
         />

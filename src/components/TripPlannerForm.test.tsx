@@ -1,36 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { TripPlannerForm } from "./TripPlannerForm";
-import type { TripFormData } from "./TripPlannerForm";
 
 describe("TripPlannerForm", () => {
-  let mockSetFormData = vi.fn();
-  let mockHandleSubmit = vi.fn();
-  let defaultFormData: TripFormData = {
-    destination: "",
-    duration: "",
-    numChildren: "",
-    childrenAges: "",
-    budget: "",
-    pace: "",
-    season: "",
-    mobility: "",
-    activities: "",
-    additionalInfo: "",
-  };
+  let mockHandleSubmit: any;
 
   beforeEach(() => {
-    mockSetFormData.mockClear();
+    mockHandleSubmit = vi.fn();
   });
 
   it("renders all form sections", () => {
-    render(
-      <TripPlannerForm
-        formData={defaultFormData}
-        handleSubmit={mockHandleSubmit}
-        setFormData={mockSetFormData}
-      />
-    );
+    render(<TripPlannerForm handleSubmit={mockHandleSubmit} />);
 
     expect(screen.getByText("Basic Trip Details")).toBeDefined();
     expect(screen.getByText("Travel Group")).toBeDefined();
@@ -39,73 +19,69 @@ describe("TripPlannerForm", () => {
   });
 
   it("updates destination when input changes", () => {
-    render(
-      <TripPlannerForm
-        formData={defaultFormData}
-        handleSubmit={mockHandleSubmit}
-        setFormData={mockSetFormData}
-      />
-    );
+    render(<TripPlannerForm handleSubmit={mockHandleSubmit} />);
 
-    let destinationInput = screen.getByLabelText(
-      "Destination (US City/State)*"
-    );
+    const destinationInput = screen.getByRole("textbox", {
+      name: "Destination (US City/State)*",
+    });
     fireEvent.change(destinationInput, { target: { value: "New York" } });
 
-    // Check that the mock function was called with an updater function
-    expect(mockSetFormData).toHaveBeenCalledWith(expect.any(Function));
-    expect(mockSetFormData).toHaveBeenCalledOnce();
-
-    // Get the function that was passed to mockSetFormData
-    let updaterFn = mockSetFormData.mock.calls[0][0];
-
-    // Call the updater function with the previous state
-    let newState = updaterFn(defaultFormData);
-
-    // Now we can make assertions about the new state
-    expect(newState).toEqual({
-      ...defaultFormData,
-      destination: "New York",
-    });
+    expect(destinationInput).toHaveValue("New York");
   });
 
   it("selects duration when radio button is clicked", () => {
-    render(
-      <TripPlannerForm
-        formData={defaultFormData}
-        handleSubmit={mockHandleSubmit}
-        setFormData={mockSetFormData}
-      />
-    );
+    render(<TripPlannerForm handleSubmit={mockHandleSubmit} />);
 
     let durationOption = screen.getByLabelText("7 days");
     fireEvent.click(durationOption);
 
-    expect(mockSetFormData).toHaveBeenCalledOnce();
+    expect(durationOption).toBeChecked();
   });
 
   it("updates budget when option is selected", () => {
-    render(
-      <TripPlannerForm
-        formData={defaultFormData}
-        handleSubmit={mockHandleSubmit}
-        setFormData={mockSetFormData}
-      />
-    );
+    render(<TripPlannerForm handleSubmit={mockHandleSubmit} />);
 
     let budgetOption = screen.getByLabelText("Moderate ($150-300)");
     fireEvent.click(budgetOption);
 
-    expect(mockSetFormData).toHaveBeenCalledOnce();
+    expect(budgetOption).toBeChecked();
   });
 
   it("handles textarea input for mobility requirements", () => {
+    render(<TripPlannerForm handleSubmit={mockHandleSubmit} />);
+
+    let mobilityTextarea = screen.getByLabelText("Mobility Requirements");
+    fireEvent.change(mobilityTextarea, {
+      target: { value: "Wheelchair accessible" },
+    });
+
+    expect(mobilityTextarea).toHaveValue("Wheelchair accessible");
+  });
+
+  it("handles form submission correctly", () => {
+    let mockEvent = { preventDefault: vi.fn() };
+    render(<TripPlannerForm handleSubmit={mockHandleSubmit} />);
+
+    fireEvent.submit(screen.getByRole("form"));
+
+    expect(mockHandleSubmit).toHaveBeenCalledOnce();
+    expect(mockEvent.preventDefault).toHaveBeenCalledTimes(0); // The preventDefault is handled internally
+  });
+
+  it("can be reset", () => {
     render(
-      <TripPlannerForm
-        formData={defaultFormData}
-        handleSubmit={mockHandleSubmit}
-        setFormData={mockSetFormData}
-      />
+      <>
+        <TripPlannerForm handleSubmit={mockHandleSubmit} />
+        <button
+          onClick={() =>
+            (
+              document.getElementById("tripPlannerForm") as HTMLFormElement
+            ).reset()
+          }
+        >
+          reset
+        </button>
+      </>
     );
 
     let mobilityTextarea = screen.getByLabelText("Mobility Requirements");
@@ -113,48 +89,12 @@ describe("TripPlannerForm", () => {
       target: { value: "Wheelchair accessible" },
     });
 
-    expect(mockSetFormData).toHaveBeenCalledOnce();
-  });
+    expect(mobilityTextarea).toHaveValue("Wheelchair accessible");
 
-  it("correctly updates form state", () => {
-    let currentFormData = { ...defaultFormData };
-    let setFormData = vi.fn((updater) => {
-      if (typeof updater === "function") {
-        currentFormData = updater(currentFormData);
-      } else {
-        currentFormData = updater;
-      }
-    });
+    // Find and click the reset button
+    const resetButton = screen.getByRole("button", { name: /reset/i });
+    fireEvent.click(resetButton);
 
-    render(
-      <TripPlannerForm
-        formData={currentFormData}
-        handleSubmit={mockHandleSubmit}
-        setFormData={setFormData}
-      />
-    );
-
-    // Test destination update
-    let destinationInput = screen.getByLabelText(
-      "Destination (US City/State)*"
-    );
-    fireEvent.change(destinationInput, { target: { value: "New York" } });
-    expect(setFormData).toHaveBeenCalled();
-  });
-
-  it("handles form submission correctly", () => {
-    let mockEvent = { preventDefault: vi.fn() };
-    render(
-      <TripPlannerForm
-        formData={defaultFormData}
-        handleSubmit={mockHandleSubmit}
-        setFormData={mockSetFormData}
-      />
-    );
-
-    fireEvent.submit(screen.getByRole("form"));
-
-    expect(mockHandleSubmit).toHaveBeenCalledOnce();
-    expect(mockEvent.preventDefault).toHaveBeenCalledTimes(0); // The preventDefault is handled internally
+    expect(mobilityTextarea).toHaveValue("");
   });
 });

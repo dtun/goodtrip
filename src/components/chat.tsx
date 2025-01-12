@@ -5,48 +5,25 @@ import { useState } from "react";
 import { continueTextConversation } from "@/app/actions";
 import { readStreamableValue } from "ai/rsc";
 import { Button } from "@/components/ui/button";
-import { TripFormData, TripPlannerForm } from "./TripPlannerForm";
+import { TripPlannerForm } from "./TripPlannerForm";
 
 export let maxDuration = 30;
 
 export default function Chat() {
-  let [formData, setFormData] = useState<TripFormData>({
-    destination: "",
-    duration: "",
-    numChildren: "",
-    childrenAges: "",
-    budget: "",
-    pace: "",
-    season: "",
-    mobility: "",
-    activities: "",
-    additionalInfo: "",
-  });
-
   let [messages, setMessages] = useState<CoreMessage[]>([]);
   let clearMessages = () => setMessages([]);
   let clearFormData = () =>
-    setFormData({
-      destination: "",
-      duration: "",
-      numChildren: "",
-      childrenAges: "",
-      budget: "",
-      pace: "",
-      season: "",
-      mobility: "",
-      activities: "",
-      additionalInfo: "",
-    });
-
+    (document.querySelector("#tripPlannerForm") as HTMLFormElement)?.reset();
   let handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
+    let formData = new FormData(e?.target as HTMLFormElement);
+    let formDataObject = Object.fromEntries(formData.entries());
     let newMessages: CoreMessage[] = [
       ...messages,
       {
         role: "user",
-        content: JSON.stringify({ formData }),
+        content: JSON.stringify({ formData: formDataObject }),
       },
     ];
 
@@ -92,13 +69,7 @@ export default function Chat() {
           </div>
         )}
       </div>
-      {!messages.length && (
-        <TripPlannerForm
-          formData={formData}
-          handleSubmit={handleSubmit}
-          setFormData={setFormData}
-        />
-      )}
+      {!messages.length && <TripPlannerForm handleSubmit={handleSubmit} />}
     </div>
   );
 }
