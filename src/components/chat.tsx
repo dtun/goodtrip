@@ -46,7 +46,7 @@ export default function Chat() {
       ...messages,
       {
         role: "user",
-        content: JSON.stringify({ formData }, null, 2), // Pretty print JSON for better readability
+        content: JSON.stringify({ formData }),
       },
     ];
 
