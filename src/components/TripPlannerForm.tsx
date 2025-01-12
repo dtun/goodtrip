@@ -36,15 +36,15 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
     <div className="w-full">
       <div className="max-w-2xl mx-auto">
         {/* Basic Trip Details */}
-        <div className="py-8">
-          <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase">
+        <div className="py-6">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">
             Basic Trip Details
           </h2>
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
               <label
                 htmlFor="destination"
-                className="block text-sm font-bold text-gray-900 uppercase tracking-wide mb-2"
+                className="block text-sm font-medium text-foreground mb-1.5"
               >
                 Destination (US City/State)*
               </label>
@@ -55,13 +55,13 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                 required
                 value={formData.destination}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-900 focus:border-blue-600 focus:ring-0 text-lg"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
             <div>
               <label
                 htmlFor="duration"
-                className="block text-sm font-bold text-gray-900 uppercase tracking-wide mb-2"
+                className="block text-sm font-medium text-foreground mb-1.5"
               >
                 Trip Duration*
               </label>
@@ -80,18 +80,18 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                     <div className="relative flex items-center">
                       <div
                         className={`
-                        w-5 h-5 border-2 border-gray-900 mr-2
+                        w-5 h-5 rounded-sm border border-input mr-2
                         ${
                           formData.duration === days.toString()
-                            ? "bg-gray-900"
-                            : "bg-white"
+                            ? "bg-primary border-primary"
+                            : "bg-background"
                         }
                         flex items-center justify-center
                       `}
                       >
                         {formData.duration === days.toString() && (
                           <svg
-                            className="w-3 h-3 text-white"
+                            className="w-3 h-3 text-primary-foreground"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                           >
@@ -105,7 +105,7 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                       </div>
                       <label
                         htmlFor={`duration-${days}`}
-                        className="cursor-pointer"
+                        className="text-sm text-foreground cursor-pointer"
                       >
                         {days} days
                       </label>
@@ -118,15 +118,15 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
         </div>
 
         {/* Travel Group */}
-        <div className="py-8">
-          <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase">
+        <div className="py-6">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">
             Travel Group
           </h2>
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
               <label
                 htmlFor="numChildren"
-                className="block text-sm font-bold text-gray-900 uppercase tracking-wide mb-2"
+                className="block text-sm font-medium text-foreground mb-1.5"
               >
                 Number of Children
               </label>
@@ -138,13 +138,13 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                 max="10"
                 value={formData.numChildren}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-900 focus:border-blue-600 focus:ring-0 text-lg"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
             <div>
               <label
                 htmlFor="childrenAges"
-                className="block text-sm font-bold text-gray-900 uppercase tracking-wide mb-2"
+                className="block text-sm font-medium text-foreground mb-1.5"
               >
                 {`Children's Ages`}
               </label>
@@ -155,22 +155,22 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                 placeholder="e.g., 5, 8, 12"
                 value={formData.childrenAges}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-900 focus:border-blue-600 focus:ring-0 text-lg"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
           </div>
         </div>
 
         {/* Preferences */}
-        <div className="py-8">
-          <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase">
+        <div className="py-6">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">
             Trip Preferences
           </h2>
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
               <label
                 htmlFor="budget"
-                className="block text-sm font-bold text-gray-900 uppercase tracking-wide mb-2"
+                className="block text-sm font-medium text-foreground mb-1.5"
               >
                 Budget*
               </label>
@@ -193,18 +193,18 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                     <div className="relative flex items-center">
                       <div
                         className={`
-                        w-5 h-5 border-2 border-gray-900 mr-2
+                        w-5 h-5 rounded-sm border border-input mr-2
                         ${
                           formData.budget === option.value
-                            ? "bg-gray-900"
-                            : "bg-white"
+                            ? "bg-primary border-primary"
+                            : "bg-background"
                         }
                         flex items-center justify-center
                       `}
                       >
                         {formData.budget === option.value && (
                           <svg
-                            className="w-3 h-3 text-white"
+                            className="w-3 h-3 text-primary-foreground"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                           >
@@ -218,7 +218,7 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                       </div>
                       <label
                         htmlFor={`budget-${option.value}`}
-                        className="cursor-pointer"
+                        className="text-sm text-foreground cursor-pointer"
                       >
                         {option.label}
                       </label>
@@ -230,7 +230,7 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
             <div>
               <label
                 htmlFor="pace"
-                className="block text-sm font-bold text-gray-900 uppercase tracking-wide mb-2"
+                className="block text-sm font-medium text-foreground mb-1.5"
               >
                 Pace*
               </label>
@@ -256,18 +256,18 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                     <div className="relative flex items-center">
                       <div
                         className={`
-                        w-5 h-5 border-2 border-gray-900 mr-2
+                        w-5 h-5 rounded-sm border border-input mr-2
                         ${
                           formData.pace === option.value
-                            ? "bg-gray-900"
-                            : "bg-white"
+                            ? "bg-primary border-primary"
+                            : "bg-background"
                         }
                         flex items-center justify-center
                       `}
                       >
                         {formData.pace === option.value && (
                           <svg
-                            className="w-3 h-3 text-white"
+                            className="w-3 h-3 text-primary-foreground"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                           >
@@ -281,7 +281,7 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                       </div>
                       <label
                         htmlFor={`pace-${option.value}`}
-                        className="cursor-pointer"
+                        className="text-sm text-foreground cursor-pointer"
                       >
                         {option.label}
                       </label>
@@ -293,7 +293,7 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
             <div>
               <label
                 htmlFor="season"
-                className="block text-sm font-bold text-gray-900 uppercase tracking-wide mb-2"
+                className="block text-sm font-medium text-foreground mb-1.5"
               >
                 Season*
               </label>
@@ -312,18 +312,18 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                     <div className="relative flex items-center">
                       <div
                         className={`
-                        w-5 h-5 border-2 border-gray-900 mr-2
+                        w-5 h-5 rounded-sm border border-input mr-2
                         ${
                           formData.season === season
-                            ? "bg-gray-900"
-                            : "bg-white"
+                            ? "bg-primary border-primary"
+                            : "bg-background"
                         }
                         flex items-center justify-center
                       `}
                       >
                         {formData.season === season && (
                           <svg
-                            className="w-3 h-3 text-white"
+                            className="w-3 h-3 text-primary-foreground"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                           >
@@ -337,7 +337,7 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                       </div>
                       <label
                         htmlFor={`season-${season}`}
-                        className="cursor-pointer"
+                        className="text-sm text-foreground cursor-pointer"
                       >
                         {season.charAt(0).toUpperCase() + season.slice(1)}
                       </label>
@@ -350,15 +350,15 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
         </div>
 
         {/* Additional Information */}
-        <div className="py-8">
-          <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase">
+        <div className="py-6">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">
             Additional Details
           </h2>
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
               <label
                 htmlFor="mobility"
-                className="block text-sm font-bold text-gray-900 uppercase tracking-wide mb-2"
+                className="block text-sm font-medium text-foreground mb-1.5"
               >
                 Mobility Requirements
               </label>
@@ -368,13 +368,13 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                 placeholder="Any mobility considerations?"
                 value={formData.mobility}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-900 focus:border-blue-600 focus:ring-0 text-lg h-24"
+                className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
             <div>
               <label
                 htmlFor="activities"
-                className="block text-sm font-bold text-gray-900 uppercase tracking-wide mb-2"
+                className="block text-sm font-medium text-foreground mb-1.5"
               >
                 Must-Have Activities
               </label>
@@ -384,7 +384,7 @@ export function TripPlannerForm({ formData, setFormData }: FormProps) {
                 placeholder="What activities would you like?"
                 value={formData.activities}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-900 focus:border-blue-600 focus:ring-0 text-lg h-24"
+                className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
           </div>

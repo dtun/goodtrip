@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { type CoreMessage } from "ai";
 import { useState } from "react";
 import { continueTextConversation } from "@/app/actions";
@@ -106,22 +105,20 @@ export default function Chat() {
         <form onSubmit={handleSubmit}>
           <div className="w-full max-w-xl mx-auto">
             <TripPlannerForm formData={formData} setFormData={setFormData} />
-            <Card className="my-4 p-2">
-              <div className="flex">
-                <Input
-                  type="text"
-                  value={input}
-                  onChange={(event) => {
-                    setInput(event.target.value);
-                  }}
-                  className="w-[95%] mr-2 border-0 ring-offset-0 focus-visible:ring-0 focus-visible:outline-none focus:outline-none focus:ring-0 ring-0 focus-visible:border-none border-transparent focus:border-transparent focus-visible:ring-none"
-                  placeholder={`Anything else?`}
-                />
-                <Button>
-                  <IconArrowUp />
-                </Button>
-              </div>
-            </Card>
+            <div className="flex">
+              <Input
+                type="text"
+                value={input}
+                onChange={(event) => {
+                  setInput(event.target.value);
+                }}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mr-2"
+                placeholder={`Anything else?`}
+              />
+              <Button>
+                <IconArrowUp />
+              </Button>
+            </div>
           </div>
         </form>
       )}
