@@ -4,9 +4,7 @@ import { type CoreMessage } from "ai";
 import { useState } from "react";
 import { continueTextConversation } from "@/app/actions";
 import { readStreamableValue } from "ai/rsc";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { IconArrowUp } from "@/components/ui/icons";
 import { TripFormData, TripPlannerForm } from "./TripPlannerForm";
 
 export let maxDuration = 30;
