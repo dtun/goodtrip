@@ -3,9 +3,12 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/header";
 
+// Next.js requires font loader calls to be assigned to const declarations
+// to ensure consistent font loading and optimization across the application.
+// Using 'let' or 'var' will trigger the error: "Font loader calls must be assigned to a const"
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
+export let metadata: Metadata = {
   title: "GoodTrip",
   description: "Your Adventure, AI Perfected",
 };

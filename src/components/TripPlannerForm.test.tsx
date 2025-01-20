@@ -21,7 +21,7 @@ describe("TripPlannerForm", () => {
   it("updates destination when input changes", () => {
     render(<TripPlannerForm handleSubmit={mockHandleSubmit} />);
 
-    const destinationInput = screen.getByRole("textbox", {
+    let destinationInput = screen.getByRole("textbox", {
       name: "Destination (US City/State)*",
     });
     fireEvent.change(destinationInput, { target: { value: "New York" } });
@@ -92,7 +92,7 @@ describe("TripPlannerForm", () => {
     expect(mobilityTextarea).toHaveValue("Wheelchair accessible");
 
     // Find and click the reset button
-    const resetButton = screen.getByRole("button", { name: /reset/i });
+    let resetButton = screen.getByRole("button", { name: /reset/i });
     fireEvent.click(resetButton);
 
     expect(mobilityTextarea).toHaveValue("");
