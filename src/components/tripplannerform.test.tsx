@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { TripPlannerForm } from "./TripPlannerForm";
+import { TripPlannerForm } from "./tripplannerform";
 
 describe("TripPlannerForm", () => {
   let mockHandleSubmit: any;

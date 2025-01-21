@@ -5,7 +5,7 @@ import { useState } from "react";
 import { continueTextConversation } from "@/app/actions";
 import { readStreamableValue } from "ai/rsc";
 import { Button } from "@/components/ui/button";
-import { TripPlannerForm } from "./TripPlannerForm";
+import { TripPlannerForm } from "@/components/tripplannerform";
 
 export let maxDuration = 30;
 
