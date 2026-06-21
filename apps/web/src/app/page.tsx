@@ -210,13 +210,6 @@ export default function Home() {
               </div>
             ))}
           </dl>
-
-          <div
-            className="reveal mt-10"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <ShareBar />
-          </div>
         </section>
 
         {/* ════════ ACT I · THE TRIP ════════ */}
@@ -389,12 +382,15 @@ export default function Home() {
         {/* ── Footer ────────────────────────────────────────── */}
         <footer className="relative z-10 border-t border-cream/10">
           <Cheatline className="mx-auto w-full max-w-none rounded-none" />
-          <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6 py-12 text-center">
+          <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 py-14 text-center">
             <CompassRose className="h-8 w-8 text-gold" />
             <p className="font-display text-xl italic text-cream">
               Have a GOOD trip.
             </p>
-            <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
+
+            <ShareBar />
+
+            <p className="mt-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
               <MapPin className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
               GOODTrip · Spec v0.1 · Collaborative AI itineraries
             </p>
