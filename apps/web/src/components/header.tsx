@@ -1,27 +1,24 @@
-import * as React from "react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
-import { IconSeparator } from "@/components/ui/icons";
-import EnvCard from "./cards/envcard";
+import { Compass } from "lucide-react";
 
-export async function Header() {
+export function Header() {
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between w-full h-16 px-4 border-b shrink-0 bg-white">
-      <EnvCard />
-      <Link href="/" rel="nofollow" className="mr-2 font-bold">
-        GoodTrip
-      </Link>
-      <IconSeparator />
+    <header className="sticky top-0 z-50 flex h-16 w-full shrink-0 items-center justify-between border-b border-[#E0E0E0] bg-white/80 px-6 backdrop-blur">
       <Link
-        href="/about"
-        className={cn(
-          buttonVariants({ variant: "link" }),
-          "mr-auto font-normal"
-        )}
+        href="/"
+        className="flex items-center gap-2 font-bold text-[#3C3B6E]"
       >
-        <span className="md:flex">About</span>
+        <Compass className="h-5 w-5" />
+        GOODTrip
       </Link>
+      <a
+        href="https://github.com/dtun/goodtrip"
+        target="_blank"
+        rel="noreferrer noopener"
+        className="text-sm font-medium text-[#666666] transition-colors hover:text-[#3C3B6E]"
+      >
+        GitHub
+      </a>
     </header>
   );
 }

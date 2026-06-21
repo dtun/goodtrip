@@ -9,8 +9,9 @@ import { Header } from "@/components/header";
 const inter = Inter({ subsets: ["latin"] });
 
 export let metadata: Metadata = {
-  title: "GoodTrip",
-  description: "Your Adventure, AI Perfected",
+  title: "GOODTrip — Have a GOOD trip.",
+  description:
+    "A collaborative, AI-assisted travel itinerary app for small groups. v1.0 plan overview.",
 };
 
 export default function RootLayout({
@@ -22,9 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Header />
-        <main className="bg-muted/50 flex h-100vh flex-1 flex-col">
-          {children}
-        </main>
+        <main className="flex flex-1 flex-col bg-[#F8F8F8]">{children}</main>
       </body>
     </html>
   );
