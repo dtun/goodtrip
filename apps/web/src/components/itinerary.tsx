@@ -1,122 +1,175 @@
-import { ExternalLink } from "lucide-react";
-import { DAYS, TRIP, type Activity } from "@/lib/trip";
+import { ExternalLink, Check } from "lucide-react";
+import { DAYS, TRIP, type Activity, type DayPlan } from "@/lib/trip";
 import { CompassRose } from "@/components/compass-rose";
 import { PrintButton } from "@/components/print-button";
 
 const MEMBERS_LINE = "Danny · Ellen · Jack · Eva · Elizabeth · Elisha · GG · Papa";
 
+const COLOPHON: [string, string][] = [
+  ["Dates", "Jul 21–29 ’26"],
+  ["Party", "Family of 8"],
+  ["Lodging", "Residence Inn"],
+  ["Transit", "McPherson Sq"],
+];
+
 function prettyUrl(u: string) {
   return u.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/$/, "");
 }
 
-/* ── The on-screen boarding-pass itinerary ───────────────────── */
+function costTone(cost?: string) {
+  if (!cost || cost === "—") return null;
+  return cost === "Free" ? "text-cream-muted" : "text-gold/90";
+}
 
-function TicketRow({ a }: { a: Activity }) {
+/* ── The on-screen editorial programme ───────────────────────── */
+
+function ActivityRow({ a }: { a: Activity }) {
+  const tone = costTone(a.cost);
   return (
-    <div className="flex gap-4 py-2.5">
-      <span className="w-16 shrink-0 pt-0.5 font-mono text-[11px] uppercase tracking-tight text-gold/80">
+    <li className="flex gap-4 py-4 first:pt-3">
+      <span className="w-12 shrink-0 pt-1 font-mono text-[11px] uppercase leading-tight tracking-tight text-gold/70">
         {a.time}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-[15px] leading-snug text-cream">{a.title}</p>
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-[15px] font-medium leading-snug text-cream">
+            {a.title}
+          </p>
+          {tone && (
+            <span className={`shrink-0 font-mono text-[11px] tracking-wide ${tone}`}>
+              {a.cost}
+            </span>
+          )}
+        </div>
         {a.location && (
-          <p className="mt-0.5 text-xs leading-snug text-cream-muted">
+          <p className="mt-1 text-xs leading-snug text-cream-muted">
             {a.location}
           </p>
         )}
-        {(a.url || a.code) && (
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        {(a.url || a.code || a.confirmed) && (
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5">
             {a.url && (
               <a
                 href={a.url}
                 target="_blank"
                 rel="noreferrer noopener"
                 aria-label={`${a.cta ?? "Book"}: ${a.title} (opens in a new tab)`}
-                className="inline-flex items-center gap-1 rounded-full border border-gold/40 bg-gold/10 px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-gold transition-colors hover:bg-gold hover:text-ink"
+                className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-gold underline decoration-gold/30 underline-offset-[5px] transition-colors hover:text-gold-bright hover:decoration-gold"
               >
                 {a.cta ?? "Book"}
                 <ExternalLink className="h-3 w-3" aria-hidden="true" />
               </a>
             )}
             {a.code && (
-              <span className="font-mono text-[10px] uppercase tracking-wide text-cream-muted">
-                code <span className="font-semibold text-gold">{a.code}</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-cream-muted">
+                Code <span className="font-semibold text-gold">{a.code}</span>
+              </span>
+            )}
+            {a.confirmed && (
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-gold">
+                <Check className="h-3 w-3" aria-hidden="true" />
+                {a.confirmedNote ?? "Confirmed"}
               </span>
             )}
           </div>
         )}
       </div>
-      <div className="flex shrink-0 flex-col items-end gap-1">
-        {a.cost && a.cost !== "—" && (
-          <span className="whitespace-nowrap rounded-sm border border-cream/15 px-1.5 py-0.5 font-mono text-[10px] text-cream-muted">
-            {a.cost}
-          </span>
-        )}
-        {a.confirmed && (
-          <span className="-rotate-6 select-none whitespace-nowrap rounded-sm bg-flag px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-white">
-            Confirmed
-          </span>
-        )}
+    </li>
+  );
+}
+
+function DaySection({ d }: { d: DayPlan }) {
+  const tone = costTone(d.cost);
+  return (
+    <section className="flex gap-5 sm:gap-8">
+      {/* numeral anchor */}
+      <div className="w-12 shrink-0 pt-1 text-right sm:w-16">
+        <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-gold/50">
+          Day
+        </span>
+        <span className="block font-display leading-[0.8] text-gold [font-size:clamp(2.25rem,7vw,3.25rem)]">
+          {String(d.n).padStart(2, "0")}
+        </span>
       </div>
-    </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline justify-between gap-3 border-b border-gold/15 pb-3">
+          <div className="min-w-0">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
+              {d.dow} · {d.date}
+            </p>
+            <h3 className="mt-1.5 font-display text-2xl leading-tight text-cream">
+              {d.title}
+            </h3>
+          </div>
+          {tone && (
+            <span className={`shrink-0 font-mono text-xs uppercase tracking-[0.15em] ${tone}`}>
+              {d.cost}
+            </span>
+          )}
+        </div>
+        <ul className="divide-y divide-cream/[0.08]">
+          {d.activities.map((a, i) => (
+            <ActivityRow key={i} a={a} />
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }
 
 export function ItineraryTicket() {
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="overflow-hidden rounded-2xl border border-gold/25 bg-ink-800/80 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)] backdrop-blur">
-        {/* header */}
-        <div className="flex items-start justify-between gap-4 border-b border-gold/20 px-6 py-5">
-          <div className="min-w-0">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/70">
-              Itinerary · Jul 21–29 ’26
-            </p>
-            <p className="mt-1 font-display text-xl text-cream">{TRIP.name}</p>
-            <p className="mt-1.5 text-xs text-cream-muted">{TRIP.hotel}</p>
-            <p className="mt-0.5 text-[11px] text-cream-muted">{MEMBERS_LINE}</p>
-          </div>
-          <div className="flex shrink-0 flex-col items-end gap-3">
-            <CompassRose className="h-10 w-10 text-gold" />
-            <PrintButton />
-          </div>
+      <div className="rounded-[1.75rem] border border-gold/20 bg-ink-800/60 px-6 py-12 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)] backdrop-blur sm:px-14 sm:py-14">
+        {/* masthead */}
+        <header className="text-center">
+          <CompassRose className="mx-auto h-10 w-10 text-gold" />
+          <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.5em] text-gold/70">
+            The Itinerary
+          </p>
+          <h2 className="mt-4 font-display text-4xl leading-none text-cream sm:text-5xl">
+            {TRIP.destination}
+          </h2>
+          <p className="mt-3 font-display text-lg italic text-cream/80">
+            {TRIP.name} · July 21–29, 2026
+          </p>
+        </header>
+
+        {/* colophon */}
+        <dl className="mt-9 grid grid-cols-2 gap-y-5 border-y border-gold/15 py-5 text-center sm:grid-cols-4 sm:divide-x sm:divide-gold/15">
+          {COLOPHON.map(([k, v]) => (
+            <div key={k} className="px-2">
+              <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/60">
+                {k}
+              </dt>
+              <dd className="mt-1.5 text-sm text-cream">{v}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="mt-7 flex justify-center">
+          <PrintButton />
         </div>
 
-        {/* perforation */}
-        <div className="dotrule h-0.5 text-gold/40" />
+        {/* ornamental divider */}
+        <div className="my-12 flex items-center justify-center gap-4 text-gold/50">
+          <span className="h-px w-16 bg-gradient-to-r from-transparent to-gold/40" />
+          <CompassRose className="h-4 w-4 text-gold/60" />
+          <span className="h-px w-16 bg-gradient-to-l from-transparent to-gold/40" />
+        </div>
 
-        {/* days */}
-        <div className="px-6 py-4">
+        {/* programme */}
+        <div className="space-y-12">
           {DAYS.map((d) => (
-            <div key={d.n} className="pt-3 first:pt-1">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span className="font-mono text-xs font-semibold tracking-[0.15em] text-gold">
-                  DAY {String(d.n).padStart(2, "0")}
-                </span>
-                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-cream-muted">
-                  {d.dow} {d.date}
-                </span>
-                <span className="font-display text-[15px] text-cream">
-                  {d.title}
-                </span>
-                <span className="ml-auto whitespace-nowrap rounded-sm border border-gold/25 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-gold/80">
-                  {d.cost}
-                </span>
-              </div>
-              <div className="mb-1 mt-2 h-px bg-gold/12" />
-              <div className="divide-y divide-cream/5">
-                {d.activities.map((a, i) => (
-                  <TicketRow key={i} a={a} />
-                ))}
-              </div>
-            </div>
+            <DaySection key={d.n} d={d} />
           ))}
         </div>
 
-        {/* footer — livery cheatline */}
-        <div className="flex items-center gap-3 border-t border-gold/20 px-6 py-3">
+        {/* dateline / livery cheatline */}
+        <div className="mt-14 flex items-center gap-3">
           <span className="h-1 flex-1 rounded-full bg-gradient-to-r from-[#3C3B6E] via-flag to-gold" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cream-muted">
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-cream-muted">
             Have a GOOD trip
           </span>
         </div>
@@ -132,10 +185,10 @@ export function PrintableItinerary() {
     <div className="hidden bg-white px-10 py-8 text-black print:block">
       <header className="border-b-2 border-black pb-3">
         <h1 className="text-2xl font-bold">Washington, D.C.</h1>
-        <p className="text-sm">America’s 250th Birthday Family Trip · July 21–29, 2026</p>
-        <p className="mt-1 text-xs">
-          {TRIP.hotel.replace(/ · /g, " — ")}
+        <p className="text-sm">
+          America’s 250th Birthday Family Trip · July 21–29, 2026
         </p>
+        <p className="mt-1 text-xs">{TRIP.hotel.replace(/ · /g, " — ")}</p>
         <p className="text-xs">{MEMBERS_LINE.replace(/ · /g, ", ")}</p>
       </header>
 
