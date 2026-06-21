@@ -10,6 +10,7 @@ import {
 import { CompassRose } from "@/components/compass-rose";
 import { AppMockup } from "@/components/app-mockup";
 import { ItineraryTicket, PrintableItinerary } from "@/components/itinerary";
+import { ShareBar } from "@/components/share-bar";
 
 const areas = [
   {
@@ -209,6 +210,13 @@ export default function Home() {
               </div>
             ))}
           </dl>
+
+          <div
+            className="reveal mt-10"
+            style={{ animationDelay: "0.4s" }}
+          >
+            <ShareBar />
+          </div>
         </section>
 
         {/* ════════ ACT I · THE TRIP ════════ */}

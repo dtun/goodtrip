@@ -22,10 +22,42 @@ const mono = JetBrains_Mono({
   display: "swap",
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
+const title = "GOODTrip — Have a GOOD trip.";
+const description =
+  "A collaborative, AI-assisted travel itinerary for small groups. One trip, every day, shared in real time. DC 2026.";
+
 export let metadata: Metadata = {
-  title: "GOODTrip — Have a GOOD trip.",
-  description:
-    "A collaborative, AI-assisted travel itinerary for small groups. One trip, every day, shared in real time. DC 2026.",
+  metadataBase: new URL(siteUrl),
+  title,
+  description,
+  applicationName: "GOODTrip",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicons/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicons/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+    ],
+    apple: "/apple-touch-icon/apple-touch-icon-180x180.png",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "GOODTrip",
+    title,
+    description,
+    url: "/",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export let viewport = {
