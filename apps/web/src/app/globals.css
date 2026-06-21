@@ -30,6 +30,14 @@
   }
 }
 
+/* Plain black-and-white print: drop the poster, show the printable sheet */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+}
+
 /* ── Atmosphere ─────────────────────────────────────────────── */
 
 /* Fine film grain over everything */
