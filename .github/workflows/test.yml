@@ -39,12 +39,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run tests with coverage
-        run: pnpm test -- --coverage --reporter verbose
+      - name: Run web tests with coverage
+        run: pnpm --filter goodtrip-web test -- --coverage --reporter verbose
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage/
+          path: apps/web/coverage/
           retention-days: 30

@@ -1,20 +1,30 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
+node_modules/
+.pnp
 .pnp.js
 .yarn/install-state.gz
 
 # testing
-/coverage
+coverage/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build/
+
+# expo / react native
+.expo/
+dist/
+*.orig.*
+web-build/
+
+# native
+*.ipa
+ios/Pods/
 
 # misc
 .DS_Store
@@ -31,6 +41,10 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# supabase
+supabase/.branches
+supabase/.temp
 
 # typescript
 *.tsbuildinfo

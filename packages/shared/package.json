@@ -1,0 +1,10 @@
+{
+  "name": "@goodtrip/shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "echo \"(placeholder) no shared package tests yet\" && exit 0"
+  }
+}

@@ -1,47 +1,47 @@
-# GoodTrip AI Travel Planner
+# GOODTrip
 
-GoodTrip is an AI-powered travel planning assistant that creates detailed, family-friendly itineraries for destinations across the USA. Built with Next.js and OpenAI's GPT-4, it generates personalized travel plans based on your specific needs and preferences.
+> *Have a GOOD trip.*
 
-## Features
+GOODTrip is a collaborative, AI-assisted travel itinerary app for small groups.
+It turns a structured trip plan into a shared, living experience — so every
+member of the party always knows what's happening, what's checked off, and
+what's next.
 
-- **AI-Powered Itineraries**: Detailed day-by-day travel plans generated using GPT-4
-- **Family-Focused**: Tailored suggestions for families with children of all ages
-- **Customizable Plans**: Adjust for budget, pace, season, and mobility requirements
-- **Weather-Ready**: Includes backup indoor activities for weather changes
-- **Restaurant Recommendations**: Specific dining suggestions with kid-friendly features
-- **Accessibility Conscious**: Considers mobility requirements in planning
+The full product specification lives in [`goodtrip_app_spec.md`](./goodtrip_app_spec.md).
 
-## Getting Started
+## Monorepo layout
 
-First, run the development server:
+This is a [pnpm workspace](https://pnpm.io/workspaces).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+goodtrip/
+  apps/
+    mobile/      # GOODTrip iOS app — React Native (Expo) + Supabase  [v1.0 deliverable]
+    web/         # Legacy Next.js AI travel-planner (parked; web companion is v2)
+  packages/
+    shared/      # Shared TypeScript types + AI action contracts
+  supabase/      # Postgres schema, RLS, Realtime, edge functions, seed data
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Getting started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+| Command            | What it does                          |
+| ------------------ | ------------------------------------- |
+| `pnpm dev:web`     | Run the legacy Next.js web app        |
+| `pnpm build:web`   | Build the web app                     |
+| `pnpm test`        | Run tests across all workspaces       |
+| `pnpm --filter goodtrip-web <script>` | Run a script in a workspace |
 
-## Learn More
+The mobile app and Supabase backend are built out through the GitHub issues /
+milestones tracking the spec's Phase 1–5 build order.
 
-To learn more about Next.js, take a look at the following resources:
+## Stack (v1.0 mobile)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+React Native 0.76+ (New Architecture) · Expo + EAS Build · React Navigation v7 ·
+Supabase (Postgres + Realtime + Auth + Edge Functions) · NativeWind v4 · Jotai ·
+TanStack Query v5 · Apple Sign In · Anthropic Claude (`claude-sonnet-4-6`) via
+edge function.
