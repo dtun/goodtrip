@@ -146,14 +146,6 @@ export default function Home() {
             <a href="#tech" className="hidden transition-colors hover:text-gold sm:inline">
               Tech
             </a>
-            <a
-              href="https://github.com/dtun/goodtrip"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="transition-colors hover:text-gold"
-            >
-              GitHub ↗
-            </a>
           </nav>
         </header>
 
@@ -215,7 +207,7 @@ export default function Home() {
         {/* ════════ ACT I · THE TRIP ════════ */}
         <section
           id="trip"
-          className="relative z-10 scroll-mt-20 px-6 py-24 sm:py-32"
+          className="relative z-10 scroll-mt-20 px-4 py-24 sm:px-6 sm:py-32"
         >
           <ActHeader
             index="01"

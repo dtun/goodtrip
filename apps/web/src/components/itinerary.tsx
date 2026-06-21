@@ -47,7 +47,7 @@ function ActivityRow({ a }: { a: Activity }) {
           </p>
         )}
         {(a.url || a.code || a.confirmed) && (
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5">
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
             {a.url && (
               <a
                 href={a.url}
@@ -80,30 +80,37 @@ function ActivityRow({ a }: { a: Activity }) {
 
 function DaySection({ d }: { d: DayPlan }) {
   const tone = costTone(d.cost);
+  const num = String(d.n).padStart(2, "0");
   return (
-    <section className="flex gap-5 sm:gap-8">
-      {/* numeral anchor */}
-      <div className="w-12 shrink-0 pt-1 text-right sm:w-16">
+    <section className="sm:flex sm:gap-8">
+      {/* desktop numeral rail */}
+      <div className="hidden sm:block sm:w-16 sm:shrink-0 sm:pt-1 sm:text-right">
         <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-gold/50">
           Day
         </span>
-        <span className="block font-display leading-[0.8] text-gold [font-size:clamp(2.25rem,7vw,3.25rem)]">
-          {String(d.n).padStart(2, "0")}
+        <span className="block font-display text-[3.25rem] leading-[0.8] text-gold">
+          {num}
         </span>
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-baseline justify-between gap-3 border-b border-gold/15 pb-3">
-          <div className="min-w-0">
+        {/* day header — numeral sits inline on mobile */}
+        <div className="flex items-end gap-3 border-b border-gold/15 pb-3">
+          <span className="font-display text-[2.6rem] leading-[0.8] text-gold sm:hidden">
+            {num}
+          </span>
+          <div className="min-w-0 flex-1">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
               {d.dow} · {d.date}
             </p>
-            <h3 className="mt-1.5 font-display text-2xl leading-tight text-cream">
+            <h3 className="mt-1.5 font-display text-xl leading-tight text-cream sm:text-2xl">
               {d.title}
             </h3>
           </div>
           {tone && (
-            <span className={`shrink-0 font-mono text-xs uppercase tracking-[0.15em] ${tone}`}>
+            <span
+              className={`shrink-0 self-end pb-0.5 font-mono text-xs uppercase tracking-[0.15em] ${tone}`}
+            >
               {d.cost}
             </span>
           )}
@@ -121,7 +128,7 @@ function DaySection({ d }: { d: DayPlan }) {
 export function ItineraryTicket() {
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="rounded-[1.75rem] border border-gold/20 bg-ink-800/60 px-6 py-12 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)] backdrop-blur sm:px-14 sm:py-14">
+      <div className="rounded-[1.75rem] border border-gold/20 bg-ink-800/60 px-5 py-10 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)] backdrop-blur sm:px-14 sm:py-14">
         {/* masthead */}
         <header className="text-center">
           <CompassRose className="mx-auto h-10 w-10 text-gold" />
@@ -153,7 +160,7 @@ export function ItineraryTicket() {
         </div>
 
         {/* ornamental divider */}
-        <div className="my-12 flex items-center justify-center gap-4 text-gold/50">
+        <div className="my-10 flex items-center justify-center gap-4 text-gold/50 sm:my-12">
           <span className="h-px w-16 bg-gradient-to-r from-transparent to-gold/40" />
           <CompassRose className="h-4 w-4 text-gold/60" />
           <span className="h-px w-16 bg-gradient-to-l from-transparent to-gold/40" />
