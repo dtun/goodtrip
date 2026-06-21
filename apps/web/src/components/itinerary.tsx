@@ -1,8 +1,13 @@
+import { ExternalLink } from "lucide-react";
 import { DAYS, TRIP, type Activity } from "@/lib/trip";
 import { CompassRose } from "@/components/compass-rose";
 import { PrintButton } from "@/components/print-button";
 
 const MEMBERS_LINE = "Danny · Ellen · Jack · Eva · Elizabeth · Elisha · GG · Papa";
+
+function prettyUrl(u: string) {
+  return u.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/$/, "");
+}
 
 /* ── The on-screen boarding-pass itinerary ───────────────────── */
 
@@ -19,16 +24,40 @@ function TicketRow({ a }: { a: Activity }) {
             {a.location}
           </p>
         )}
+        {(a.url || a.code) && (
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            {a.url && (
+              <a
+                href={a.url}
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label={`${a.cta ?? "Book"}: ${a.title} (opens in a new tab)`}
+                className="inline-flex items-center gap-1 rounded-full border border-gold/40 bg-gold/10 px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-gold transition-colors hover:bg-gold hover:text-ink"
+              >
+                {a.cta ?? "Book"}
+                <ExternalLink className="h-3 w-3" aria-hidden="true" />
+              </a>
+            )}
+            {a.code && (
+              <span className="font-mono text-[10px] uppercase tracking-wide text-cream-muted">
+                code <span className="font-semibold text-gold">{a.code}</span>
+              </span>
+            )}
+          </div>
+        )}
       </div>
-      {a.confirmed ? (
-        <span className="shrink-0 -rotate-6 select-none self-start whitespace-nowrap rounded-sm bg-flag px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-white">
-          Confirmed
-        </span>
-      ) : a.cost && a.cost !== "—" ? (
-        <span className="shrink-0 self-start whitespace-nowrap rounded-sm border border-cream/15 px-1.5 py-0.5 font-mono text-[10px] text-cream-muted">
-          {a.cost}
-        </span>
-      ) : null}
+      <div className="flex shrink-0 flex-col items-end gap-1">
+        {a.cost && a.cost !== "—" && (
+          <span className="whitespace-nowrap rounded-sm border border-cream/15 px-1.5 py-0.5 font-mono text-[10px] text-cream-muted">
+            {a.cost}
+          </span>
+        )}
+        {a.confirmed && (
+          <span className="-rotate-6 select-none whitespace-nowrap rounded-sm bg-flag px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-white">
+            Confirmed
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -125,6 +154,15 @@ export function PrintableItinerary() {
                   {a.location ? `, ${a.location}` : ""}
                   {a.cost && a.cost !== "—" ? ` (${a.cost})` : ""}
                   {a.confirmed && a.confirmedNote ? ` — ${a.confirmedNote}` : ""}
+                  {a.url ? (
+                    <span className="text-gray-600">
+                      {" "}
+                      — {a.cta ?? "Book"}: {prettyUrl(a.url)}
+                      {a.code ? ` (code ${a.code})` : ""}
+                    </span>
+                  ) : (
+                    ""
+                  )}
                 </li>
               ))}
             </ul>
