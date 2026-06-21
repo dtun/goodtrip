@@ -2,6 +2,7 @@ import { ExternalLink, Check } from "lucide-react";
 import { DAYS, TRIP, type Activity, type DayPlan } from "@/lib/trip";
 import { CompassRose } from "@/components/compass-rose";
 import { PrintButton } from "@/components/print-button";
+import { CopyCode } from "@/components/copy-code";
 
 const MEMBERS_LINE = "Danny · Ellen · Jack · Eva · Elizabeth · Elisha · GG · Papa";
 
@@ -60,11 +61,7 @@ function ActivityRow({ a }: { a: Activity }) {
                 <ExternalLink className="h-3 w-3" aria-hidden="true" />
               </a>
             )}
-            {a.code && (
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-cream-muted">
-                Code <span className="font-semibold text-gold">{a.code}</span>
-              </span>
-            )}
+            {a.code && <CopyCode code={a.code} />}
             {a.confirmed && (
               <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-gold">
                 <Check className="h-3 w-3" aria-hidden="true" />
