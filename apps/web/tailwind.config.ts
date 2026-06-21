@@ -18,7 +18,26 @@ let config = {
       },
     },
     extend: {
+      fontFamily: {
+        display: ["var(--font-display)", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+      },
       colors: {
+        ink: {
+          DEFAULT: "#0B0D24",
+          800: "#0E1029",
+          700: "#161A3C",
+        },
+        cream: {
+          DEFAULT: "#F3EAD8",
+          muted: "#A7A189",
+        },
+        gold: {
+          DEFAULT: "#C9A84C",
+          bright: "#E6CB78",
+        },
+        flag: "#B22234",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
