@@ -21,7 +21,7 @@ function TicketRow({ a }: { a: Activity }) {
         )}
       </div>
       {a.confirmed ? (
-        <span className="shrink-0 -rotate-6 select-none self-start whitespace-nowrap rounded-sm border border-flag/70 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-flag">
+        <span className="shrink-0 -rotate-6 select-none self-start whitespace-nowrap rounded-sm bg-flag px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-white">
           Confirmed
         </span>
       ) : a.cost && a.cost !== "—" ? (

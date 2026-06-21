@@ -100,8 +100,8 @@ function ActHeader({
   return (
     <div className="mx-auto max-w-3xl text-center">
       <div className="flex items-center justify-center gap-3 font-mono text-xs uppercase tracking-[0.4em]">
-        <span className="text-flag">{index}</span>
-        <span className="h-3 w-px bg-cream/20" />
+        <span className="text-gold">{index}</span>
+        <span className="h-3 w-px bg-flag" />
         <span className="text-gold/70">{kicker}</span>
       </div>
       <h2 className="mt-6 font-display font-semibold leading-[0.95] tracking-tight text-cream [font-size:clamp(2.5rem,7vw,4.5rem)]">
@@ -156,6 +156,7 @@ export default function Home() {
           </nav>
         </header>
 
+        <main id="content">
         {/* ── Hero ──────────────────────────────────────────── */}
         <section className="relative z-10 mx-auto max-w-4xl px-6 pb-16 pt-16 text-center sm:pt-24">
           <p className="reveal font-mono text-[11px] uppercase tracking-[0.5em] text-gold sm:text-xs">
@@ -262,9 +263,9 @@ export default function Home() {
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-3 font-display text-2xl text-cream sm:text-3xl">
               <span>Trip</span>
-              <ArrowRight className="h-5 w-5 text-flag" />
+              <ArrowRight className="h-5 w-5 text-gold/70" aria-hidden="true" />
               <span>Days</span>
-              <ArrowRight className="h-5 w-5 text-flag" />
+              <ArrowRight className="h-5 w-5 text-gold/70" aria-hidden="true" />
               <span>Activities</span>
             </div>
             <p className="mx-auto mt-5 max-w-md text-sm text-cream-muted">
@@ -375,6 +376,8 @@ export default function Home() {
           </div>
         </section>
 
+        </main>
+
         {/* ── Footer ────────────────────────────────────────── */}
         <footer className="relative z-10 border-t border-cream/10">
           <Cheatline className="mx-auto w-full max-w-none rounded-none" />
@@ -384,7 +387,7 @@ export default function Home() {
               Have a GOOD trip.
             </p>
             <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
-              <MapPin className="h-3.5 w-3.5 text-flag" />
+              <MapPin className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
               GOODTrip · Spec v0.1 · Collaborative AI itineraries
             </p>
           </div>

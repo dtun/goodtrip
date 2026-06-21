@@ -208,7 +208,7 @@ function DayList({ onOpen }: { onOpen: (n: number) => void }) {
                 {d.progress}
               </span>
             </div>
-            <ChevronRight className="h-4 w-4 shrink-0 text-[#C0C0C0]" />
+            <ChevronRight className="h-4 w-4 shrink-0 text-[#9AA0AA]" aria-hidden="true" />
           </button>
         );
       })}
@@ -255,13 +255,13 @@ function DayDetail({ day }: { day: DayPlan }) {
               </span>
               <span
                 className={`flex-1 text-sm ${
-                  item.done ? "text-[#999] line-through" : "text-[#111]"
+                  item.done ? "text-[#6E6E6E] line-through" : "text-[#111]"
                 }`}
               >
                 {item.text}
               </span>
               {item.by && (
-                <span className="text-[10px] text-[#999]">{item.by}</span>
+                <span className="text-[10px] text-[#6E6E6E]">{item.by}</span>
               )}
             </div>
           ))}
@@ -313,13 +313,13 @@ function Checklists() {
                 </span>
                 <span
                   className={`flex-1 text-sm ${
-                    item.done ? "text-[#999] line-through" : "text-[#111]"
+                    item.done ? "text-[#6E6E6E] line-through" : "text-[#111]"
                   }`}
                 >
                   {item.text}
                 </span>
                 {item.by && (
-                  <span className="text-[10px] text-[#999]">{item.by}</span>
+                  <span className="text-[10px] text-[#6E6E6E]">{item.by}</span>
                 )}
               </div>
             ))}
@@ -385,8 +385,8 @@ function Ask() {
           ))}
         </div>
         <div className="flex items-center gap-2 rounded-full border border-[#E0E0E0] bg-white py-1.5 pl-4 pr-1.5">
-          <span className="flex-1 text-sm text-[#999]">Ask GOODTrip…</span>
-          <Mic className="h-4 w-4 text-[#999]" />
+          <span className="flex-1 text-sm text-[#6E6E6E]">Ask GOODTrip…</span>
+          <Mic className="h-4 w-4 text-[#6E6E6E]" />
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3C3B6E] text-white">
             <Send className="h-4 w-4" />
           </span>
@@ -442,7 +442,7 @@ function TripOverview() {
               <span className="font-semibold text-[#3C3B6E]">{f.who}</span>
               <span className="text-[#666]">{f.action}</span>
               <span className="min-w-0 flex-1 truncate text-[#111]">{f.target}</span>
-              <span className="shrink-0 text-[11px] text-[#999]">{f.when}</span>
+              <span className="shrink-0 text-[11px] text-[#6E6E6E]">{f.when}</span>
             </div>
           ))}
         </div>
@@ -489,7 +489,7 @@ export function AppMockup() {
           {/* status bar */}
           <div className="flex items-center justify-between px-7 pb-1 pt-3 text-[#111]">
             <span className="font-mono text-xs font-semibold">9:41</span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1" aria-hidden="true">
               <SignalHigh className="h-3.5 w-3.5" />
               <Wifi className="h-3.5 w-3.5" />
               <BatteryFull className="h-4 w-4" />
@@ -503,9 +503,9 @@ export function AppMockup() {
                 <button
                   onClick={() => setOpenDay(null)}
                   className="-ml-1 flex h-7 w-7 items-center justify-center rounded-full text-[#3C3B6E] active:bg-[#3C3B6E]/10"
-                  aria-label="Back"
+                  aria-label="Back to itinerary"
                 >
-                  <ChevronLeft className="h-5 w-5" />
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                 </button>
               )}
               <span className="font-display text-lg text-[#111]">{title}</span>
@@ -545,15 +545,17 @@ export function AppMockup() {
                     setTab(t.id);
                     setOpenDay(null);
                   }}
+                  aria-current={active ? "page" : undefined}
                   className="flex flex-col items-center gap-1 py-1"
                 >
                   <Icon
                     className="h-[22px] w-[22px]"
-                    style={{ color: active ? PRIMARY : "#9A9AA2" }}
+                    style={{ color: active ? PRIMARY : "#6B7280" }}
+                    aria-hidden="true"
                   />
                   <span
-                    className="text-[10px] font-medium"
-                    style={{ color: active ? PRIMARY : "#9A9AA2" }}
+                    className={`text-[10px] ${active ? "font-bold" : "font-medium"}`}
+                    style={{ color: active ? PRIMARY : "#6B7280" }}
                   >
                     {t.label}
                   </span>
