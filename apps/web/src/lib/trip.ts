@@ -152,7 +152,7 @@ export const DAYS: DayPlan[] = [
         location: "Colonial-inspired American",
         cost: "$$",
         booking: true,
-        url: "https://www.mountvernon.org/inn/mount-vernon-inn-restaurant/",
+        url: "https://www.mountvernon.org/the-estate-gardens/location/mount-vernon-inn-restaurant",
         cta: "Reserve",
       },
     ],
