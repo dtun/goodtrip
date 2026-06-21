@@ -118,35 +118,257 @@ const stack = [
   "Claude · sonnet-4-6",
 ];
 
-/* one sample day for the itinerary artifact */
-function ActivityRow({
-  time,
-  title,
-  place,
-  badge,
-  confirmed,
-}: {
+/* The real DC itinerary — America's 250th Birthday family trip, Jul 21–29 2026 */
+type Row = {
   time: string;
   title: string;
   place: string;
   badge?: string;
   confirmed?: boolean;
-}) {
+};
+type Day = {
+  n: string;
+  dow: string;
+  date: string;
+  title: string;
+  cost: string;
+  rows: Row[];
+};
+
+const days: Day[] = [
+  {
+    n: "01",
+    dow: "Tue",
+    date: "Jul 21",
+    title: "Arrival & Settle In",
+    cost: "Free",
+    rows: [
+      {
+        time: "PM",
+        title: "Check in & stock the kitchen",
+        place: "Residence Inn · CVS / Wawa across the street",
+      },
+      {
+        time: "Eve",
+        title: "White House lit at night",
+        place: "12-min walk south — no tickets, no lines",
+      },
+      {
+        time: "Din",
+        title: "Founding Farmers",
+        place: "1924 Pennsylvania Ave NW · farm-to-table",
+        badge: "~$240",
+      },
+    ],
+  },
+  {
+    n: "02",
+    dow: "Wed",
+    date: "Jul 22",
+    title: "Capitol Tour + Ford’s Theatre",
+    cost: "Free",
+    rows: [
+      {
+        time: "10:30",
+        title: "U.S. Capitol Building Tour",
+        place: "via Sen. Mark Kelly’s office · arrive 10:00 AM, REAL ID",
+        confirmed: true,
+      },
+      {
+        time: "1:00",
+        title: "Ford’s Theatre",
+        place: "511 10th St NW · where Lincoln was shot",
+        badge: "$3",
+      },
+      {
+        time: "3:00",
+        title: "Return to hotel — rest",
+        place: "Mandatory afternoon reset",
+      },
+    ],
+  },
+  {
+    n: "03",
+    dow: "Thu",
+    date: "Jul 23",
+    title: "Mount Vernon",
+    cost: "~$184",
+    rows: [
+      {
+        time: "9:00",
+        title: "Washington’s Mansion tour",
+        place: "Both floors restored for the 250th · arrive at opening",
+      },
+      {
+        time: "—",
+        title: "4D Revolutionary War Theater",
+        place: "Snow falls, cannons fire — all ages love it",
+      },
+      {
+        time: "Lun",
+        title: "Mount Vernon Inn Restaurant",
+        place: "Depart 2:30–3:00 PM · code SPRING2026",
+        badge: "−20%",
+      },
+    ],
+  },
+  {
+    n: "04",
+    dow: "Fri",
+    date: "Jul 24",
+    title: "Museum of the Bible",
+    cost: "~$320",
+    rows: [
+      {
+        time: "10:00",
+        title: "Dead Sea Scrolls",
+        place: "Floor 5 · timed entry · 24 scroll fragments",
+      },
+      {
+        time: "—",
+        title: "Megiddo Mosaic",
+        place: "Free lobby · oldest known Christian worship site",
+        badge: "Free",
+      },
+      {
+        time: "Eve",
+        title: "The Wharf waterfront dinner",
+        place: "code CIC25 saves 25% on GA",
+      },
+    ],
+  },
+  {
+    n: "05",
+    dow: "Sat",
+    date: "Jul 25",
+    title: "Rest Day + Monument Walk",
+    cost: "Free",
+    rows: [
+      {
+        time: "AM",
+        title: "Unscheduled — protect this day",
+        place: "Sleep in · laundry · catch up on photos",
+      },
+      {
+        time: "7:00",
+        title: "Evening Monument Walk",
+        place: "WWII Memorial → Lincoln Memorial · sunset ~8:25 PM",
+      },
+      {
+        time: "New",
+        title: "Lincoln Memorial Undercroft",
+        place: "$69M museum opening July 2026",
+      },
+    ],
+  },
+  {
+    n: "06",
+    dow: "Sun",
+    date: "Jul 26",
+    title: "Worship + Holocaust Museum",
+    cost: "Free",
+    rows: [
+      {
+        time: "10:30",
+        title: "Capitol Hill Baptist Church",
+        place: "525 A St NE · Eastern Market Metro",
+      },
+      {
+        time: "1:30",
+        title: "Holocaust Memorial Museum",
+        place: "‘Daniel’s Story’ (ages 8+) · timed passes",
+        badge: "$1",
+      },
+    ],
+  },
+  {
+    n: "07",
+    dow: "Mon",
+    date: "Jul 27",
+    title: "Museum of American History",
+    cost: "Free",
+    rows: [
+      {
+        time: "10:00",
+        title: "Star-Spangled Banner",
+        place: "The actual 1814 flag · America 250 mega-exhibit",
+      },
+      {
+        time: "Lun",
+        title: "Mitsitam Native Foods Café",
+        place: "Museum of the American Indian · voted best on the Mall",
+        badge: "$$",
+      },
+      {
+        time: "Eve",
+        title: "National Portrait Gallery",
+        place: "Free · open until 7 PM",
+      },
+    ],
+  },
+  {
+    n: "08",
+    dow: "Tue",
+    date: "Jul 28",
+    title: "National Archives + Dinner",
+    cost: "Free + dinner",
+    rows: [
+      {
+        time: "10:00",
+        title: "The Rotunda",
+        place: "Declaration · Constitution · 1297 Magna Carta",
+        badge: "$1",
+      },
+      {
+        time: "5:30",
+        title: "Old Ebbitt Grill",
+        place: "675 15th St NW · est. 1856 · party of 8",
+        badge: "~$330–420",
+      },
+    ],
+  },
+  {
+    n: "09",
+    dow: "Wed",
+    date: "Jul 29",
+    title: "Departure Day",
+    cost: "Free",
+    rows: [
+      {
+        time: "AM",
+        title: "Final breakfast & checkout",
+        place: "Pack · store luggage if needed",
+      },
+      {
+        time: "Opt",
+        title: "National Portrait Gallery",
+        place: "Opens 11:30 AM · one hour max",
+      },
+      {
+        time: "✈",
+        title: "Reagan National (DCA)",
+        place: "Metro Blue/Yellow from McPherson Sq · ~25 min",
+      },
+    ],
+  },
+];
+
+function ActivityRow({ time, title, place, badge, confirmed }: Row) {
   return (
-    <div className="group flex items-baseline gap-4 py-3 transition-colors hover:bg-gold/[0.04]">
-      <span className="w-12 shrink-0 font-mono text-xs tracking-tight text-gold/80">
+    <div className="group flex gap-4 py-2.5 transition-colors hover:bg-gold/[0.04]">
+      <span className="w-10 shrink-0 pt-0.5 font-mono text-[11px] uppercase tracking-tight text-gold/80">
         {time}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[15px] text-cream">{title}</p>
-        <p className="truncate text-xs text-cream-muted">{place}</p>
+        <p className="text-[15px] leading-snug text-cream">{title}</p>
+        <p className="mt-0.5 text-xs leading-snug text-cream-muted">{place}</p>
       </div>
       {confirmed ? (
-        <span className="shrink-0 -rotate-6 select-none rounded-sm border border-flag/70 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-flag">
+        <span className="shrink-0 -rotate-6 select-none self-start whitespace-nowrap rounded-sm border border-flag/70 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-flag">
           Confirmed
         </span>
       ) : badge ? (
-        <span className="shrink-0 font-mono text-[11px] text-cream-muted">
+        <span className="shrink-0 self-start whitespace-nowrap rounded-sm border border-cream/15 px-1.5 py-0.5 font-mono text-[10px] text-cream-muted">
           {badge}
         </span>
       ) : null}
@@ -222,7 +444,7 @@ export default function Home() {
           {[
             ["Destination", "Washington, D.C."],
             ["Dates", "Jul 21–29 ’26"],
-            ["Party", "Up to 4"],
+            ["Party", "Family of 8"],
             ["Platform", "iOS · TestFlight"],
           ].map(([k, v]) => (
             <div key={k} className="bg-ink/40 px-4 py-3">
@@ -244,84 +466,59 @@ export default function Home() {
             <span className="text-gold">Shared in real time.</span>
           </h2>
           <span className="hidden font-mono text-xs uppercase tracking-[0.2em] text-cream-muted sm:block">
-            9 days · 4 travelers
+            9 days · family of 8
           </span>
         </div>
 
-        <div className="float-y mx-auto max-w-2xl">
+        <div className="mx-auto max-w-3xl">
           <div className="overflow-hidden rounded-2xl border border-gold/25 bg-ink-800/80 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)] backdrop-blur">
             {/* ticket header */}
-            <div className="flex items-center justify-between border-b border-gold/20 px-6 py-4">
-              <div>
+            <div className="flex items-start justify-between gap-4 border-b border-gold/20 px-6 py-5">
+              <div className="min-w-0">
                 <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/70">
-                  Itinerary
+                  Itinerary · Jul 21–29 ’26
                 </p>
-                <p className="mt-0.5 font-display text-lg text-cream">
+                <p className="mt-1 font-display text-xl text-cream">
                   America&apos;s 250th Birthday
                 </p>
+                <p className="mt-1.5 text-xs text-cream-muted">
+                  Residence Inn · 1199 Vermont Ave NW · McPherson Square Metro
+                </p>
+                <p className="mt-0.5 text-[11px] text-cream-muted">
+                  Danny · Ellen · Jack · Eva · Elizabeth · Elisha · GG · Papa
+                </p>
               </div>
-              <CompassRose className="h-9 w-9" />
+              <CompassRose className="h-10 w-10 shrink-0" />
             </div>
 
             {/* perforation */}
             <div className="dotrule h-0.5 text-gold/40" />
 
-            <div className="px-6 py-5">
-              {/* Day 03 */}
-              <div className="flex items-center gap-3 pb-1 pt-2">
-                <span className="font-mono text-xs font-semibold tracking-[0.15em] text-gold">
-                  DAY 03
-                </span>
-                <span className="text-xs uppercase tracking-[0.2em] text-cream-muted">
-                  Capitol Hill
-                </span>
-                <span className="h-px flex-1 bg-gold/15" />
-              </div>
-              <div className="divide-y divide-cream/5">
-                <ActivityRow
-                  time="09:30"
-                  title="U.S. Capitol Building Tour"
-                  place="via Sen. Mark Kelly’s office"
-                  confirmed
-                />
-                <ActivityRow
-                  time="12:30"
-                  title="Mitsitam Native Foods Café"
-                  place="Museum of the American Indian"
-                  badge="$80–120"
-                />
-                <ActivityRow
-                  time="15:00"
-                  title="Library of Congress"
-                  place="Thomas Jefferson Building"
-                  badge="FREE"
-                />
-              </div>
-
-              {/* Day 05 */}
-              <div className="flex items-center gap-3 pb-1 pt-6">
-                <span className="font-mono text-xs font-semibold tracking-[0.15em] text-gold">
-                  DAY 05
-                </span>
-                <span className="text-xs uppercase tracking-[0.2em] text-cream-muted">
-                  Mount Vernon
-                </span>
-                <span className="h-px flex-1 bg-gold/15" />
-              </div>
-              <div className="divide-y divide-cream/5">
-                <ActivityRow
-                  time="10:00"
-                  title="George Washington’s Estate"
-                  place="Mount Vernon, VA"
-                  badge="~$320"
-                />
-                <ActivityRow
-                  time="19:30"
-                  title="Ford’s Theatre"
-                  place="Evening performance"
-                  badge="booking"
-                />
-              </div>
+            <div className="px-6 py-4">
+              {days.map((d) => (
+                <div key={d.n} className="pt-3 first:pt-1">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="font-mono text-xs font-semibold tracking-[0.15em] text-gold">
+                      DAY {d.n}
+                    </span>
+                    <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-cream-muted">
+                      {d.dow} {d.date}
+                    </span>
+                    <span className="font-display text-[15px] text-cream">
+                      {d.title}
+                    </span>
+                    <span className="ml-auto whitespace-nowrap rounded-sm border border-gold/25 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-gold/80">
+                      {d.cost}
+                    </span>
+                  </div>
+                  <div className="mb-1 mt-2 h-px bg-gold/12" />
+                  <div className="divide-y divide-cream/5">
+                    {d.rows.map((r, i) => (
+                      <ActivityRow key={i} {...r} />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* ticket footer */}
