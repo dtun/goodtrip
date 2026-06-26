@@ -125,9 +125,7 @@ function ActivityCard({ a }: { a: Activity }) {
               {a.time}
             </p>
           )}
-          <p className="mt-1 text-[15px] font-semibold leading-tight text-[#111]">
-            {a.title}
-          </p>
+          <p className="mt-1 text-[15px] font-semibold leading-tight text-[#111]">{a.title}</p>
           {a.location && (
             <p className="mt-1 flex items-center gap-1 text-xs text-[#666]">
               <MapPin className="h-3 w-3 shrink-0" />
@@ -167,12 +165,8 @@ function DayList({ onOpen }: { onOpen: (n: number) => void }) {
   return (
     <div className="space-y-3">
       <div className="rounded-2xl bg-[#3C3B6E] p-4 text-white">
-        <p className="text-[11px] uppercase tracking-wide text-white/60">
-          {TRIP.name}
-        </p>
-        <p className="mt-0.5 font-display text-2xl leading-tight">
-          {TRIP.destination}
-        </p>
+        <p className="text-[11px] uppercase tracking-wide text-white/60">{TRIP.name}</p>
+        <p className="mt-0.5 font-display text-2xl leading-tight">{TRIP.destination}</p>
         <div className="mt-3 flex items-center justify-between">
           <span className="text-xs text-white/80">{TRIP.dates}</span>
           <span className="rounded-full bg-[#C9A84C] px-2.5 py-1 font-mono text-[11px] font-semibold text-[#3C3B6E]">
@@ -194,9 +188,7 @@ function DayList({ onOpen }: { onOpen: (n: number) => void }) {
               <span className="font-display text-lg text-[#3C3B6E]">{d.n}</span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[15px] font-semibold text-[#111]">
-                {d.title}
-              </p>
+              <p className="truncate text-[15px] font-semibold text-[#111]">{d.title}</p>
               <p className="mt-0.5 text-xs text-[#666]">
                 {d.dow} {d.date} · {d.activities.length} activities
                 {confirmed > 0 ? ` · ${confirmed} confirmed` : ""}
@@ -238,17 +230,13 @@ function DayDetail({ day }: { day: DayPlan }) {
       </button>
 
       <div className="rounded-2xl border border-[#E0E0E0] bg-white p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-[#666]">
-          Day checklist
-        </p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-[#666]">Day checklist</p>
         <div className="mt-3 space-y-2.5">
           {DAY_CHECKLIST.map((item, i) => (
             <div key={i} className="flex items-center gap-2.5">
               <span
                 className={`flex h-5 w-5 items-center justify-center rounded-md border ${
-                  item.done
-                    ? "border-[#2D6A4F] bg-[#2D6A4F]"
-                    : "border-[#C8C8C8] bg-white"
+                  item.done ? "border-[#2D6A4F] bg-[#2D6A4F]" : "border-[#C8C8C8] bg-white"
                 }`}
               >
                 {item.done && <Check className="h-3.5 w-3.5 text-white" />}
@@ -260,9 +248,7 @@ function DayDetail({ day }: { day: DayPlan }) {
               >
                 {item.text}
               </span>
-              {item.by && (
-                <span className="text-[10px] text-[#6E6E6E]">{item.by}</span>
-              )}
+              {item.by && <span className="text-[10px] text-[#6E6E6E]">{item.by}</span>}
             </div>
           ))}
         </div>
@@ -304,9 +290,7 @@ function Checklists() {
               >
                 <span
                   className={`flex h-5 w-5 items-center justify-center rounded-md border ${
-                    item.done
-                      ? "border-[#2D6A4F] bg-[#2D6A4F]"
-                      : "border-[#C8C8C8] bg-white"
+                    item.done ? "border-[#2D6A4F] bg-[#2D6A4F]" : "border-[#C8C8C8] bg-white"
                   }`}
                 >
                   {item.done && <Check className="h-3.5 w-3.5 text-white" />}
@@ -318,9 +302,7 @@ function Checklists() {
                 >
                   {item.text}
                 </span>
-                {item.by && (
-                  <span className="text-[10px] text-[#6E6E6E]">{item.by}</span>
-                )}
+                {item.by && <span className="text-[10px] text-[#6E6E6E]">{item.by}</span>}
               </div>
             ))}
           </div>
@@ -350,25 +332,21 @@ function Ask() {
                 {m.content}
               </p>
             </div>
-          )
+          ),
         )}
 
         {/* AI action card */}
         <div className="ml-9 max-w-[82%] overflow-hidden rounded-2xl border border-[#C9A84C]/50 bg-[#C9A84C]/[0.07]">
           <div className="px-3.5 pt-3">
             <p className="text-xs font-semibold text-[#9A7B1F]">{AI_ACTION.prompt}</p>
-            <p className="mt-1.5 text-sm font-semibold text-[#111]">
-              {AI_ACTION.title}
-            </p>
+            <p className="mt-1.5 text-sm font-semibold text-[#111]">{AI_ACTION.title}</p>
             <p className="text-xs text-[#666]">{AI_ACTION.detail}</p>
           </div>
           <div className="mt-3 flex border-t border-[#C9A84C]/30">
             <button className="flex-1 border-r border-[#C9A84C]/30 py-2.5 text-sm font-semibold text-[#2D6A4F]">
               Accept
             </button>
-            <button className="flex-1 py-2.5 text-sm font-medium text-[#666]">
-              Dismiss
-            </button>
+            <button className="flex-1 py-2.5 text-sm font-medium text-[#666]">Dismiss</button>
           </div>
         </div>
       </div>
@@ -518,16 +496,9 @@ export function AppMockup() {
           </div>
 
           {/* screen body */}
-          <div
-            key={screenKey}
-            className="screen-in flex-1 overflow-y-auto px-4 py-4"
-          >
+          <div key={screenKey} className="screen-in flex-1 overflow-y-auto px-4 py-4">
             {tab === "itinerary" &&
-              (day ? (
-                <DayDetail day={day} />
-              ) : (
-                <DayList onOpen={setOpenDay} />
-              ))}
+              (day ? <DayDetail day={day} /> : <DayList onOpen={setOpenDay} />)}
             {tab === "checklists" && <Checklists />}
             {tab === "ask" && <Ask />}
             {tab === "trip" && <TripOverview />}

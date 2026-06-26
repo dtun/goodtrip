@@ -14,7 +14,10 @@ const COLOPHON: [string, string][] = [
 ];
 
 function prettyUrl(u: string) {
-  return u.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/$/, "");
+  return u
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\/$/, "");
 }
 
 function costTone(cost?: string) {
@@ -33,20 +36,12 @@ function ActivityRow({ a }: { a: Activity }) {
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-3">
-          <p className="text-[15px] font-medium leading-snug text-cream">
-            {a.title}
-          </p>
+          <p className="text-[15px] font-medium leading-snug text-cream">{a.title}</p>
           {tone && (
-            <span className={`shrink-0 font-mono text-[11px] tracking-wide ${tone}`}>
-              {a.cost}
-            </span>
+            <span className={`shrink-0 font-mono text-[11px] tracking-wide ${tone}`}>{a.cost}</span>
           )}
         </div>
-        {a.location && (
-          <p className="mt-1 text-xs leading-snug text-cream-muted">
-            {a.location}
-          </p>
-        )}
+        {a.location && <p className="mt-1 text-xs leading-snug text-cream-muted">{a.location}</p>}
         {(a.url || a.code || a.confirmed) && (
           <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
             {a.url && (
@@ -85,9 +80,7 @@ function DaySection({ d }: { d: DayPlan }) {
         <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-gold/50">
           Day
         </span>
-        <span className="block font-display text-[3.25rem] leading-[0.8] text-gold">
-          {num}
-        </span>
+        <span className="block font-display text-[3.25rem] leading-[0.8] text-gold">{num}</span>
       </div>
 
       <div className="min-w-0 flex-1">
@@ -144,9 +137,7 @@ export function ItineraryTicket() {
         <dl className="mt-9 grid grid-cols-2 gap-y-5 border-y border-gold/15 py-5 text-center sm:grid-cols-4 sm:divide-x sm:divide-gold/15">
           {COLOPHON.map(([k, v]) => (
             <div key={k} className="px-2">
-              <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/60">
-                {k}
-              </dt>
+              <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/60">{k}</dt>
               <dd className="mt-1.5 text-sm text-cream">{v}</dd>
             </div>
           ))}
@@ -189,9 +180,7 @@ export function PrintableItinerary() {
     <div className="hidden bg-white px-10 py-8 text-black print:block">
       <header className="border-b-2 border-black pb-3">
         <h1 className="text-2xl font-bold">Washington, D.C.</h1>
-        <p className="text-sm">
-          America’s 250th Birthday Family Trip · July 21–29, 2026
-        </p>
+        <p className="text-sm">America’s 250th Birthday Family Trip · July 21–29, 2026</p>
         <p className="mt-1 text-xs">{TRIP.hotel.replace(/ · /g, " — ")}</p>
         <p className="text-xs">{MEMBERS_LINE.replace(/ · /g, ", ")}</p>
       </header>

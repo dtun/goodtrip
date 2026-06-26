@@ -27,7 +27,10 @@ export function CopyCode({ code }: { code: string }) {
       {copied ? (
         <Check className="h-3 w-3 text-gold" aria-hidden="true" />
       ) : (
-        <Copy className="h-3 w-3 opacity-50 transition-opacity group-hover:opacity-100" aria-hidden="true" />
+        <Copy
+          className="h-3 w-3 opacity-50 transition-opacity group-hover:opacity-100"
+          aria-hidden="true"
+        />
       )}
     </button>
   );

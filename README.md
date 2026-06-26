@@ -1,6 +1,6 @@
 # GOODTrip
 
-> *Have a GOOD trip.*
+> _Have a GOOD trip._
 
 GOODTrip is a collaborative, AI-assisted travel itinerary app for small groups.
 It turns a structured trip plan into a shared, living experience — so every
@@ -29,12 +29,12 @@ goodtrip/
 pnpm install
 ```
 
-| Command            | What it does                          |
-| ------------------ | ------------------------------------- |
-| `pnpm dev:web`     | Run the legacy Next.js web app        |
-| `pnpm build:web`   | Build the web app                     |
-| `pnpm test`        | Run tests across all workspaces       |
-| `pnpm --filter goodtrip-web <script>` | Run a script in a workspace |
+| Command                               | What it does                    |
+| ------------------------------------- | ------------------------------- |
+| `pnpm dev:web`                        | Run the legacy Next.js web app  |
+| `pnpm build:web`                      | Build the web app               |
+| `pnpm test`                           | Run tests across all workspaces |
+| `pnpm --filter goodtrip-web <script>` | Run a script in a workspace     |
 
 The mobile app and Supabase backend are built out through the GitHub issues /
 milestones tracking the spec's Phase 1–5 build order.

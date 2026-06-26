@@ -71,9 +71,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${display.variable} ${sans.variable} ${mono.variable} grain font-sans`}
-      >
+      <body className={`${display.variable} ${sans.variable} ${mono.variable} grain font-sans`}>
         {children}
       </body>
     </html>

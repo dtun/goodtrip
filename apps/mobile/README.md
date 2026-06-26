@@ -8,15 +8,15 @@ deliverable described in [`/goodtrip_app_spec.md`](../../goodtrip_app_spec.md).
 
 ## Planned stack
 
-| Layer        | Choice                                   |
-| ------------ | ---------------------------------------- |
-| Framework    | React Native 0.76+ (New Architecture)    |
-| Tooling      | Expo + EAS Build (TestFlight)            |
-| Navigation   | React Navigation v7                      |
-| Backend      | Supabase (`@supabase/supabase-js`)       |
-| Styling      | NativeWind v4                            |
-| State        | Jotai + TanStack Query v5                |
-| Auth         | Supabase Auth + Apple Sign In            |
+| Layer      | Choice                                |
+| ---------- | ------------------------------------- |
+| Framework  | React Native 0.76+ (New Architecture) |
+| Tooling    | Expo + EAS Build (TestFlight)         |
+| Navigation | React Navigation v7                   |
+| Backend    | Supabase (`@supabase/supabase-js`)    |
+| Styling    | NativeWind v4                         |
+| State      | Jotai + TanStack Query v5             |
+| Auth       | Supabase Auth + Apple Sign In         |
 
 See `../../supabase` for the database schema, RLS policies, edge functions,
 and seed data.

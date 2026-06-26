@@ -62,7 +62,7 @@ export function ShareBar() {
 
       <a
         href={`mailto:?subject=${encodeURIComponent(
-          EMAIL_SUBJECT
+          EMAIL_SUBJECT,
         )}&body=${encodeURIComponent(body)}`}
         className={tile}
         aria-label="Share by email"

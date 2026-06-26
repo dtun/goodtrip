@@ -1,4 +1,4 @@
 /** @type {import('next').NextConfig} */
-let  nextConfig = {};
+let nextConfig = {};
 
 export default nextConfig;

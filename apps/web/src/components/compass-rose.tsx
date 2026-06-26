@@ -1,12 +1,7 @@
 /* Decorative compass rose — used across the poster and the app mockup. */
 export function CompassRose({ className = "" }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 200 200"
-      className={className}
-      fill="none"
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 200 200" className={className} fill="none" aria-hidden="true">
       <circle cx="100" cy="100" r="96" stroke="currentColor" strokeOpacity="0.25" />
       <circle cx="100" cy="100" r="74" stroke="currentColor" strokeOpacity="0.18" />
       <circle
