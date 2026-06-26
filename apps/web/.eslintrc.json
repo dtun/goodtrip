@@ -1,3 +1,14 @@
 {
-  "extends": "next/core-web-vitals"
+  // `prettier` must be last so it can turn off any stylistic rules that
+  // would otherwise fight Prettier's formatting.
+  "extends": ["next/core-web-vitals", "prettier"],
+  "rules": {
+    // Project convention: `let` is the default; `const` is reserved for genuine
+    // constants (true-const primitive values), NOT merely-unreassigned bindings.
+    // e.g. `let thing = [""]` is correct; `const thing = [""]` is not.
+    // This is the inverse of ESLint's `prefer-const`, so we disable that rule —
+    // it cannot be auto-enforced, it's a convention. (Exception: APIs that
+    // *require* const, e.g. next/font loaders, still use const.)
+    "prefer-const": "off"
+  }
 }
