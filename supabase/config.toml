@@ -153,7 +153,11 @@ additional_redirect_urls = [
   "https://127.0.0.1:3000",
   "http://127.0.0.1:3000/trip",
   "http://localhost:3000/trip",
+  "https://goodtrip.info/trip",
 ]
+# NOTE: the hosted project's site_url is https://goodtrip.info (prod). The
+# local value above only drives `supabase start`; don't `supabase config push`
+# this file without accounting for that.
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to the local API URL (http://127.0.0.1:<port>/auth/v1).
