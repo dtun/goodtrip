@@ -26,10 +26,11 @@ export async function fetchOwnProfile(supabase: GoodtripClient): Promise<Profile
   return data;
 }
 
-export async function fetchRoster(supabase: GoodtripClient): Promise<Profile[]> {
+/** All readable profiles — the family roster plus any guests (attribution). */
+export async function fetchProfiles(supabase: GoodtripClient): Promise<Profile[]> {
   let { data, error } = await supabase.from("profiles").select("*");
   if (error) throw error;
-  return familyRoster(data ?? []);
+  return data ?? [];
 }
 
 /** Claim a family identity (or any name) for the signed-in anonymous user. */

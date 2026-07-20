@@ -1,27 +1,44 @@
 "use client";
 
 /* The GOODTrip web app shell: anonymous sign-in → claim-a-name (#34) →
-   RLS-gated read of the seeded trip → read-only itinerary. Grown from the
-   Phase 1 walking skeleton (#33); Phase 2 screens replace pieces of this. */
+   RLS-gated reads of the seeded trip → itinerary + live checklists (#35–38).
+   Grown from the Phase 1 walking skeleton (#33). */
 
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
-import type { Profile } from "@goodtrip/shared";
+import type { ChecklistItem, Profile } from "@goodtrip/shared";
 import { getSupabase, getTripId } from "@/lib/supabase";
 import { ensureTripSession, fetchTripItinerary, type TripItinerary } from "@/lib/goodtrip";
-import { claimIdentity, fetchOwnProfile, fetchRoster, hasClaimedName } from "@/lib/identity";
+import {
+  claimIdentity,
+  familyRoster,
+  fetchOwnProfile,
+  fetchProfiles,
+  hasClaimedName,
+} from "@/lib/identity";
+import {
+  fetchTripChecklists,
+  persistToggle,
+  replaceItem,
+  type GroupedChecklists,
+} from "@/lib/checklists";
+import { Avatar } from "@/components/trip/avatar";
+import { ChecklistSection } from "@/components/trip/checklist-section";
 
 type BootData = {
   itinerary: TripItinerary;
   profile: Profile;
-  roster: Profile[];
+  profiles: Profile[];
+  checklists: GroupedChecklists;
 };
+
+type View = "itinerary" | "checklists";
 
 type PageState =
   | { status: "loading" }
   | { status: "error"; message: string }
   | { status: "claim"; data: BootData; claiming: string | null }
-  | { status: "ready"; data: BootData };
+  | { status: "ready"; data: BootData; view: View };
 
 /* Single-flight boot: React StrictMode double-invokes effects in dev, and two
    concurrent anonymous sign-ins race each other into RLS failures. Both
@@ -34,12 +51,13 @@ function bootOnce(): Promise<BootData> {
       let supabase = getSupabase();
       let tripId = getTripId();
       await ensureTripSession(supabase, tripId);
-      let [itinerary, profile, roster] = await Promise.all([
+      let [itinerary, profile, profiles, checklists] = await Promise.all([
         fetchTripItinerary(supabase, tripId),
         fetchOwnProfile(supabase),
-        fetchRoster(supabase),
+        fetchProfiles(supabase),
+        fetchTripChecklists(supabase, tripId),
       ]);
-      return { itinerary, profile, roster };
+      return { itinerary, profile, profiles, checklists };
     } catch (error) {
       boot = null; // let a reload retry
       throw error;
@@ -73,16 +91,13 @@ function formatDate(isoDate: string): string {
   });
 }
 
-function Avatar({ profile, size = "h-8 w-8" }: { profile: Profile; size?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={`inline-flex ${size} shrink-0 items-center justify-center rounded-full font-mono text-xs font-semibold text-cream`}
-      style={{ backgroundColor: profile.avatar_color }}
-    >
-      {profile.display_name.charAt(0).toUpperCase()}
-    </span>
-  );
+/** Update the checklist item in whatever state currently holds BootData. */
+function patchItem(prev: PageState, item: ChecklistItem): PageState {
+  if (prev.status !== "ready" && prev.status !== "claim") return prev;
+  return {
+    ...prev,
+    data: { ...prev.data, checklists: replaceItem(prev.data.checklists, item) },
+  };
 }
 
 function ClaimScreen({
@@ -139,22 +154,44 @@ export default function TripPage() {
 
   useEffect(() => {
     let cancelled = false;
+    let channel: ReturnType<ReturnType<typeof getSupabase>["channel"]> | null = null;
+
     (async () => {
       try {
         let data = await bootOnce();
         if (cancelled) return;
         setState(
           hasClaimedName(data.profile)
-            ? { status: "ready", data }
+            ? { status: "ready", data, view: "itinerary" }
             : { status: "claim", data, claiming: null },
         );
+
+        // Realtime (#38): remote checklist toggles land without a refresh.
+        let supabase = getSupabase();
+        channel = supabase
+          .channel(`checklist-items-${getTripId()}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "UPDATE",
+              schema: "public",
+              table: "checklist_items",
+              filter: `trip_id=eq.${getTripId()}`,
+            },
+            (payload) => {
+              setState((prev) => patchItem(prev, payload.new as ChecklistItem));
+            },
+          )
+          .subscribe();
       } catch (error) {
         console.error("GOODTrip /trip failed:", error);
         if (!cancelled) setState({ status: "error", message: errorMessage(error) });
       }
     })();
+
     return () => {
       cancelled = true;
+      if (channel) getSupabase().removeChannel(channel);
     };
   }, []);
 
@@ -163,12 +200,34 @@ export default function TripPage() {
     setState({ ...state, claiming: member.id });
     try {
       let profile = await claimIdentity(getSupabase(), member);
-      setState({ status: "ready", data: { ...state.data, profile } });
+      setState({ status: "ready", data: { ...state.data, profile }, view: "itinerary" });
     } catch (error) {
       console.error("GOODTrip claim failed:", error);
       setState({ status: "error", message: errorMessage(error) });
     }
   }
+
+  async function handleToggle(item: ChecklistItem) {
+    if (state.status !== "ready") return;
+    let me = state.data.profile;
+    let optimistic: ChecklistItem = item.done
+      ? { ...item, done: false, done_by: null, done_at: null }
+      : { ...item, done: true, done_by: me.id, done_at: new Date().toISOString() };
+
+    setState((prev) => patchItem(prev, optimistic));
+    try {
+      let saved = await persistToggle(getSupabase(), item, me.id);
+      setState((prev) => patchItem(prev, saved));
+    } catch (error) {
+      console.error("GOODTrip toggle failed:", error);
+      setState((prev) => patchItem(prev, item)); // roll back
+    }
+  }
+
+  let profilesById =
+    state.status === "ready" || state.status === "claim"
+      ? new Map(state.data.profiles.map((p) => [p.id, p]))
+      : new Map<string, Profile>();
 
   return (
     <main className="min-h-screen bg-ink px-5 py-12 text-cream sm:px-8">
@@ -190,10 +249,10 @@ export default function TripPage() {
 
         {state.status === "claim" && (
           <ClaimScreen
-            roster={state.data.roster}
+            roster={familyRoster(state.data.profiles)}
             claiming={state.claiming}
             onClaim={handleClaim}
-            onGuest={() => setState({ status: "ready", data: state.data })}
+            onGuest={() => setState({ status: "ready", data: state.data, view: "itinerary" })}
           />
         )}
 
@@ -226,46 +285,93 @@ export default function TripPage() {
                   </span>
                 </button>
               </div>
+
+              <nav className="mt-6 flex gap-2" aria-label="Trip views">
+                {(["itinerary", "checklists"] as const).map((view) => (
+                  <button
+                    key={view}
+                    type="button"
+                    aria-current={state.view === view}
+                    onClick={() => setState({ ...state, view })}
+                    className={`rounded-full px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors ${
+                      state.view === view
+                        ? "bg-gold text-ink"
+                        : "border border-cream/15 text-cream-muted hover:border-gold/50"
+                    }`}
+                  >
+                    {view}
+                  </button>
+                ))}
+              </nav>
             </header>
 
-            <div className="mt-8 space-y-10">
-              {state.data.itinerary.days.map(({ day, activities }) => (
-                <section key={day.id}>
-                  <h2 className="flex items-baseline gap-3 border-b border-gold/15 pb-2">
-                    <span className="font-display text-2xl text-gold">
-                      {String(day.day_number).padStart(2, "0")}
-                    </span>
-                    <span className="text-lg font-medium">{day.title}</span>
-                    <span className="ml-auto font-mono text-[11px] uppercase tracking-wide text-cream-muted">
-                      {formatDate(day.date)}
-                    </span>
-                  </h2>
-                  <ul className="divide-y divide-cream/10">
-                    {activities.map((activity) => (
-                      <li key={activity.id} className="flex gap-4 py-3">
-                        <span className="w-16 shrink-0 pt-0.5 font-mono text-[11px] uppercase leading-tight text-gold/70">
-                          {activity.time_label}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium leading-snug">
-                            {activity.title}
-                            {activity.confirmed && (
-                              <Check
-                                aria-label="Confirmed"
-                                className="ml-2 inline h-3.5 w-3.5 text-gold"
-                              />
+            {state.view === "checklists" && (
+              <div className="mt-8 space-y-5">
+                {state.data.checklists.global.map((entry) => (
+                  <ChecklistSection
+                    key={entry.checklist.id}
+                    entry={entry}
+                    profilesById={profilesById}
+                    onToggle={handleToggle}
+                  />
+                ))}
+              </div>
+            )}
+
+            {state.view === "itinerary" && (
+              <div className="mt-8 space-y-10">
+                {state.data.itinerary.days.map(({ day, activities }) => (
+                  <section key={day.id}>
+                    <h2 className="flex items-baseline gap-3 border-b border-gold/15 pb-2">
+                      <span className="font-display text-2xl text-gold">
+                        {String(day.day_number).padStart(2, "0")}
+                      </span>
+                      <span className="text-lg font-medium">{day.title}</span>
+                      <span className="ml-auto font-mono text-[11px] uppercase tracking-wide text-cream-muted">
+                        {formatDate(day.date)}
+                      </span>
+                    </h2>
+                    <ul className="divide-y divide-cream/10">
+                      {activities.map((activity) => (
+                        <li key={activity.id} className="flex gap-4 py-3">
+                          <span className="w-16 shrink-0 pt-0.5 font-mono text-[11px] uppercase leading-tight text-gold/70">
+                            {activity.time_label}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium leading-snug">
+                              {activity.title}
+                              {activity.confirmed && (
+                                <Check
+                                  aria-label="Confirmed"
+                                  className="ml-2 inline h-3.5 w-3.5 text-gold"
+                                />
+                              )}
+                            </p>
+                            {activity.location && (
+                              <p className="mt-1 text-xs text-cream-muted">{activity.location}</p>
                             )}
-                          </p>
-                          {activity.location && (
-                            <p className="mt-1 text-xs text-cream-muted">{activity.location}</p>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ))}
-            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {(state.data.checklists.byDay.get(day.id) ?? []).length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        {state.data.checklists.byDay.get(day.id)!.map((entry) => (
+                          <ChecklistSection
+                            key={entry.checklist.id}
+                            entry={entry}
+                            profilesById={profilesById}
+                            onToggle={handleToggle}
+                            heading="summary"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
