@@ -74,8 +74,19 @@ export function AskPanel({
       ]);
     } finally {
       setBusy(false);
-      requestAnimationFrame(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight }));
+      scrollToBottom();
     }
+  }
+
+  function scrollToBottom() {
+    // Double rAF: give React a frame to commit the new message to the DOM
+    // before measuring scrollHeight, so long replies aren't left clipped
+    // at the bottom of the scroll container.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+      });
+    });
   }
 
   function setCard(messageIndex: number, cardId: string, patch: Partial<Card>) {
@@ -107,7 +118,7 @@ export function AskPanel({
 
   return (
     <div className="mt-8 flex flex-col">
-      <div ref={listRef} className="max-h-[55vh] space-y-4 overflow-y-auto pb-2">
+      <div ref={listRef} className="max-h-[55dvh] space-y-4 overflow-y-auto pb-2">
         {messages.length === 0 && (
           <div className="rounded-xl border border-cream/10 bg-ink-800/40 px-5 py-6 text-center">
             <Sparkles className="mx-auto h-5 w-5 text-gold" aria-hidden />
@@ -221,7 +232,7 @@ export function AskPanel({
           onChange={(event) => setInput(event.target.value)}
           placeholder="Ask GOODTrip…"
           disabled={busy}
-          className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-cream-muted/60"
+          className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-cream-muted/60 sm:text-sm"
         />
         <button
           type="submit"
