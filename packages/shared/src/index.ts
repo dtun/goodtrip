@@ -12,15 +12,15 @@ export type ISODateTime = string;
 
 export type TripMemberRole = "owner" | "member";
 
-export interface Profile {
+export type Profile = {
   id: UUID;
   display_name: string;
   avatar_color: string;
   created_at: ISODateTime;
   updated_at: ISODateTime;
-}
+};
 
-export interface Trip {
+export type Trip = {
   id: UUID;
   name: string;
   destination: string;
@@ -30,17 +30,17 @@ export interface Trip {
   created_by: UUID | null;
   created_at: ISODateTime;
   updated_at: ISODateTime;
-}
+};
 
-export interface TripMember {
+export type TripMember = {
   id: UUID;
   trip_id: UUID;
   user_id: UUID;
   role: TripMemberRole;
   joined_at: ISODateTime;
-}
+};
 
-export interface Day {
+export type Day = {
   id: UUID;
   trip_id: UUID;
   day_number: number;
@@ -48,9 +48,9 @@ export interface Day {
   title: string;
   created_at: ISODateTime;
   updated_at: ISODateTime;
-}
+};
 
-export interface Activity {
+export type Activity = {
   id: UUID;
   trip_id: UUID;
   day_id: UUID;
@@ -68,10 +68,10 @@ export interface Activity {
   created_by: UUID | null;
   created_at: ISODateTime;
   updated_at: ISODateTime;
-}
+};
 
 /** A checklist; global to the trip when `day_id` is null, per-day otherwise. */
-export interface Checklist {
+export type Checklist = {
   id: UUID;
   trip_id: UUID;
   day_id: UUID | null;
@@ -79,9 +79,9 @@ export interface Checklist {
   position: number;
   created_at: ISODateTime;
   updated_at: ISODateTime;
-}
+};
 
-export interface ChecklistItem {
+export type ChecklistItem = {
   id: UUID;
   trip_id: UUID;
   checklist_id: UUID;
@@ -92,16 +92,16 @@ export interface ChecklistItem {
   done_at: ISODateTime | null;
   created_at: ISODateTime;
   updated_at: ISODateTime;
-}
+};
 
-export interface ActivityFeedEntry {
+export type ActivityFeedEntry = {
   id: UUID;
   trip_id: UUID;
   actor_id: UUID | null;
   verb: string;
   target: string;
   created_at: ISODateTime;
-}
+};
 
 /** Insert shape for a row type: database-generated columns become optional. */
 type Insert<Row, Generated extends keyof Row> = Omit<Row, Generated> &
@@ -145,7 +145,7 @@ export type ActivityFeedEntryInsert = Insert<ActivityFeedEntry, "id" | "created_
  * Database definition for `createClient<Database>()` from @supabase/supabase-js.
  * Covers the tables used through Phase 3; `ai_conversations` lands in Phase 4.
  */
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       profiles: {
@@ -204,4 +204,4 @@ export interface Database {
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
-}
+};
