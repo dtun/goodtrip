@@ -1,20 +1,25 @@
 "use client";
 
-/* The GOODTrip web app shell: anonymous sign-in → claim-a-name (#34) →
-   RLS-gated reads of the seeded trip → itinerary + live checklists (#35–38).
-   Grown from the Phase 1 walking skeleton (#33). */
+/* The GOODTrip web app shell: welcome (returning email or fresh anonymous
+   sign-in, spec §4) → claim-a-name (#34) → RLS-gated reads of the seeded
+   trip → itinerary + live checklists (#35–38). Grown from the Phase 1
+   walking skeleton (#33). */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CalendarDays, Check, MapPin, Plane, Sparkles, SquareCheckBig } from "lucide-react";
 import type { ChecklistItem, Profile } from "@goodtrip/shared";
-import { getSupabase, getTripId } from "@/lib/supabase";
+import { getSupabase, getTripId, type GoodtripClient } from "@/lib/supabase";
 import { ensureTripSession, fetchTripItinerary, type TripItinerary } from "@/lib/goodtrip";
 import {
   claimIdentity,
   familyRoster,
+  fetchLinkedEmail,
   fetchOwnProfile,
   fetchProfiles,
   hasClaimedName,
+  linkEmail,
+  sendSignInLink,
+  type LinkedEmail,
 } from "@/lib/identity";
 import {
   fetchTripChecklists,
@@ -24,6 +29,7 @@ import {
 } from "@/lib/checklists";
 import { errorMessage } from "@/lib/utils";
 import { Avatar } from "@/components/trip/avatar";
+import { SaveSpotBanner, WelcomeScreen } from "@/components/trip/account";
 import { ChecklistSection } from "@/components/trip/checklist-section";
 import { AskPanel } from "@/components/trip/ask-panel";
 import { CompassRose } from "@/components/compass-rose";
@@ -41,12 +47,14 @@ type BootData = {
   profile: Profile;
   profiles: Profile[];
   checklists: GroupedChecklists;
+  linkedEmail: LinkedEmail;
 };
 
 type View = "itinerary" | "checklists" | "ask";
 
 type PageState =
   | { status: "loading" }
+  | { status: "welcome" }
   | { status: "error"; message: string }
   | { status: "claim"; data: BootData; claiming: string | null }
   | { status: "ready"; data: BootData; view: View };
@@ -62,13 +70,14 @@ function bootOnce(): Promise<BootData> {
       let supabase = getSupabase();
       let tripId = getTripId();
       await ensureTripSession(supabase, tripId);
-      let [itinerary, profile, profiles, checklists] = await Promise.all([
+      let [itinerary, profile, profiles, checklists, linkedEmail] = await Promise.all([
         fetchTripItinerary(supabase, tripId),
         fetchOwnProfile(supabase),
         fetchProfiles(supabase),
         fetchTripChecklists(supabase, tripId),
+        fetchLinkedEmail(supabase),
       ]);
-      return { itinerary, profile, profiles, checklists };
+      return { itinerary, profile, profiles, checklists, linkedEmail };
     } catch (error) {
       boot = null; // let a reload retry
       throw error;
@@ -167,38 +176,54 @@ function ClaimScreen({
 
 export default function TripPage() {
   let [state, setState] = useState<PageState>({ status: "loading" });
+  let channelRef = useRef<ReturnType<GoodtripClient["channel"]> | null>(null);
+
+  /** Boot into the trip (signing in anonymously if needed) and go live. */
+  async function enterTrip(isCancelled: () => boolean = () => false) {
+    let data = await bootOnce();
+    if (isCancelled()) return;
+    setState(
+      hasClaimedName(data.profile)
+        ? { status: "ready", data, view: "itinerary" }
+        : { status: "claim", data, claiming: null },
+    );
+
+    // Realtime (#38): remote checklist toggles land without a refresh.
+    if (!channelRef.current) {
+      channelRef.current = getSupabase()
+        .channel(`checklist-items-${getTripId()}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "checklist_items",
+            filter: `trip_id=eq.${getTripId()}`,
+          },
+          (payload) => {
+            setState((prev) => patchItem(prev, payload.new as ChecklistItem));
+          },
+        )
+        .subscribe();
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
-    let channel: ReturnType<ReturnType<typeof getSupabase>["channel"]> | null = null;
 
     (async () => {
       try {
-        let data = await bootOnce();
+        // Peek before booting: a fresh browser gets the welcome screen instead
+        // of a silently minted anonymous profile it may immediately abandon.
+        let {
+          data: { session },
+        } = await getSupabase().auth.getSession();
         if (cancelled) return;
-        setState(
-          hasClaimedName(data.profile)
-            ? { status: "ready", data, view: "itinerary" }
-            : { status: "claim", data, claiming: null },
-        );
-
-        // Realtime (#38): remote checklist toggles land without a refresh.
-        let supabase = getSupabase();
-        channel = supabase
-          .channel(`checklist-items-${getTripId()}`)
-          .on(
-            "postgres_changes",
-            {
-              event: "UPDATE",
-              schema: "public",
-              table: "checklist_items",
-              filter: `trip_id=eq.${getTripId()}`,
-            },
-            (payload) => {
-              setState((prev) => patchItem(prev, payload.new as ChecklistItem));
-            },
-          )
-          .subscribe();
+        if (!session) {
+          setState({ status: "welcome" });
+          return;
+        }
+        await enterTrip(() => cancelled);
       } catch (error) {
         console.error("GOODTrip /trip failed:", error);
         if (!cancelled) setState({ status: "error", message: errorMessage(error) });
@@ -207,9 +232,35 @@ export default function TripPage() {
 
     return () => {
       cancelled = true;
-      if (channel) getSupabase().removeChannel(channel);
+      if (channelRef.current) {
+        getSupabase().removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /** Where magic links land — must be in the Supabase redirect allow-list. */
+  function tripRedirectUrl(): string {
+    return `${window.location.origin}/trip`;
+  }
+
+  async function handleContinueAsNew() {
+    setState({ status: "loading" });
+    try {
+      await enterTrip();
+    } catch (error) {
+      console.error("GOODTrip anonymous entry failed:", error);
+      setState({ status: "error", message: errorMessage(error) });
+    }
+  }
+
+  async function handleLinkEmail(email: string) {
+    let linked = await linkEmail(getSupabase(), email, tripRedirectUrl());
+    setState((prev) =>
+      prev.status === "ready" ? { ...prev, data: { ...prev.data, linkedEmail: linked } } : prev,
+    );
+  }
 
   async function handleClaim(member: Profile) {
     if (state.status !== "claim") return;
@@ -274,6 +325,13 @@ export default function TripPage() {
             </p>
             <p className="mt-3 text-sm text-cream-muted">{state.message}</p>
           </div>
+        )}
+
+        {state.status === "welcome" && (
+          <WelcomeScreen
+            onSendLink={(email) => sendSignInLink(getSupabase(), email, tripRedirectUrl())}
+            onContinueAsNew={handleContinueAsNew}
+          />
         )}
 
         {state.status === "claim" && (
@@ -363,6 +421,12 @@ export default function TripPage() {
                 </nav>
               </div>
             </header>
+
+            <SaveSpotBanner
+              linked={state.data.linkedEmail}
+              onLink={handleLinkEmail}
+              onSendSignInLink={(email) => sendSignInLink(getSupabase(), email, tripRedirectUrl())}
+            />
 
             {state.view === "ask" && (
               <AskPanel
