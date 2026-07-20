@@ -24,6 +24,7 @@ import {
 } from "@/lib/checklists";
 import { Avatar } from "@/components/trip/avatar";
 import { ChecklistSection } from "@/components/trip/checklist-section";
+import { AskPanel } from "@/components/trip/ask-panel";
 
 type BootData = {
   itinerary: TripItinerary;
@@ -32,7 +33,7 @@ type BootData = {
   checklists: GroupedChecklists;
 };
 
-type View = "itinerary" | "checklists";
+type View = "itinerary" | "checklists" | "ask";
 
 type PageState =
   | { status: "loading" }
@@ -207,6 +208,19 @@ export default function TripPage() {
     }
   }
 
+  /** Re-read itinerary + checklists after an AI op writes (#41). */
+  async function refreshTripData() {
+    let supabase = getSupabase();
+    let tripId = getTripId();
+    let [itinerary, checklists] = await Promise.all([
+      fetchTripItinerary(supabase, tripId),
+      fetchTripChecklists(supabase, tripId),
+    ]);
+    setState((prev) =>
+      prev.status === "ready" ? { ...prev, data: { ...prev.data, itinerary, checklists } } : prev,
+    );
+  }
+
   async function handleToggle(item: ChecklistItem) {
     if (state.status !== "ready") return;
     let me = state.data.profile;
@@ -287,7 +301,7 @@ export default function TripPage() {
               </div>
 
               <nav className="mt-6 flex gap-2" aria-label="Trip views">
-                {(["itinerary", "checklists"] as const).map((view) => (
+                {(["itinerary", "checklists", "ask"] as const).map((view) => (
                   <button
                     key={view}
                     type="button"
@@ -304,6 +318,16 @@ export default function TripPage() {
                 ))}
               </nav>
             </header>
+
+            {state.view === "ask" && (
+              <AskPanel
+                tripId={getTripId()}
+                profile={state.data.profile}
+                itinerary={state.data.itinerary}
+                checklists={state.data.checklists}
+                onApplied={refreshTripData}
+              />
+            )}
 
             {state.view === "checklists" && (
               <div className="mt-8 space-y-5">
