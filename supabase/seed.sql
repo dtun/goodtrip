@@ -202,44 +202,44 @@ insert into public.checklists (id, trip_id, day_id, title, position) values
   ('cccccccc-0000-4000-8000-000000000003', '11111111-1111-4111-8111-111111111111', null, 'Documents', 2)
 on conflict (id) do nothing;
 
-insert into public.checklist_items
-  (trip_id, checklist_id, label, position, done, done_by, done_at)
+-- Items start unchecked — real checks come from the family, not the seed.
+insert into public.checklist_items (trip_id, checklist_id, label, position)
 values
   -- Clothing
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000001',
-   'Comfortable walking shoes', 0, true, '00000000-0000-4000-8000-000000000002', now()),
+   'Comfortable walking shoes', 0),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000001',
-   'Light sweater — museums are cold', 1, true, '00000000-0000-4000-8000-000000000007', now()),
+   'Light sweater — museums are cold', 1),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000001',
-   'Compact rain poncho ×8', 2, true, '00000000-0000-4000-8000-000000000008', now()),
+   'Compact rain poncho ×8', 2),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000001',
-   'Nice outfit for Old Ebbitt', 3, false, null, null),
+   'Nice outfit for Old Ebbitt', 3),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000001',
-   'Sunday church outfit', 4, false, null, null),
+   'Sunday church outfit', 4),
   -- Essentials
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000002',
-   'Sunscreen SPF 50+', 0, true, '00000000-0000-4000-8000-000000000004', now()),
+   'Sunscreen SPF 50+', 0),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000002',
-   'Refillable water bottles', 1, true, '00000000-0000-4000-8000-000000000003', now()),
+   'Refillable water bottles', 1),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000002',
-   'Electrolyte packets', 2, true, null, now()),
+   'Electrolyte packets', 2),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000002',
-   'Small backpack (no bags at Capitol)', 3, true, '00000000-0000-4000-8000-000000000001', now()),
+   'Small backpack (no bags at Capitol)', 3),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000002',
-   'First aid kit + medications', 4, false, null, null),
+   'First aid kit + medications', 4),
   -- Documents
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000003',
-   'REAL ID for all adults', 0, true, '00000000-0000-4000-8000-000000000002', now()),
+   'REAL ID for all adults', 0),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000003',
-   'Southwest check-in — 24 hrs before each flight (ATXHVU + AU62AD)', 1, false, null, null),
+   'Southwest check-in — 24 hrs before each flight (ATXHVU + AU62AD)', 1),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000003',
-   'Capitol Tour confirmation (Jul 22)', 2, true, '00000000-0000-4000-8000-000000000001', now()),
+   'Capitol Tour confirmation (Jul 22)', 2),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000003',
-   'All ticket confirmations saved', 3, false, null, null),
+   'All ticket confirmations saved', 3),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000003',
-   'Contactless cards for Metro', 4, false, null, null),
+   'Contactless cards for Metro', 4),
   ('11111111-1111-4111-8111-111111111111', 'cccccccc-0000-4000-8000-000000000003',
-   'Emergency cash', 5, false, null, null);
+   'Emergency cash', 5);
 
 -- ── Per-day Morning / Evening checklists (Days 2–8) ─────────────────────────
 
@@ -277,17 +277,6 @@ cross join (values
 where c.title = 'Evening'
   and d.trip_id = '11111111-1111-4111-8111-111111111111';
 
--- ── Activity feed ───────────────────────────────────────────────────────────
-
-insert into public.activity_feed (trip_id, actor_id, verb, target, created_at)
-values
-  ('11111111-1111-4111-8111-111111111111', '00000000-0000-4000-8000-000000000004',
-   'checked off', 'Sunscreen on everyone', now() - interval '2 minutes'),
-  ('11111111-1111-4111-8111-111111111111', '00000000-0000-4000-8000-000000000008',
-   'confirmed', 'Old Ebbitt Grill', now() - interval '18 minutes'),
-  ('11111111-1111-4111-8111-111111111111', '00000000-0000-4000-8000-000000000002',
-   'added', 'The Wharf dinner to Day 4', now() - interval '1 hour'),
-  ('11111111-1111-4111-8111-111111111111', null,
-   'suggestion accepted', 'Mount Vernon Inn lunch', now() - interval '2 hours');
+-- The activity feed starts empty — it records real actions only.
 
 commit;
