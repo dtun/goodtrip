@@ -273,12 +273,12 @@ export default function TripPage() {
         {state.status === "ready" && (
           <>
             <header className="border-b border-gold/20 pb-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-baseline gap-3">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-gold/70">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-baseline gap-3">
+                  <p className="hidden shrink-0 font-mono text-[10px] uppercase tracking-[0.4em] text-gold/70 sm:block">
                     GOODTrip
                   </p>
-                  <h1 className="font-display text-xl leading-tight">
+                  <h1 className="truncate font-display text-lg leading-tight sm:text-xl">
                     {state.data.itinerary.trip.name}
                   </h1>
                 </div>
@@ -289,7 +289,7 @@ export default function TripPage() {
                   className="flex shrink-0 items-center gap-2 rounded-full border border-cream/15 py-1 pl-1 pr-3 transition-colors hover:border-gold/50"
                 >
                   <Avatar profile={state.data.profile} size="h-7 w-7" />
-                  <span className="font-mono text-[11px] uppercase tracking-wide text-cream-muted">
+                  <span className="hidden font-mono text-[11px] uppercase tracking-wide text-cream-muted sm:inline">
                     {state.data.profile.display_name}
                   </span>
                 </button>
