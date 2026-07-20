@@ -5,7 +5,7 @@
    Grown from the Phase 1 walking skeleton (#33). */
 
 import { useEffect, useState } from "react";
-import { Check } from "lucide-react";
+import { CalendarDays, Check, MapPin, Plane, Sparkles, SquareCheckBig } from "lucide-react";
 import type { ChecklistItem, Profile } from "@goodtrip/shared";
 import { getSupabase, getTripId } from "@/lib/supabase";
 import { ensureTripSession, fetchTripItinerary, type TripItinerary } from "@/lib/goodtrip";
@@ -25,6 +25,15 @@ import {
 import { Avatar } from "@/components/trip/avatar";
 import { ChecklistSection } from "@/components/trip/checklist-section";
 import { AskPanel } from "@/components/trip/ask-panel";
+import { CompassRose } from "@/components/compass-rose";
+
+/* Tab metadata: icon + label per view, so the nav reads as a proper
+   segmented control instead of three bare text pills. */
+const VIEW_META: Record<View, { label: string; icon: typeof Check }> = {
+  itinerary: { label: "Itinerary", icon: CalendarDays },
+  checklists: { label: "Checklists", icon: SquareCheckBig },
+  ask: { label: "Ask", icon: Sparkles },
+};
 
 type BootData = {
   itinerary: TripItinerary;
@@ -90,6 +99,28 @@ function formatDate(isoDate: string): string {
     month: "short",
     day: "numeric",
   });
+}
+
+/* A live status line for the header eyebrow — turns two dates into something
+   that feels alive: a countdown before the trip, a day-counter during it. */
+function tripCountdown(startIso: string, endIso: string): string {
+  let dayMs = 86_400_000;
+  let midnight = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  let now = midnight(new Date());
+  let start = midnight(new Date(`${startIso}T00:00:00`));
+  let end = midnight(new Date(`${endIso}T00:00:00`));
+
+  if (now < start) {
+    let days = Math.round((start - now) / dayMs);
+    if (days === 1) return "Starts tomorrow";
+    return `Starts in ${days} days`;
+  }
+  if (now <= end) {
+    let total = Math.round((end - start) / dayMs) + 1;
+    let current = Math.round((now - start) / dayMs) + 1;
+    return `Day ${current} of ${total}`;
+  }
+  return "Trip complete";
 }
 
 /** Update the checklist item in whatever state currently holds BootData. */
@@ -244,7 +275,7 @@ export default function TripPage() {
       : new Map<string, Profile>();
 
   return (
-    <main className="min-h-screen bg-ink px-5 py-12 text-cream sm:px-8">
+    <main className="min-h-screen bg-ink px-5 pb-16 pt-6 text-cream sm:px-8 sm:py-12">
       <div className="mx-auto max-w-2xl">
         {state.status === "loading" && (
           <p className="font-mono text-sm uppercase tracking-[0.2em] text-cream-muted">
@@ -272,51 +303,81 @@ export default function TripPage() {
 
         {state.status === "ready" && (
           <>
-            <header className="border-b border-gold/20 pb-4">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-baseline gap-3">
-                  <p className="hidden shrink-0 font-mono text-[10px] uppercase tracking-[0.4em] text-gold/70 sm:block">
-                    GOODTrip
-                  </p>
-                  <h1 className="truncate font-display text-lg leading-tight sm:text-xl">
-                    {state.data.itinerary.trip.name}
-                  </h1>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setState({ status: "claim", data: state.data, claiming: null })}
-                  title="Switch who you are"
-                  className="flex shrink-0 items-center gap-2 rounded-full border border-cream/15 py-1 pl-1 pr-3 transition-colors hover:border-gold/50"
-                >
-                  <Avatar profile={state.data.profile} size="h-7 w-7" />
-                  <span className="hidden font-mono text-[11px] uppercase tracking-wide text-cream-muted sm:inline">
-                    {state.data.profile.display_name}
-                  </span>
-                </button>
-              </div>
-              <p className="mt-1 text-xs text-cream-muted">
-                {state.data.itinerary.trip.destination} ·{" "}
-                {formatDate(state.data.itinerary.trip.start_date)} –{" "}
-                {formatDate(state.data.itinerary.trip.end_date)}
-              </p>
+            <header className="relative -mx-5 -mt-6 overflow-hidden border-b border-gold/20 px-5 pb-5 pt-8 sm:mx-0 sm:mt-0 sm:px-0 sm:pb-4 sm:pt-0">
+              {/* Poster atmosphere: a gold horizon glow bleeding from the top,
+                  strong on mobile where the header is the hero, faint on desktop. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 -top-24 h-56 sm:h-40 sm:opacity-60"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(120% 90% at 50% 0%, rgba(201,168,76,0.20), transparent 62%)",
+                }}
+              />
+              <CompassRose className="pointer-events-none absolute -right-14 -top-10 h-44 w-44 text-gold opacity-[0.07] sm:h-32 sm:w-32 sm:opacity-[0.05]" />
 
-              <nav className="mt-4 flex gap-2" aria-label="Trip views">
-                {(["itinerary", "checklists", "ask"] as const).map((view) => (
+              <div className="relative">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-gold-bright">
+                    <Plane className="h-3 w-3" aria-hidden />
+                    {tripCountdown(
+                      state.data.itinerary.trip.start_date,
+                      state.data.itinerary.trip.end_date,
+                    )}
+                  </span>
                   <button
-                    key={view}
                     type="button"
-                    aria-current={state.view === view}
-                    onClick={() => setState({ ...state, view })}
-                    className={`rounded-full px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors ${
-                      state.view === view
-                        ? "bg-gold text-ink"
-                        : "border border-cream/15 text-cream-muted hover:border-gold/50"
-                    }`}
+                    onClick={() => setState({ status: "claim", data: state.data, claiming: null })}
+                    title="Switch who you are"
+                    className="flex shrink-0 items-center gap-2 rounded-full p-1 ring-1 ring-cream/15 transition-colors hover:ring-gold/50 sm:pr-3"
                   >
-                    {view}
+                    <Avatar profile={state.data.profile} size="h-8 w-8" />
+                    <span className="hidden font-mono text-[11px] uppercase tracking-wide text-cream-muted sm:inline">
+                      {state.data.profile.display_name}
+                    </span>
                   </button>
-                ))}
-              </nav>
+                </div>
+
+                <h1 className="mt-4 text-balance font-display text-3xl leading-[1.05] text-shadow-gold sm:mt-3 sm:text-2xl">
+                  {state.data.itinerary.trip.name}
+                </h1>
+
+                <p className="mt-2.5 flex items-center gap-1.5 text-sm text-cream-muted sm:mt-1.5 sm:text-xs">
+                  <MapPin className="h-3.5 w-3.5 shrink-0 text-gold/70" aria-hidden />
+                  <span className="truncate">{state.data.itinerary.trip.destination}</span>
+                  <span className="text-gold/40">·</span>
+                  <span className="whitespace-nowrap">
+                    {formatDate(state.data.itinerary.trip.start_date)} –{" "}
+                    {formatDate(state.data.itinerary.trip.end_date)}
+                  </span>
+                </p>
+
+                <nav
+                  aria-label="Trip views"
+                  className="mt-5 grid grid-cols-3 gap-1 rounded-2xl border border-cream/10 bg-ink-800/70 p-1 sm:mt-4 sm:inline-grid sm:gap-1.5"
+                >
+                  {(["itinerary", "checklists", "ask"] as const).map((view) => {
+                    let active = state.view === view;
+                    let Icon = VIEW_META[view].icon;
+                    return (
+                      <button
+                        key={view}
+                        type="button"
+                        aria-current={active}
+                        onClick={() => setState({ ...state, view })}
+                        className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.15em] transition-colors sm:px-4 sm:py-1.5 ${
+                          active
+                            ? "bg-gold text-ink shadow-[0_1px_8px_rgba(201,168,76,0.35)]"
+                            : "text-cream-muted hover:text-cream"
+                        }`}
+                      >
+                        <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                        {VIEW_META[view].label}
+                      </button>
+                    );
+                  })}
+                </nav>
+              </div>
             </header>
 
             {state.view === "ask" && (
