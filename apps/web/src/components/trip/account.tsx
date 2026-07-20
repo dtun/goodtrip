@@ -118,6 +118,7 @@ export function SaveSpotBanner({
   let [error, setError] = useState<string | null>(null);
   let [taken, setTaken] = useState(false);
   let [signInSentTo, setSignInSentTo] = useState<string | null>(null);
+  let [justLinked, setJustLinked] = useState(false);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -125,7 +126,8 @@ export function SaveSpotBanner({
     setError(null);
     setTaken(false);
     try {
-      await onLink(email); // parent flips linked to pending, which replaces this form
+      await onLink(email); // parent swaps linked to pending/confirmed, replacing this form
+      setJustLinked(true);
     } catch (err) {
       if (isEmailTakenError(err)) {
         setTaken(true);
@@ -151,7 +153,16 @@ export function SaveSpotBanner({
     }
   }
 
-  if (linked.status === "confirmed") return null;
+  if (linked.status === "confirmed") {
+    // Quiet unless the link just happened here — then acknowledge it.
+    if (!justLinked) return null;
+    return (
+      <p className="mt-4 rounded-xl border border-gold/25 bg-gold/10 px-4 py-3 text-xs text-cream-muted">
+        Spot saved — sign in as <span className="text-cream">{linked.email}</span> from any
+        device.
+      </p>
+    );
+  }
 
   if (linked.status === "pending") {
     return (
