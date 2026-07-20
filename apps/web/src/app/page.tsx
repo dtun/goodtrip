@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   CalendarDays,
   ListChecks,
@@ -133,6 +134,9 @@ export default function Home() {
             </span>
           </div>
           <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-[0.2em] text-cream-muted">
+            <Link href="/trip" className="text-gold transition-colors hover:text-gold-bright">
+              Preview
+            </Link>
             <a href="#trip" className="transition-colors hover:text-gold">
               Trip
             </a>
@@ -178,6 +182,26 @@ export default function Home() {
               happening, what&apos;s checked off, and what&apos;s next.
             </p>
 
+            {/* preview access CTA */}
+            <div
+              className="reveal mt-10 flex flex-col items-center gap-3"
+              style={{ animationDelay: "0.28s" }}
+            >
+              <Link
+                href="/trip"
+                className="group inline-flex items-center gap-2.5 rounded-full bg-gold px-7 py-3 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-gold-bright"
+              >
+                Open the app
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </Link>
+              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-cream-muted">
+                Preview access · Live itinerary · No sign-up
+              </p>
+            </div>
+
             {/* boarding-pass meta strip */}
             <dl
               className="reveal mx-auto mt-12 grid max-w-2xl grid-cols-2 gap-px overflow-hidden rounded-lg border border-gold/25 bg-gold/[0.04] text-left sm:grid-cols-4"
@@ -187,7 +211,7 @@ export default function Home() {
                 ["Destination", "Washington, D.C."],
                 ["Dates", "Jul 21–29 ’26"],
                 ["Party", "Family of 8"],
-                ["Platform", "iOS · TestFlight"],
+                ["Platform", "Web preview · iOS next"],
               ].map(([k, v]) => (
                 <div key={k} className="bg-ink/40 px-4 py-3">
                   <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/70">
@@ -236,6 +260,19 @@ export default function Home() {
 
             <div className="mt-16">
               <AppMockup />
+            </div>
+
+            <div className="mt-10 text-center">
+              <Link
+                href="/trip"
+                className="group inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-gold underline decoration-gold/30 underline-offset-[6px] transition-colors hover:text-gold-bright hover:decoration-gold"
+              >
+                Preview access is live — open the web app
+                <ArrowRight
+                  className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </Link>
             </div>
 
             {/* hierarchy */}
