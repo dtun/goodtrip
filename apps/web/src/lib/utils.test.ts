@@ -1,5 +1,21 @@
 import { describe, it, expect } from "vitest";
-import { randomBoolean } from "./utils";
+import { errorMessage, randomBoolean } from "./utils";
+
+describe("errorMessage", () => {
+  it("uses Error messages directly", () => {
+    expect(errorMessage(new Error("boom"))).toBe("boom");
+  });
+
+  it("assembles Supabase-style plain-object errors", () => {
+    expect(errorMessage({ message: "nope", code: "42501", details: "RLS" })).toBe(
+      "nope (42501) RLS",
+    );
+  });
+
+  it("never renders [object Object]", () => {
+    expect(errorMessage({ weird: true })).toBe('{"weird":true}');
+  });
+});
 
 describe("randomBoolean", () => {
   it("should return boolean values", () => {

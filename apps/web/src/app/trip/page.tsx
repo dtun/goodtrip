@@ -22,6 +22,7 @@ import {
   replaceItem,
   type GroupedChecklists,
 } from "@/lib/checklists";
+import { errorMessage } from "@/lib/utils";
 import { Avatar } from "@/components/trip/avatar";
 import { ChecklistSection } from "@/components/trip/checklist-section";
 import { AskPanel } from "@/components/trip/ask-panel";
@@ -74,23 +75,6 @@ function bootOnce(): Promise<BootData> {
     }
   })();
   return boot;
-}
-
-/* Supabase errors (PostgrestError, AuthError) are often plain objects, so a
-   bare String() renders "[object Object]". */
-function errorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (error && typeof error === "object") {
-    let { message, code, details } = error as {
-      message?: string;
-      code?: string;
-      details?: string;
-    };
-    let parts = [message, code && `(${code})`, details].filter(Boolean);
-    if (parts.length) return parts.join(" ");
-    return JSON.stringify(error);
-  }
-  return String(error);
 }
 
 function formatDate(isoDate: string): string {
