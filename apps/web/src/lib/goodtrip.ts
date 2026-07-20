@@ -32,6 +32,11 @@ export async function ensureTripSession(supabase: GoodtripClient, tripId: string
   }
   if (!session) throw new Error("Anonymous sign-in returned no session");
 
+  // The realtime socket doesn't reliably pick up the JWT on its own, and our
+  // policies are scoped `to authenticated` — without this, subscriptions
+  // connect fine but RLS silently filters out every event.
+  await supabase.realtime.setAuth(session.access_token);
+
   let userId = session.user.id;
   let color = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
 
