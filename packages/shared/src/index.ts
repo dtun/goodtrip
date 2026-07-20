@@ -1,7 +1,6 @@
 // @goodtrip/shared — shared types and constants.
-// Data-model types for the tables used through Phase 3 (spec section 3).
-// AI action contracts and `ai_conversations` types (spec section 8) are
-// deferred to Phase 4.
+// Data-model types (spec section 3) and AI action contracts (spec section 8),
+// shared by the web app and the ai-chat edge function.
 
 /** UUID string, e.g. "11111111-1111-4111-8111-111111111111". */
 export type UUID = string;
@@ -113,6 +112,49 @@ export let SEED_FAMILY_PROFILE_ID_PREFIX = "00000000-0000-4000-8000-0000000000";
 export function isFamilyProfile(profile: Pick<Profile, "id">): boolean {
   return profile.id.startsWith(SEED_FAMILY_PROFILE_ID_PREFIX);
 }
+
+// ── AI action contracts (spec section 8) ────────────────────────────────────
+// Ask GOODTrip proposes changes as structured actions; nothing is written
+// until the user confirms a card (#40/#41).
+
+export type AddActivityAction = {
+  type: "add_activity";
+  day_number: number;
+  title: string;
+  time_label?: string | null;
+  location?: string | null;
+  cost?: string | null;
+};
+
+export type UpdateActivityAction = {
+  type: "update_activity";
+  activity_id: UUID;
+  changes: {
+    title?: string;
+    time_label?: string | null;
+    location?: string | null;
+    cost?: string | null;
+    confirmed?: boolean;
+    confirmed_note?: string | null;
+  };
+};
+
+export type CheckItemAction = {
+  type: "check_item";
+  item_id: UUID;
+  done: boolean;
+};
+
+export type AIAction = AddActivityAction | UpdateActivityAction | CheckItemAction;
+
+/** An action awaiting confirmation; id is the model's tool_use id. */
+export type ProposedAction = { id: string; action: AIAction };
+
+export type ChatTurn = { role: "user" | "assistant"; content: string };
+
+export type AIChatRequest = { tripId: UUID; messages: ChatTurn[] };
+
+export type AIChatResponse = { reply: string; actions: ProposedAction[] };
 
 /** Insert shape for a row type: database-generated columns become optional. */
 type Insert<Row, Generated extends keyof Row> = Omit<Row, Generated> &

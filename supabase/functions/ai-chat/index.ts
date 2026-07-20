@@ -1,0 +1,184 @@
+// ai-chat — Ask GOODTrip edge function (spec section 8, issues #24/#25).
+//
+// Verifies the caller's JWT, reads the trip through the caller's own
+// RLS-gated client (non-members get nothing), injects the trip as context,
+// and asks Claude. Itinerary changes come back as tool_use proposals that
+// the client renders as confirmation cards — this function never writes.
+//
+// Secrets: ANTHROPIC_API_KEY (supabase secrets set).
+
+import Anthropic from "npm:@anthropic-ai/sdk@0.57.0";
+import { createClient } from "npm:@supabase/supabase-js@2.49.0";
+
+let MODEL = "claude-sonnet-4-6"; // per spec (README stack)
+
+let corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+let tools: Anthropic.Tool[] = [
+  {
+    name: "add_activity",
+    description:
+      "Propose adding a new activity to a day of the itinerary. Use when the user wants something new on the plan. The user confirms before anything is saved.",
+    input_schema: {
+      type: "object",
+      properties: {
+        day_number: { type: "integer", description: "Which day (1-9) to add it to" },
+        title: { type: "string", description: "Short activity title" },
+        time_label: {
+          type: "string",
+          description: "Freeform time, e.g. '1:00 PM', 'Morning', 'Evening'",
+        },
+        location: { type: "string", description: "Where, incl. helpful notes" },
+        cost: { type: "string", description: "'Free', '$', '$$', or '$$$'" },
+      },
+      required: ["day_number", "title"],
+    },
+  },
+  {
+    name: "update_activity",
+    description:
+      "Propose editing an existing activity (retitle, retime, relocate, set cost, or mark confirmed). Reference the activity by its id from the itinerary context.",
+    input_schema: {
+      type: "object",
+      properties: {
+        activity_id: { type: "string", description: "The activity's id from context" },
+        changes: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            time_label: { type: "string" },
+            location: { type: "string" },
+            cost: { type: "string" },
+            confirmed: { type: "boolean" },
+            confirmed_note: { type: "string" },
+          },
+        },
+      },
+      required: ["activity_id", "changes"],
+    },
+  },
+  {
+    name: "check_item",
+    description:
+      "Propose checking or unchecking a checklist item. Reference the item by its id from the checklist context.",
+    input_schema: {
+      type: "object",
+      properties: {
+        item_id: { type: "string", description: "The checklist item's id from context" },
+        done: { type: "boolean" },
+      },
+      required: ["item_id", "done"],
+    },
+  },
+];
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  try {
+    let apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!apiKey) return json({ error: "ANTHROPIC_API_KEY is not configured" }, 500);
+
+    // A user-scoped client: every read below happens under the caller's RLS.
+    let supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: req.headers.get("Authorization")! } },
+    });
+    let {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return json({ error: "Unauthorized" }, 401);
+
+    let { tripId, messages } = await req.json();
+    if (!tripId || !Array.isArray(messages) || messages.length === 0) {
+      return json({ error: "tripId and messages are required" }, 400);
+    }
+
+    let [trip, days, activities, checklists, items, profiles] = await Promise.all([
+      supabase.from("trips").select("*").eq("id", tripId).maybeSingle(),
+      supabase.from("days").select("*").eq("trip_id", tripId).order("day_number"),
+      supabase.from("activities").select("*").eq("trip_id", tripId).order("position"),
+      supabase.from("checklists").select("*").eq("trip_id", tripId),
+      supabase.from("checklist_items").select("*").eq("trip_id", tripId),
+      supabase.from("profiles").select("id, display_name"),
+    ]);
+    if (trip.error) throw trip.error;
+    if (!trip.data) return json({ error: "Not a member of this trip" }, 403);
+
+    let names = new Map((profiles.data ?? []).map((p) => [p.id, p.display_name]));
+    let me = names.get(user.id) ?? "a trip member";
+
+    let itinerary = (days.data ?? [])
+      .map((day) => {
+        let lines = (activities.data ?? [])
+          .filter((a) => a.day_id === day.id)
+          .map(
+            (a) =>
+              `  - [id ${a.id}] ${a.time_label ?? "anytime"} · ${a.title}` +
+              (a.location ? ` @ ${a.location}` : "") +
+              (a.cost ? ` (${a.cost})` : "") +
+              (a.confirmed ? ` [confirmed${a.confirmed_note ? ": " + a.confirmed_note : ""}]` : ""),
+          );
+        return `Day ${day.day_number} (${day.date}) — ${day.title}\n${lines.join("\n")}`;
+      })
+      .join("\n");
+
+    let lists = (checklists.data ?? [])
+      .map((list) => {
+        let day = (days.data ?? []).find((d) => d.id === list.day_id);
+        let scope = day ? `Day ${day.day_number} ${list.title}` : list.title;
+        let lines = (items.data ?? [])
+          .filter((i) => i.checklist_id === list.id)
+          .map(
+            (i) =>
+              `  - [id ${i.id}] ${i.done ? "[x]" : "[ ]"} ${i.label}` +
+              (i.done && i.done_by ? ` (by ${names.get(i.done_by) ?? "someone"})` : ""),
+          );
+        return `${scope}\n${lines.join("\n")}`;
+      })
+      .join("\n");
+
+    let system = `You are GOODTrip, the family trip assistant for "${trip.data.name}" — ${trip.data.destination}, ${trip.data.start_date} to ${trip.data.end_date}. Lodging: ${trip.data.lodging ?? "n/a"}. Today's date is ${new Date().toISOString().slice(0, 10)}. You are talking to ${me}.
+
+You know the whole trip. Answer questions concretely from the itinerary and checklists below. When the user wants to change the plan — add, edit, or check something off — propose it with the matching tool; the user confirms before anything is saved, so propose confidently and keep your text brief. Reference real days, ids, and names from context only.
+
+ITINERARY
+${itinerary}
+
+CHECKLISTS
+${lists}`;
+
+    let anthropic = new Anthropic({ apiKey });
+    let response = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 1500,
+      system,
+      messages,
+      tools,
+      thinking: { type: "adaptive" },
+    });
+
+    let reply = response.content
+      .filter((block) => block.type === "text")
+      .map((block) => block.text)
+      .join("\n")
+      .trim();
+    let actions = response.content
+      .filter((block) => block.type === "tool_use")
+      .map((block) => ({ id: block.id, action: { type: block.name, ...block.input } }));
+
+    return json({ reply, actions });
+  } catch (error) {
+    console.error("ai-chat failed:", error);
+    let message = error instanceof Error ? error.message : String(error);
+    return json({ error: message }, 500);
+  }
+});
