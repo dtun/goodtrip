@@ -272,20 +272,15 @@ export default function TripPage() {
 
         {state.status === "ready" && (
           <>
-            <header className="border-b border-gold/20 pb-6">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-mono text-[11px] uppercase tracking-[0.4em] text-gold/70">
+            <header className="border-b border-gold/20 pb-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-baseline gap-3">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-gold/70">
                     GOODTrip
                   </p>
-                  <h1 className="mt-3 font-display text-4xl leading-tight">
+                  <h1 className="font-display text-xl leading-tight">
                     {state.data.itinerary.trip.name}
                   </h1>
-                  <p className="mt-2 text-sm text-cream-muted">
-                    {state.data.itinerary.trip.destination} ·{" "}
-                    {formatDate(state.data.itinerary.trip.start_date)} –{" "}
-                    {formatDate(state.data.itinerary.trip.end_date)}
-                  </p>
                 </div>
                 <button
                   type="button"
@@ -299,8 +294,13 @@ export default function TripPage() {
                   </span>
                 </button>
               </div>
+              <p className="mt-1 text-xs text-cream-muted">
+                {state.data.itinerary.trip.destination} ·{" "}
+                {formatDate(state.data.itinerary.trip.start_date)} –{" "}
+                {formatDate(state.data.itinerary.trip.end_date)}
+              </p>
 
-              <nav className="mt-6 flex gap-2" aria-label="Trip views">
+              <nav className="mt-4 flex gap-2" aria-label="Trip views">
                 {(["itinerary", "checklists", "ask"] as const).map((view) => (
                   <button
                     key={view}
@@ -330,7 +330,7 @@ export default function TripPage() {
             )}
 
             {state.view === "checklists" && (
-              <div className="mt-8 space-y-5">
+              <div className="mt-6 space-y-5">
                 {state.data.checklists.global.map((entry) => (
                   <ChecklistSection
                     key={entry.checklist.id}
@@ -343,7 +343,7 @@ export default function TripPage() {
             )}
 
             {state.view === "itinerary" && (
-              <div className="mt-8 space-y-10">
+              <div className="mt-6 space-y-10">
                 {state.data.itinerary.days.map(({ day, activities }) => (
                   <section key={day.id}>
                     <h2 className="flex items-baseline gap-3 border-b border-gold/15 pb-2">
