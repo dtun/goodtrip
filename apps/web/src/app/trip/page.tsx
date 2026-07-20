@@ -14,6 +14,43 @@ type PageState =
   | { status: "error"; message: string }
   | { status: "ready"; itinerary: TripItinerary };
 
+/* Single-flight boot: React StrictMode double-invokes effects in dev, and two
+   concurrent anonymous sign-ins race each other into RLS failures. Both
+   invocations must share one flow. */
+let tripLoad: Promise<TripItinerary> | null = null;
+
+function loadTripOnce(): Promise<TripItinerary> {
+  tripLoad ??= (async () => {
+    try {
+      let supabase = getSupabase();
+      let tripId = getTripId();
+      await ensureTripSession(supabase, tripId);
+      return await fetchTripItinerary(supabase, tripId);
+    } catch (error) {
+      tripLoad = null; // let a reload retry
+      throw error;
+    }
+  })();
+  return tripLoad;
+}
+
+/* Supabase errors (PostgrestError, AuthError) are often plain objects, so a
+   bare String() renders "[object Object]". */
+function errorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object") {
+    let { message, code, details } = error as {
+      message?: string;
+      code?: string;
+      details?: string;
+    };
+    let parts = [message, code && `(${code})`, details].filter(Boolean);
+    if (parts.length) return parts.join(" ");
+    return JSON.stringify(error);
+  }
+  return String(error);
+}
+
 function formatDate(isoDate: string): string {
   return new Date(`${isoDate}T00:00:00`).toLocaleDateString("en-US", {
     weekday: "short",
@@ -29,14 +66,11 @@ export default function TripPage() {
     let cancelled = false;
     (async () => {
       try {
-        let supabase = getSupabase();
-        let tripId = getTripId();
-        await ensureTripSession(supabase, tripId);
-        let itinerary = await fetchTripItinerary(supabase, tripId);
+        let itinerary = await loadTripOnce();
         if (!cancelled) setState({ status: "ready", itinerary });
       } catch (error) {
-        let message = error instanceof Error ? error.message : String(error);
-        if (!cancelled) setState({ status: "error", message });
+        console.error("GOODTrip /trip failed:", error);
+        if (!cancelled) setState({ status: "error", message: errorMessage(error) });
       }
     })();
     return () => {
