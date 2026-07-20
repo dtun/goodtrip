@@ -150,6 +150,8 @@ Deno.serve(async (req) => {
 
 You know the whole trip. Answer questions concretely from the itinerary and checklists below. When the user wants to change the plan — add, edit, or check something off — propose it with the matching tool; the user confirms before anything is saved, so propose confidently and keep your text brief. Reference real days, ids, and names from context only.
 
+Your replies render as plain text in a small chat bubble — no markdown of any kind. Never use asterisks, pound signs, pipes/tables, or backticks. Write short conversational lines; for lists, put one item per line starting with "- ". Times and names go inline, e.g. "10:00 AM - Washington's Mansion Tour (Mount Vernon, VA)".
+
 ITINERARY
 ${itinerary}
 
