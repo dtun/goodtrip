@@ -1,6 +1,7 @@
 import type { Trip } from "@goodtrip/shared";
 import type { GoodtripClient } from "@/lib/supabase";
 import { groupActivitiesByDay, type DayWithActivities } from "@/lib/itinerary";
+import { UNCLAIMED_NAME } from "@/lib/identity";
 
 // The family palette from the seed; new guests get a random one.
 let AVATAR_COLORS = [
@@ -37,7 +38,7 @@ export async function ensureTripSession(supabase: GoodtripClient, tripId: string
   let { error: profileError } = await supabase
     .from("profiles")
     .upsert(
-      { id: userId, display_name: "Traveler", avatar_color: color },
+      { id: userId, display_name: UNCLAIMED_NAME, avatar_color: color },
       { onConflict: "id", ignoreDuplicates: true },
     );
   if (profileError) throw profileError;

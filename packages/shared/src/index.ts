@@ -103,6 +103,17 @@ export type ActivityFeedEntry = {
   created_at: ISODateTime;
 };
 
+/**
+ * The eight seeded family profiles (supabase/seed.sql) share this id prefix —
+ * the DC 2026 beta's claimable roster. Devices sign in anonymously with fresh
+ * UUIDs, so the prefix cleanly separates family identities from guests.
+ */
+export let SEED_FAMILY_PROFILE_ID_PREFIX = "00000000-0000-4000-8000-0000000000";
+
+export function isFamilyProfile(profile: Pick<Profile, "id">): boolean {
+  return profile.id.startsWith(SEED_FAMILY_PROFILE_ID_PREFIX);
+}
+
 /** Insert shape for a row type: database-generated columns become optional. */
 type Insert<Row, Generated extends keyof Row> = Omit<Row, Generated> &
   Partial<Pick<Row, Generated>>;
