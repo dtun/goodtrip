@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import type { Activity, Day } from "@goodtrip/shared";
-import { describeAction } from "./ai";
+import type { Activity, Day, Profile } from "@goodtrip/shared";
+import { applyAction, describeAction, undoChange, type AppliedChange } from "./ai";
+import type { GoodtripClient } from "./supabase";
 import { groupChecklists } from "./checklists";
 import type { TripItinerary } from "./goodtrip";
 
@@ -82,6 +83,124 @@ let checklists = groupChecklists(
     },
   ],
 );
+
+let me: Profile = {
+  id: "99999999-9999-4999-8999-999999999999",
+  display_name: "Danny",
+  avatar_color: "#c9a84c",
+  created_at: "2026-07-20T00:00:00Z",
+  updated_at: "2026-07-20T00:00:00Z",
+};
+
+/** One recorded query: table, verb, values, and filter columns. */
+type Op = {
+  table: string;
+  verb: "insert" | "update" | "delete";
+  values?: Record<string, unknown>;
+  eq?: Record<string, unknown>;
+};
+
+/* A chainable stand-in for the Supabase client that records every write and
+   returns canned rows, so the apply/undo reverse logic can be tested without a
+   live database. `.single()` resolves a promise; a chain awaited at `.eq()`
+   (undo's update/delete) resolves via the thenable. */
+function fakeSupabase(rows: Record<string, Record<string, unknown>> = {}) {
+  let ops: Op[] = [];
+  function builder(table: string) {
+    let op: Op = { table, verb: "insert" };
+    let result = () => ({ data: rows[table] ?? null, error: null });
+    let b = {
+      insert(values: Record<string, unknown>) {
+        op = { table, verb: "insert", values };
+        return b;
+      },
+      update(values: Record<string, unknown>) {
+        op = { table, verb: "update", values };
+        return b;
+      },
+      delete() {
+        op = { table, verb: "delete" };
+        return b;
+      },
+      eq(col: string, val: unknown) {
+        op.eq = { ...op.eq, [col]: val };
+        return b;
+      },
+      select() {
+        return b;
+      },
+      single() {
+        ops.push(op);
+        return Promise.resolve(result());
+      },
+      then(onOk: (v: { data: unknown; error: null }) => unknown, onErr?: (e: unknown) => unknown) {
+        ops.push(op);
+        return Promise.resolve(result()).then(onOk, onErr);
+      },
+    };
+    return b;
+  }
+  return { client: { from: builder } as unknown as GoodtripClient, ops };
+}
+
+describe("applyAction / undoChange", () => {
+  it("adds an activity and undoes by deleting the new row", async () => {
+    let { client, ops } = fakeSupabase({ activities: { id: "new-1" } });
+    let change = await applyAction(
+      client,
+      TRIP,
+      me,
+      { type: "add_activity", day_number: 4, title: "Wharf dinner" },
+      itinerary,
+    );
+    expect(change).toEqual({
+      kind: "added_activity",
+      activityId: "new-1",
+      title: "Wharf dinner",
+      dayNumber: 4,
+    });
+
+    await undoChange(client, TRIP, me, change);
+    let del = ops.find((o) => o.table === "activities" && o.verb === "delete");
+    expect(del?.eq).toEqual({ id: "new-1" });
+  });
+
+  it("snapshots pre-edit values so an update can be reverted", async () => {
+    let { client } = fakeSupabase({ activities: { title: "Dead Sea Scrolls" } });
+    let change = (await applyAction(
+      client,
+      TRIP,
+      me,
+      { type: "update_activity", activity_id: "a1", changes: { time_label: "2:00 PM" } },
+      itinerary,
+    )) as Extract<AppliedChange, { kind: "updated_activity" }>;
+    // a1 had a null time_label in the itinerary fixture — Undo restores that.
+    expect(change.previous).toEqual({ time_label: null });
+
+    let { client: c2, ops } = fakeSupabase({ activities: { title: "Dead Sea Scrolls" } });
+    await undoChange(c2, TRIP, me, change);
+    let upd = ops.find((o) => o.table === "activities" && o.verb === "update");
+    expect(upd?.values).toEqual({ time_label: null });
+    expect(upd?.eq).toEqual({ id: "a1" });
+  });
+
+  it("reverses a check by flipping done back off", async () => {
+    let { client, ops } = fakeSupabase({ checklist_items: { label: "Sunscreen SPF 50+" } });
+    let change = await applyAction(
+      client,
+      TRIP,
+      me,
+      { type: "check_item", item_id: "i1", done: true },
+      itinerary,
+    );
+    expect(change).toMatchObject({ kind: "checked_item", itemId: "i1", done: true });
+
+    await undoChange(client, TRIP, me, change);
+    let undoUpd = ops.filter((o) => o.table === "checklist_items" && o.verb === "update").at(-1);
+    expect(undoUpd?.values).toMatchObject({ done: false, done_by: null });
+    expect(undoUpd?.eq).toEqual({ id: "i1" });
+  });
+});
 
 describe("describeAction", () => {
   it("describes add_activity with day and time", () => {

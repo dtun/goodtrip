@@ -1,7 +1,24 @@
-import type { AIAction, AIChatResponse, ChatTurn, Profile, UUID } from "@goodtrip/shared";
+import type {
+  AIAction,
+  AIChatResponse,
+  ChatTurn,
+  Profile,
+  UpdateActivityAction,
+  UUID,
+} from "@goodtrip/shared";
 import type { GoodtripClient } from "@/lib/supabase";
 import type { TripItinerary } from "@/lib/goodtrip";
 import type { GroupedChecklists } from "@/lib/checklists";
+
+/**
+ * The reverse of a confirmed action, captured at apply-time so the card can
+ * offer an Undo. add_activity records the new row to delete; update_activity
+ * snapshots the pre-edit values; check_item just flips `done` back.
+ */
+export type AppliedChange =
+  | { kind: "added_activity"; activityId: UUID; title: string; dayNumber: number }
+  | { kind: "updated_activity"; activityId: UUID; title: string; previous: UpdateActivityAction["changes"] }
+  | { kind: "checked_item"; itemId: UUID; label: string; done: boolean };
 
 /** Ask the ai-chat edge function; the caller's JWT rides along automatically. */
 export async function sendChat(
@@ -64,9 +81,23 @@ export function describeAction(
   return action.done ? `Check off “${label}”` : `Uncheck “${label}”`;
 }
 
+/** Append one line to the trip's activity feed (#41). */
+async function feed(
+  supabase: GoodtripClient,
+  tripId: UUID,
+  actorId: UUID,
+  verb: string,
+  target: string,
+): Promise<void> {
+  let { error } = await supabase
+    .from("activity_feed")
+    .insert({ trip_id: tripId, actor_id: actorId, verb, target });
+  if (error) throw error;
+}
+
 /**
- * Execute a confirmed action through RLS as the signed-in member and record
- * it on the activity feed (#41).
+ * Execute a confirmed action through RLS as the signed-in member, record it on
+ * the activity feed (#41), and return the change needed to reverse it (Undo).
  */
 export async function applyAction(
   supabase: GoodtripClient,
@@ -74,36 +105,48 @@ export async function applyAction(
   me: Profile,
   action: AIAction,
   itinerary: TripItinerary,
-): Promise<void> {
-  let feed = async (verb: string, target: string) => {
-    let { error } = await supabase
-      .from("activity_feed")
-      .insert({ trip_id: tripId, actor_id: me.id, verb, target });
-    if (error) throw error;
-  };
-
+): Promise<AppliedChange> {
   if (action.type === "add_activity") {
     let dayEntry = itinerary.days.find((d) => d.day.day_number === action.day_number);
     if (!dayEntry) throw new Error(`Day ${action.day_number} is not on this trip`);
     let position = dayEntry.activities.length
       ? Math.max(...dayEntry.activities.map((a) => a.position)) + 1
       : 0;
-    let { error } = await supabase.from("activities").insert({
-      trip_id: tripId,
-      day_id: dayEntry.day.id,
-      position,
-      title: action.title,
-      time_label: action.time_label ?? null,
-      location: action.location ?? null,
-      cost: action.cost ?? null,
-      created_by: me.id,
-    });
+    let { data, error } = await supabase
+      .from("activities")
+      .insert({
+        trip_id: tripId,
+        day_id: dayEntry.day.id,
+        position,
+        title: action.title,
+        time_label: action.time_label ?? null,
+        location: action.location ?? null,
+        cost: action.cost ?? null,
+        created_by: me.id,
+      })
+      .select("id")
+      .single();
     if (error) throw error;
-    await feed("added", `${action.title} to Day ${action.day_number}`);
-    return;
+    if (!data) throw new Error("Activity was not created");
+    await feed(supabase, tripId, me.id, "added", `${action.title} to Day ${action.day_number}`);
+    return {
+      kind: "added_activity",
+      activityId: data.id,
+      title: action.title,
+      dayNumber: action.day_number,
+    };
   }
 
   if (action.type === "update_activity") {
+    let found = findActivity(itinerary, action.activity_id);
+    // Snapshot the pre-edit value of every field this change touches, so Undo
+    // can restore exactly what was there before.
+    let previous: UpdateActivityAction["changes"] = {};
+    if (found) {
+      for (let key of Object.keys(action.changes) as (keyof UpdateActivityAction["changes"])[]) {
+        (previous as Record<string, unknown>)[key] = found.activity[key];
+      }
+    }
     let { data, error } = await supabase
       .from("activities")
       .update(action.changes)
@@ -111,8 +154,13 @@ export async function applyAction(
       .select()
       .single();
     if (error) throw error;
-    await feed("updated", data?.title ?? "an activity");
-    return;
+    await feed(supabase, tripId, me.id, "updated", data?.title ?? "an activity");
+    return {
+      kind: "updated_activity",
+      activityId: action.activity_id,
+      title: data?.title ?? found?.activity.title ?? "an activity",
+      previous,
+    };
   }
 
   let next = action.done
@@ -125,5 +173,42 @@ export async function applyAction(
     .select()
     .single();
   if (error) throw error;
-  await feed(action.done ? "checked off" : "unchecked", data?.label ?? "an item");
+  await feed(supabase, tripId, me.id, action.done ? "checked off" : "unchecked", data?.label ?? "an item");
+  return { kind: "checked_item", itemId: action.item_id, label: data?.label ?? "an item", done: action.done };
+}
+
+/** Reverse a previously-applied change and note the reversal on the feed. */
+export async function undoChange(
+  supabase: GoodtripClient,
+  tripId: UUID,
+  me: Profile,
+  change: AppliedChange,
+): Promise<void> {
+  if (change.kind === "added_activity") {
+    let { error } = await supabase.from("activities").delete().eq("id", change.activityId);
+    if (error) throw error;
+    await feed(supabase, tripId, me.id, "removed", `${change.title} from Day ${change.dayNumber}`);
+    return;
+  }
+
+  if (change.kind === "updated_activity") {
+    let { error } = await supabase
+      .from("activities")
+      .update(change.previous)
+      .eq("id", change.activityId);
+    if (error) throw error;
+    await feed(supabase, tripId, me.id, "reverted", change.title);
+    return;
+  }
+
+  // Reverse a check by flipping `done` back; clear the doer when un-checking.
+  let restored = change.done
+    ? { done: false, done_by: null, done_at: null }
+    : { done: true, done_by: me.id, done_at: new Date().toISOString() };
+  let { error } = await supabase
+    .from("checklist_items")
+    .update(restored)
+    .eq("id", change.itemId);
+  if (error) throw error;
+  await feed(supabase, tripId, me.id, change.done ? "unchecked" : "checked off", change.label);
 }
