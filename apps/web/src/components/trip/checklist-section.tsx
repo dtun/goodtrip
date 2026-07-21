@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type MouseEvent } from "react";
-import { Check, Pencil } from "lucide-react";
+import { Check, ChevronRight, Pencil } from "lucide-react";
 import type { ChecklistItem, Profile, UUID } from "@goodtrip/shared";
 import { doneCount, type ChecklistWithItems } from "@/lib/checklists";
 import { Avatar } from "@/components/trip/avatar";
@@ -144,9 +144,10 @@ export function ChecklistSection({
     return (
       <details className="group relative rounded-lg border border-cream/10 px-4 py-2">
         <summary className="flex cursor-pointer list-none items-center gap-3 py-1 pr-9 [&::-webkit-details-marker]:hidden">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/70 transition-transform group-open:rotate-90">
-            ›
-          </span>
+          <ChevronRight
+            className="h-5 w-5 shrink-0 text-gold/70 transition-transform group-open:rotate-90"
+            aria-hidden
+          />
           <span className="text-sm font-medium">{entry.checklist.title}</span>
           {count}
           {/* Inside <summary> so it stays visible when the accordion is collapsed
