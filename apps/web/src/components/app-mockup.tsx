@@ -19,6 +19,7 @@ import {
   SignalHigh,
 } from "lucide-react";
 import { CompassRose } from "@/components/compass-rose";
+import { WeatherIcon, weatherLabel } from "@/components/weather-badge";
 import {
   TRIP,
   DAYS,
@@ -31,6 +32,8 @@ import {
   FEED,
   type Activity,
   type DayPlan,
+  type Weather,
+  type WeatherByDate,
 } from "@/lib/trip";
 
 type Tab = "itinerary" | "checklists" | "ask" | "trip";
@@ -161,7 +164,7 @@ function ActivityCard({ a }: { a: Activity }) {
 
 /* ── screens ──────────────────────────────────────────────────── */
 
-function DayList({ onOpen }: { onOpen: (n: number) => void }) {
+function DayList({ onOpen, weather }: { onOpen: (n: number) => void; weather: WeatherByDate }) {
   return (
     <div className="space-y-3">
       <div className="rounded-2xl bg-[#3C3B6E] p-4 text-white">
@@ -177,6 +180,7 @@ function DayList({ onOpen }: { onOpen: (n: number) => void }) {
 
       {DAYS.map((d) => {
         const confirmed = d.activities.filter((a) => a.confirmed).length;
+        const w = weather[d.iso];
         return (
           <button
             key={d.n}
@@ -193,6 +197,14 @@ function DayList({ onOpen }: { onOpen: (n: number) => void }) {
                 {d.dow} {d.date} · {d.activities.length} activities
                 {confirmed > 0 ? ` · ${confirmed} confirmed` : ""}
               </p>
+              {w && (
+                <p className="mt-0.5 flex items-center gap-1 text-[11px] text-[#9A7B1F]">
+                  <WeatherIcon sky={w.sky} className="h-3.5 w-3.5" />
+                  <span className="text-[#666]">
+                    {w.hi}° / {w.lo}° · {w.summary}
+                  </span>
+                </p>
+              )}
             </div>
             <div className="relative shrink-0">
               <ProgressRing pct={d.progress} />
@@ -208,7 +220,7 @@ function DayList({ onOpen }: { onOpen: (n: number) => void }) {
   );
 }
 
-function DayDetail({ day }: { day: DayPlan }) {
+function DayDetail({ day, w }: { day: DayPlan; w?: Weather }) {
   return (
     <div className="space-y-4">
       <div>
@@ -216,6 +228,15 @@ function DayDetail({ day }: { day: DayPlan }) {
           Day {day.n} · {day.dow} {day.date}
         </p>
         <h3 className="mt-0.5 font-display text-2xl text-[#111]">{day.title}</h3>
+        {w && (
+          <p
+            className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-[#3C3B6E]/8 px-2.5 py-1 text-xs font-medium text-[#3C3B6E]"
+            title={weatherLabel(w)}
+          >
+            <WeatherIcon sky={w.sky} className="h-4 w-4 text-[#9A7B1F]" />
+            {w.hi}° / {w.lo}° · {w.summary}
+          </p>
+        )}
       </div>
 
       <div className="space-y-2.5">
@@ -438,7 +459,7 @@ const TABS: { id: Tab; label: string; icon: typeof CalendarDays }[] = [
   { id: "trip", label: "Trip", icon: Plane },
 ];
 
-export function AppMockup() {
+export function AppMockup({ weather = {} }: { weather?: WeatherByDate }) {
   const [tab, setTab] = useState<Tab>("itinerary");
   const [openDay, setOpenDay] = useState<number | null>(null);
 
@@ -498,7 +519,11 @@ export function AppMockup() {
           {/* screen body */}
           <div key={screenKey} className="screen-in flex-1 overflow-y-auto px-4 py-4">
             {tab === "itinerary" &&
-              (day ? <DayDetail day={day} /> : <DayList onOpen={setOpenDay} />)}
+              (day ? (
+                <DayDetail day={day} w={weather[day.iso]} />
+              ) : (
+                <DayList onOpen={setOpenDay} weather={weather} />
+              ))}
             {tab === "checklists" && <Checklists />}
             {tab === "ask" && <Ask />}
             {tab === "trip" && <TripOverview />}

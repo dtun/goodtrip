@@ -15,10 +15,27 @@ export type Activity = {
   tags?: string[];
 };
 
+/**
+ * A day's real forecast, fetched at runtime from a weather service and keyed
+ * by the day's `iso` date. `sky` picks the icon. Never hard-coded — a day with
+ * no live data (fetch failed, or the date is beyond the forecast horizon)
+ * simply carries no weather rather than an invented one.
+ */
+export type Weather = {
+  sky: "sunny" | "partly" | "cloudy" | "rain" | "storms";
+  summary: string; // short label, e.g. "Thunderstorms"
+  hi: number; // high, °F
+  lo: number; // low, °F
+};
+
+/** Live forecast keyed by ISO date (YYYY-MM-DD). */
+export type WeatherByDate = Record<string, Weather>;
+
 export type DayPlan = {
   n: number;
   dow: string;
   date: string;
+  iso: string; // ISO date (YYYY-MM-DD) — the weather-lookup key
   title: string;
   cost: string;
   progress: number; // checklist completion %
@@ -61,6 +78,7 @@ export const DAYS: DayPlan[] = [
     n: 1,
     dow: "Tue",
     date: "Jul 21",
+    iso: "2026-07-21",
     title: "Arrival & Settle In",
     cost: "Free",
     progress: 40,
@@ -97,6 +115,7 @@ export const DAYS: DayPlan[] = [
     n: 2,
     dow: "Wed",
     date: "Jul 22",
+    iso: "2026-07-22",
     title: "Capitol Tour + Ford’s Theatre",
     cost: "Free",
     progress: 75,
@@ -131,6 +150,7 @@ export const DAYS: DayPlan[] = [
     n: 3,
     dow: "Thu",
     date: "Jul 23",
+    iso: "2026-07-23",
     title: "Mount Vernon",
     cost: "$$",
     progress: 20,
@@ -183,6 +203,7 @@ export const DAYS: DayPlan[] = [
     n: 4,
     dow: "Fri",
     date: "Jul 24",
+    iso: "2026-07-24",
     title: "Museum of the Bible",
     cost: "$$$",
     progress: 15,
@@ -225,6 +246,7 @@ export const DAYS: DayPlan[] = [
     n: 5,
     dow: "Sat",
     date: "Jul 25",
+    iso: "2026-07-25",
     title: "Rest Day + Monument Walk",
     cost: "$$",
     progress: 10,
@@ -273,6 +295,7 @@ export const DAYS: DayPlan[] = [
     n: 6,
     dow: "Sun",
     date: "Jul 26",
+    iso: "2026-07-26",
     title: "Worship + Holocaust Museum",
     cost: "Free",
     progress: 5,
@@ -302,6 +325,7 @@ export const DAYS: DayPlan[] = [
     n: 7,
     dow: "Mon",
     date: "Jul 27",
+    iso: "2026-07-27",
     title: "Museum of American History",
     cost: "Free",
     progress: 5,
@@ -339,6 +363,7 @@ export const DAYS: DayPlan[] = [
     n: 8,
     dow: "Tue",
     date: "Jul 28",
+    iso: "2026-07-28",
     title: "National Archives + Dinner",
     cost: "$$$",
     progress: 0,
@@ -370,6 +395,7 @@ export const DAYS: DayPlan[] = [
     n: 9,
     dow: "Wed",
     date: "Jul 29",
+    iso: "2026-07-29",
     title: "Departure Day",
     cost: "Free",
     progress: 0,
