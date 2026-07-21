@@ -1,9 +1,12 @@
 import type {
+  Activity,
   AIAction,
   AIChatResponse,
   ChatTurn,
   ChecklistItem,
+  ISODate,
   Profile,
+  ReviseDayAction,
   UpdateActivityAction,
   UUID,
 } from "@goodtrip/shared";
@@ -29,7 +32,27 @@ export type AppliedChange =
   | { kind: "checked_item"; itemId: UUID; label: string; done: boolean }
   | { kind: "added_item"; itemId: UUID; label: string; checklistTitle: string }
   | { kind: "edited_item"; itemId: UUID; label: string; previousLabel: string }
-  | { kind: "removed_item"; item: ChecklistItem };
+  | { kind: "removed_item"; item: ChecklistItem }
+  | {
+      kind: "revised_day";
+      dayId: UUID;
+      dayNumber: number;
+      label: string;
+      /** Pre-revision day fields that changed, so Undo can restore them. */
+      previousDay: { title?: string; date?: ISODate };
+      /** One reversal record per op, captured at apply-time. */
+      steps: RevisedDayStep[];
+    };
+
+/**
+ * The reverse of one op inside a confirmed day revision: an add records the new
+ * row to delete, an update snapshots the pre-edit fields, and a remove keeps the
+ * whole deleted activity so Undo can re-create it intact.
+ */
+export type RevisedDayStep =
+  | { op: "added"; activityId: UUID }
+  | { op: "updated"; activityId: UUID; previous: UpdateActivityAction["changes"] }
+  | { op: "removed"; activity: Activity };
 
 /** Ask the ai-chat edge function; the caller's JWT rides along automatically. */
 export async function sendChat(
@@ -79,12 +102,97 @@ function findChecklist(checklists: GroupedChecklists, id: UUID) {
   return all.find((entry) => entry.checklist.id === id) ?? null;
 }
 
+/** A resolved, human-readable view of one op inside a day revision. */
+export type DayRevisionOpView =
+  | { kind: "add"; title: string; meta: string | null }
+  | { kind: "update"; name: string; changes: string[] }
+  | { kind: "remove"; name: string; meta: string | null };
+
+/**
+ * A whole-day revision resolved against the current itinerary: the day's
+ * before/after title and date plus every activity change spelled out, ready for
+ * the confirmation card to render without re-deriving anything.
+ */
+export type DayRevisionView = {
+  dayNumber: number;
+  summary: string | null;
+  titleChange: { from: string; to: string } | null;
+  dateChange: { from: string; to: string } | null;
+  ops: DayRevisionOpView[];
+};
+
+/** Spell out an activity update field by field, as "from → to" where useful. */
+function describeChanges(changes: UpdateActivityAction["changes"], previous?: Activity): string[] {
+  let out: string[] = [];
+  for (let key of Object.keys(changes) as (keyof UpdateActivityAction["changes"])[]) {
+    let to = changes[key];
+    if (key === "confirmed") {
+      out.push(to ? "mark confirmed" : "mark unconfirmed");
+    } else if (key === "time_label") {
+      let from = previous?.time_label;
+      out.push(from ? `${from} → ${to}` : `time ${to}`);
+    } else if (key === "title") {
+      out.push(`rename to “${to}”`);
+    } else if (key === "location") {
+      out.push(`location: ${to}`);
+    } else if (key === "cost") {
+      out.push(`cost: ${to}`);
+    } else if (key === "confirmed_note") {
+      out.push(`note: ${to}`);
+    }
+  }
+  return out;
+}
+
+/** Resolve a revise_day proposal into a card-ready before/after view. */
+export function summarizeDayRevision(
+  action: ReviseDayAction,
+  itinerary: TripItinerary,
+): DayRevisionView {
+  let day = itinerary.days.find((d) => d.day.day_number === action.day_number)?.day ?? null;
+
+  let titleChange =
+    action.title !== undefined && action.title !== (day?.title ?? "")
+      ? { from: day?.title ?? "", to: action.title }
+      : null;
+  let dateChange =
+    action.date !== undefined && day && action.date !== day.date
+      ? { from: day.date, to: action.date }
+      : null;
+
+  let ops: DayRevisionOpView[] = action.ops.map((op) => {
+    if (op.op === "add") {
+      let meta = [op.time_label, op.location, op.cost].filter(Boolean).join(" · ") || null;
+      return { kind: "add", title: op.title, meta };
+    }
+    let found = findActivity(itinerary, op.activity_id);
+    let name = found ? found.activity.title : "an activity";
+    if (op.op === "update") {
+      return { kind: "update", name, changes: describeChanges(op.changes, found?.activity) };
+    }
+    return { kind: "remove", name, meta: found?.activity.time_label ?? null };
+  });
+
+  return {
+    dayNumber: action.day_number,
+    summary: action.summary?.trim() || null,
+    titleChange,
+    dateChange,
+    ops,
+  };
+}
+
 /** One human-readable line for a confirmation card. */
 export function describeAction(
   action: AIAction,
   itinerary: TripItinerary,
   checklists: GroupedChecklists,
 ): string {
+  if (action.type === "revise_day") {
+    let n = action.ops.length;
+    let count = `${n} ${n === 1 ? "change" : "changes"}`;
+    return `Revise Day ${action.day_number} — ${count}`;
+  }
   if (action.type === "add_activity") {
     let when = action.time_label ? ` · ${action.time_label}` : "";
     return `Add “${action.title}” to Day ${action.day_number}${when}`;
@@ -241,6 +349,87 @@ export async function applyAction(
     return { kind: "removed_item", item: found.item };
   }
 
+  if (action.type === "revise_day") {
+    let dayEntry = itinerary.days.find((d) => d.day.day_number === action.day_number);
+    if (!dayEntry) throw new Error(`Day ${action.day_number} is not on this trip`);
+
+    // Day-level re-title / re-date: snapshot only the fields that actually
+    // change, so Undo restores exactly what was there before.
+    let dayChanges: { title?: string; date?: ISODate } = {};
+    let previousDay: { title?: string; date?: ISODate } = {};
+    if (action.title !== undefined && action.title !== dayEntry.day.title) {
+      dayChanges.title = action.title;
+      previousDay.title = dayEntry.day.title;
+    }
+    if (action.date !== undefined && action.date !== dayEntry.day.date) {
+      dayChanges.date = action.date;
+      previousDay.date = dayEntry.day.date;
+    }
+    if (Object.keys(dayChanges).length > 0) {
+      let { error } = await supabase.from("days").update(dayChanges).eq("id", dayEntry.day.id);
+      if (error) throw error;
+    }
+
+    // Each op runs in turn, recording its reversal so the whole revision undoes
+    // as one unit. New activities append past the current tail.
+    let position = dayEntry.activities.length
+      ? Math.max(...dayEntry.activities.map((a) => a.position)) + 1
+      : 0;
+    let steps: RevisedDayStep[] = [];
+    for (let op of action.ops) {
+      if (op.op === "add") {
+        let { data, error } = await supabase
+          .from("activities")
+          .insert({
+            trip_id: tripId,
+            day_id: dayEntry.day.id,
+            position: position++,
+            title: op.title,
+            time_label: op.time_label ?? null,
+            location: op.location ?? null,
+            cost: op.cost ?? null,
+            created_by: me.id,
+          })
+          .select("id")
+          .single();
+        if (error) throw error;
+        if (!data) throw new Error("Activity was not created");
+        steps.push({ op: "added", activityId: data.id });
+      } else if (op.op === "update") {
+        let found = findActivity(itinerary, op.activity_id);
+        let previous: UpdateActivityAction["changes"] = {};
+        if (found) {
+          for (let key of Object.keys(op.changes) as (keyof UpdateActivityAction["changes"])[]) {
+            (previous as Record<string, unknown>)[key] = found.activity[key];
+          }
+        }
+        let { error } = await supabase
+          .from("activities")
+          .update(op.changes)
+          .eq("id", op.activity_id);
+        if (error) throw error;
+        steps.push({ op: "updated", activityId: op.activity_id, previous });
+      } else {
+        let found = findActivity(itinerary, op.activity_id);
+        if (!found) throw new Error("That activity is no longer on this day");
+        let { error } = await supabase.from("activities").delete().eq("id", op.activity_id);
+        if (error) throw error;
+        steps.push({ op: "removed", activity: found.activity });
+      }
+    }
+
+    let label = `Day ${action.day_number}${action.title ? ` — ${action.title}` : ""}`;
+    await feed(supabase, tripId, me.id, "revised", label);
+    return {
+      kind: "revised_day",
+      dayId: dayEntry.day.id,
+      dayNumber: action.day_number,
+      label,
+      previousDay,
+      steps,
+    };
+  }
+
   let next = action.done
     ? { done: true, done_by: me.id, done_at: new Date().toISOString() }
     : { done: false, done_by: null, done_at: null };
@@ -316,6 +505,32 @@ export async function undoChange(
       .insert({ id, trip_id, checklist_id, label, position, done, done_by, done_at });
     if (error) throw error;
     await feed(supabase, tripId, me.id, "added", label);
+    return;
+  }
+
+  if (change.kind === "revised_day") {
+    // Reverse each op: delete added rows, restore updated fields, and re-create
+    // removed activities exactly (same id, so any reference survives).
+    for (let step of change.steps) {
+      if (step.op === "added") {
+        let { error } = await supabase.from("activities").delete().eq("id", step.activityId);
+        if (error) throw error;
+      } else if (step.op === "updated") {
+        let { error } = await supabase
+          .from("activities")
+          .update(step.previous)
+          .eq("id", step.activityId);
+        if (error) throw error;
+      } else {
+        let { error } = await supabase.from("activities").insert(step.activity);
+        if (error) throw error;
+      }
+    }
+    if (Object.keys(change.previousDay).length > 0) {
+      let { error } = await supabase.from("days").update(change.previousDay).eq("id", change.dayId);
+      if (error) throw error;
+    }
+    await feed(supabase, tripId, me.id, "reverted", change.label);
     return;
   }
 

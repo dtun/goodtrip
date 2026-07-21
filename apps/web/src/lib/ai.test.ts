@@ -1,6 +1,12 @@
 import { describe, it, expect } from "vitest";
 import type { Activity, Day, Profile } from "@goodtrip/shared";
-import { applyAction, describeAction, undoChange, type AppliedChange } from "./ai";
+import {
+  applyAction,
+  describeAction,
+  summarizeDayRevision,
+  undoChange,
+  type AppliedChange,
+} from "./ai";
 import type { GoodtripClient } from "./supabase";
 import { groupChecklists } from "./checklists";
 import type { TripItinerary } from "./goodtrip";
@@ -326,5 +332,130 @@ describe("describeAction", () => {
       checklists,
     );
     expect(text).toBe("Uncheck “a checklist item”");
+  });
+
+  it("counts the ops in a whole-day revision", () => {
+    let text = describeAction(
+      {
+        type: "revise_day",
+        day_number: 1,
+        ops: [
+          { op: "add", title: "New flight" },
+          { op: "remove", activity_id: "a1" },
+        ],
+      },
+      itinerary,
+      checklists,
+    );
+    expect(text).toBe("Revise Day 1 — 2 changes");
+  });
+});
+
+// A one-day fixture with two activities, for whole-day revision tests.
+let reviseItinerary: TripItinerary = {
+  trip: itinerary.trip,
+  days: [
+    {
+      day: day("d1", 1), // date 2026-07-21, title "Day 1"
+      activities: [activity("a1", "d1", "Southwest #2491"), activity("a2", "d1", "White House")],
+    },
+  ],
+};
+
+describe("summarizeDayRevision", () => {
+  it("resolves title/date changes and each op against the itinerary", () => {
+    let view = summarizeDayRevision(
+      {
+        type: "revise_day",
+        day_number: 1,
+        title: "Delayed Arrival",
+        date: "2026-07-22",
+        summary: "Flight delayed to 5 AM by the tornado",
+        ops: [
+          { op: "add", title: "Southwest #2491 (rebooked)", time_label: "5:00 AM", cost: "Free" },
+          { op: "update", activity_id: "a2", changes: { time_label: "9:00 PM" } },
+          { op: "remove", activity_id: "a1" },
+        ],
+      },
+      reviseItinerary,
+    );
+
+    expect(view.dayNumber).toBe(1);
+    expect(view.summary).toBe("Flight delayed to 5 AM by the tornado");
+    expect(view.titleChange).toEqual({ from: "Day 1", to: "Delayed Arrival" });
+    expect(view.dateChange).toEqual({ from: "2026-07-21", to: "2026-07-22" });
+    expect(view.ops).toEqual([
+      { kind: "add", title: "Southwest #2491 (rebooked)", meta: "5:00 AM · Free" },
+      // a2 had a null time_label, so the update reads as a plain "time X".
+      { kind: "update", name: "White House", changes: ["time 9:00 PM"] },
+      { kind: "remove", name: "Southwest #2491", meta: null },
+    ]);
+  });
+
+  it("omits a title change that matches the current title", () => {
+    let view = summarizeDayRevision(
+      { type: "revise_day", day_number: 1, title: "Day 1", ops: [] },
+      reviseItinerary,
+    );
+    expect(view.titleChange).toBeNull();
+    expect(view.dateChange).toBeNull();
+    expect(view.summary).toBeNull();
+  });
+});
+
+describe("applyAction / undoChange — revise_day", () => {
+  it("applies day fields and every op, then undoes them all", async () => {
+    let { client, ops } = fakeSupabase({ activities: { id: "add-1" } });
+    let change = (await applyAction(
+      client,
+      TRIP,
+      me,
+      {
+        type: "revise_day",
+        day_number: 1,
+        title: "Delayed Arrival",
+        date: "2026-07-22",
+        ops: [
+          { op: "add", title: "Southwest #2491 (rebooked)", time_label: "5:00 AM" },
+          { op: "update", activity_id: "a2", changes: { time_label: "9:00 PM" } },
+          { op: "remove", activity_id: "a1" },
+        ],
+      },
+      reviseItinerary,
+      checklists,
+    )) as Extract<AppliedChange, { kind: "revised_day" }>;
+
+    expect(change.kind).toBe("revised_day");
+    expect(change.dayId).toBe("d1");
+    expect(change.previousDay).toEqual({ title: "Day 1", date: "2026-07-21" });
+    expect(change.steps).toEqual([
+      { op: "added", activityId: "add-1" },
+      { op: "updated", activityId: "a2", previous: { time_label: null } },
+      { op: "removed", activity: expect.objectContaining({ id: "a1", title: "Southwest #2491" }) },
+    ]);
+
+    // The day was re-titled and re-dated in one update.
+    let dayUpd = ops.find((o) => o.table === "days" && o.verb === "update");
+    expect(dayUpd?.values).toEqual({ title: "Delayed Arrival", date: "2026-07-22" });
+    // The new activity appended past the tail (both fixtures sit at position 0).
+    let ins = ops.find((o) => o.table === "activities" && o.verb === "insert");
+    expect(ins?.values).toMatchObject({ title: "Southwest #2491 (rebooked)", position: 1 });
+
+    let { client: c2, ops: undoOps } = fakeSupabase();
+    await undoChange(c2, TRIP, me, change);
+    // Added row deleted, updated row restored, removed row re-created, day reset.
+    expect(undoOps.find((o) => o.table === "activities" && o.verb === "delete")?.eq).toEqual({
+      id: "add-1",
+    });
+    let restore = undoOps.find((o) => o.table === "activities" && o.verb === "update");
+    expect(restore?.values).toEqual({ time_label: null });
+    expect(restore?.eq).toEqual({ id: "a2" });
+    expect(
+      undoOps.find((o) => o.table === "activities" && o.verb === "insert")?.values,
+    ).toMatchObject({ id: "a1", title: "Southwest #2491" });
+    expect(undoOps.find((o) => o.table === "days" && o.verb === "update")?.values).toEqual({
+      title: "Day 1",
+      date: "2026-07-21",
+    });
   });
 });

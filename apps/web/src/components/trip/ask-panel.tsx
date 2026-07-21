@@ -8,10 +8,18 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Check, RotateCcw, Sparkles, Undo2, X } from "lucide-react";
 import type { ChatTurn, Profile, ProposedAction, UUID } from "@goodtrip/shared";
 import { getSupabase } from "@/lib/supabase";
-import { applyAction, describeAction, sendChat, undoChange, type AppliedChange } from "@/lib/ai";
+import {
+  applyAction,
+  describeAction,
+  sendChat,
+  summarizeDayRevision,
+  undoChange,
+  type AppliedChange,
+} from "@/lib/ai";
 import type { TripItinerary } from "@/lib/goodtrip";
 import type { GroupedChecklists } from "@/lib/checklists";
 import { localToday } from "@/lib/utils";
+import { DayRevisionSummary } from "@/components/trip/day-revision-card";
 
 type CardStatus = "pending" | "applying" | "applied" | "undoing" | "dismissed" | "failed";
 
@@ -233,12 +241,20 @@ export function AskPanel({
                 key={card.proposal.id}
                 className="mt-2 w-fit max-w-[85%] rounded-xl border border-gold/30 bg-gold/[0.06] px-4 py-3"
               >
-                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/70">
-                  Proposed change
-                </p>
-                <p className="mt-1.5 text-sm">
-                  {describeAction(card.proposal.action, itinerary, checklists)}
-                </p>
+                {card.proposal.action.type === "revise_day" ? (
+                  <DayRevisionSummary
+                    view={summarizeDayRevision(card.proposal.action, itinerary)}
+                  />
+                ) : (
+                  <>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/70">
+                      Proposed change
+                    </p>
+                    <p className="mt-1.5 text-sm">
+                      {describeAction(card.proposal.action, itinerary, checklists)}
+                    </p>
+                  </>
+                )}
                 <div className="mt-2.5 flex items-center gap-3">
                   {card.status === "pending" && (
                     <>
