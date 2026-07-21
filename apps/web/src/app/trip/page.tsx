@@ -428,7 +428,9 @@ export default function TripPage() {
               onSendSignInLink={(email) => sendSignInLink(getSupabase(), email, tripRedirectUrl())}
             />
 
-            {state.view === "ask" && (
+            {/* Kept mounted (hidden when inactive) so the conversation survives
+                tab switches — chat state lives in the panel. */}
+            <div className={state.view === "ask" ? undefined : "hidden"}>
               <AskPanel
                 tripId={getTripId()}
                 profile={state.data.profile}
@@ -436,7 +438,7 @@ export default function TripPage() {
                 checklists={state.data.checklists}
                 onApplied={refreshTripData}
               />
-            )}
+            </div>
 
             {state.view === "checklists" && (
               <div className="mt-6 space-y-5">
