@@ -66,14 +66,24 @@ function ItemRow({
   );
 }
 
-function EditButton({ onClick }: { onClick: (event: MouseEvent) => void }) {
+/* Parked in the card's top-right corner (absolute) rather than inline in the
+   title/summary row, so it never crowds the heading — and it's a tap target, not
+   a hover-reveal, since this is a phone-first app. */
+function EditButton({
+  onClick,
+  className,
+}: {
+  onClick: (event: MouseEvent) => void;
+  className?: string;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex shrink-0 items-center gap-1 rounded-full border border-cream/15 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide text-cream-muted transition-colors hover:border-gold/50 hover:text-cream"
+      aria-label="Edit checklist"
+      className={`absolute z-10 flex h-8 w-8 items-center justify-center rounded-full border border-cream/15 text-cream-muted transition-colors hover:border-gold/50 hover:text-cream active:bg-cream/10 ${className}`}
     >
-      <Pencil className="h-3 w-3" aria-hidden /> Edit
+      <Pencil className="h-3.5 w-3.5" aria-hidden />
     </button>
   );
 }
@@ -94,22 +104,18 @@ export function ChecklistSection({
   let [editing, setEditing] = useState(false);
   let { done, total } = doneCount(entry);
 
+  // Count sits right after the title so the top-right corner stays clear for the
+  // Edit button.
   let count = (
-    <span className="ml-auto font-mono text-[11px] text-cream-muted">
+    <span className="font-mono text-[11px] text-cream-muted">
       {done}/{total}
     </span>
   );
-  // In the <summary> variant the button sits inside a click-to-toggle region,
-  // so it must swallow the event to avoid opening/closing the accordion.
-  let editButton = controls ? (
-    <EditButton
-      onClick={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setEditing(true);
-      }}
-    />
-  ) : null;
+  let openEditor = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setEditing(true);
+  };
 
   let items = (
     <ul className="divide-y divide-cream/[0.06]">
@@ -136,14 +142,18 @@ export function ChecklistSection({
 
   if (heading === "summary") {
     return (
-      <details className="group rounded-lg border border-cream/10 px-4 py-2">
-        <summary className="flex cursor-pointer list-none items-center gap-3 py-1 [&::-webkit-details-marker]:hidden">
+      <details className="group relative rounded-lg border border-cream/10 px-4 py-2">
+        <summary className="flex cursor-pointer list-none items-center gap-3 py-1 pr-9 [&::-webkit-details-marker]:hidden">
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/70 transition-transform group-open:rotate-90">
             ›
           </span>
           <span className="text-sm font-medium">{entry.checklist.title}</span>
           {count}
-          {editButton}
+          {/* Inside <summary> so it stays visible when the accordion is collapsed
+              (a closed <details> hides its other children); absolutely placed so
+              it sits in the corner, and it swallows the click so the tap opens the
+              editor instead of toggling the accordion. */}
+          {controls && <EditButton onClick={openEditor} className="right-2.5 top-2" />}
         </summary>
         {items}
         {sheet}
@@ -152,12 +162,12 @@ export function ChecklistSection({
   }
 
   return (
-    <section className="rounded-xl border border-cream/10 bg-ink-800/40 px-5 py-4">
-      <h3 className="flex items-center gap-3 border-b border-gold/15 pb-2">
+    <section className="relative rounded-xl border border-cream/10 bg-ink-800/40 px-5 py-4">
+      <h3 className="flex items-center gap-2.5 border-b border-gold/15 pb-2 pr-9">
         <span className="text-sm font-medium">{entry.checklist.title}</span>
         {count}
-        {editButton}
       </h3>
+      {controls && <EditButton onClick={openEditor} className="right-3.5 top-3.5" />}
       {items}
       {sheet}
     </section>

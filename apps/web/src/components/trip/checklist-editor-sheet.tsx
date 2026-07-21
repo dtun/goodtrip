@@ -200,7 +200,10 @@ export function ChecklistEditorSheet({
       role="dialog"
       aria-modal="true"
       aria-label={`Edit ${entry.checklist.title}`}
-      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6"
+      // 100dvh, not inset-0: on mobile the browser's collapsing toolbar leaves a
+      // fixed inset-0 overlay short of the visual bottom, so the page peeks out
+      // beneath the sheet. The dynamic viewport unit tracks the real bottom.
+      className="fixed inset-x-0 top-0 z-50 flex h-[100dvh] items-end justify-center sm:items-center sm:p-6"
     >
       <button
         type="button"
@@ -245,7 +248,7 @@ export function ChecklistEditorSheet({
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto border-t border-cream/10 px-4 py-3">
+        <div className="flex-1 overflow-y-auto border-t border-cream/10 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
           {entry.items.length === 0 && (
             <p className="px-2 py-3 text-sm text-cream-muted">
               Nothing here yet — add the first item below.
