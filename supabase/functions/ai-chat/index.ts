@@ -169,13 +169,19 @@ CHECKLISTS
 ${lists}`;
 
     let anthropic = new Anthropic({ apiKey });
+    // Adaptive thinking draws from the same max_tokens budget as the visible
+    // reply, so it needs real headroom: at 1500 the model can spend the whole
+    // budget reasoning about a change and stop (stop_reason "max_tokens") before
+    // emitting any text or tool_use — the client then shows an empty "…" bubble.
+    // Give thinking room, and cap effort so replies stay snappy.
     let response = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 1500,
+      max_tokens: 4096,
       system,
       messages,
       tools,
       thinking: { type: "adaptive" },
+      output_config: { effort: "medium" },
     });
 
     let reply = response.content
@@ -186,6 +192,14 @@ ${lists}`;
     let actions = response.content
       .filter((block) => block.type === "tool_use")
       .map((block) => ({ id: block.id, action: { type: block.name, ...block.input } }));
+
+    // Never hand the client an empty turn: if the model produced neither text
+    // nor a proposal (e.g. it ran out of tokens mid-thought), say so plainly
+    // rather than leaving a blank "…" bubble the user can't act on.
+    if (!reply && actions.length === 0) {
+      reply =
+        "Sorry — I couldn’t put together a response just now. Could you rephrase or try again?";
+    }
 
     return json({ reply, actions });
   } catch (error) {
