@@ -152,7 +152,14 @@ export type ProposedAction = { id: string; action: AIAction };
 
 export type ChatTurn = { role: "user" | "assistant"; content: string };
 
-export type AIChatRequest = { tripId: UUID; messages: ChatTurn[] };
+export type AIChatRequest = {
+  tripId: UUID;
+  messages: ChatTurn[];
+  /** The caller's local date (YYYY-MM-DD) and IANA timezone, so the assistant
+      reasons about "today" from the user's clock rather than the server's UTC. */
+  today?: ISODate;
+  timeZone?: string;
+};
 
 export type AIChatResponse = { reply: string; actions: ProposedAction[] };
 

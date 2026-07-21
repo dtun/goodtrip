@@ -97,10 +97,20 @@ Deno.serve(async (req) => {
     } = await supabase.auth.getUser();
     if (!user) return json({ error: "Unauthorized" }, 401);
 
-    let { tripId, messages } = await req.json();
+    let { tripId, messages, today, timeZone } = await req.json();
     if (!tripId || !Array.isArray(messages) || messages.length === 0) {
       return json({ error: "tripId and messages are required" }, 400);
     }
+
+    // "Today" comes from the caller's local clock (the server runs in UTC, which
+    // reads as tomorrow for users west of it). Validate before it reaches the
+    // prompt; fall back to the server date if it's missing or malformed.
+    let todayLabel =
+      typeof today === "string" && /^\d{4}-\d{2}-\d{2}$/.test(today)
+        ? today
+        : new Date().toISOString().slice(0, 10);
+    let zoneLabel =
+      typeof timeZone === "string" && /^[A-Za-z0-9_+\-/]{1,64}$/.test(timeZone) ? timeZone : "";
 
     let [trip, days, activities, checklists, items, profiles] = await Promise.all([
       supabase.from("trips").select("*").eq("id", tripId).maybeSingle(),
@@ -146,7 +156,7 @@ Deno.serve(async (req) => {
       })
       .join("\n");
 
-    let system = `You are GOODTrip, the family trip assistant for "${trip.data.name}" — ${trip.data.destination}, ${trip.data.start_date} to ${trip.data.end_date}. Lodging: ${trip.data.lodging ?? "n/a"}. Today's date is ${new Date().toISOString().slice(0, 10)}. You are talking to ${me}.
+    let system = `You are GOODTrip, the family trip assistant for "${trip.data.name}" — ${trip.data.destination}, ${trip.data.start_date} to ${trip.data.end_date}. Lodging: ${trip.data.lodging ?? "n/a"}. Today's date is ${todayLabel}${zoneLabel ? ` (${zoneLabel})` : ""}. You are talking to ${me}.
 
 You know the whole trip. Answer questions concretely from the itinerary and checklists below. When the user wants to change the plan — add, edit, or check something off — propose it with the matching tool; the user confirms before anything is saved, so propose confidently and keep your text brief. Reference real days, ids, and names from context only.
 

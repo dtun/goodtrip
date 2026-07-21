@@ -9,6 +9,18 @@ export function randomBoolean(threshold: number = 0.5) {
   return Math.random() < threshold;
 }
 
+/* Today's calendar date in the browser's own timezone as YYYY-MM-DD. The
+   "en-CA" locale formats dates ISO-style, so this stays correct west of UTC
+   where toISOString() would have already rolled over to tomorrow. */
+export function localToday(): string {
+  return new Date().toLocaleDateString("en-CA");
+}
+
+/** The browser's IANA timezone, e.g. "America/Phoenix" (empty if unavailable). */
+export function localTimeZone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";
+}
+
 /* Supabase errors (PostgrestError, AuthError) are often plain objects, so a
    bare String() renders "[object Object]". */
 export function errorMessage(error: unknown): string {

@@ -11,6 +11,7 @@ import { getSupabase } from "@/lib/supabase";
 import { applyAction, describeAction, sendChat, undoChange, type AppliedChange } from "@/lib/ai";
 import type { TripItinerary } from "@/lib/goodtrip";
 import type { GroupedChecklists } from "@/lib/checklists";
+import { localToday } from "@/lib/utils";
 
 type CardStatus = "pending" | "applying" | "applied" | "undoing" | "dismissed" | "failed";
 
@@ -30,7 +31,7 @@ type PanelMessage = {
 function buildSuggestions(itinerary: TripItinerary, checklists: GroupedChecklists): string[] {
   let out: string[] = [];
 
-  let today = new Date().toISOString().slice(0, 10);
+  let today = localToday();
   let nextDay =
     itinerary.days.find(({ day }) => day.date >= today)?.day ?? itinerary.days[0]?.day;
   if (nextDay) out.push(`What’s the plan for Day ${nextDay.day_number}?`);

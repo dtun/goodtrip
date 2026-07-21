@@ -9,6 +9,7 @@ import type {
 import type { GoodtripClient } from "@/lib/supabase";
 import type { TripItinerary } from "@/lib/goodtrip";
 import type { GroupedChecklists } from "@/lib/checklists";
+import { localTimeZone, localToday } from "@/lib/utils";
 
 /**
  * The reverse of a confirmed action, captured at apply-time so the card can
@@ -26,8 +27,10 @@ export async function sendChat(
   tripId: UUID,
   messages: ChatTurn[],
 ): Promise<AIChatResponse> {
+  // Send the caller's local date + timezone so the assistant reasons about
+  // "today" from the user's perspective, not the server's UTC clock.
   let { data, error } = await supabase.functions.invoke("ai-chat", {
-    body: { tripId, messages },
+    body: { tripId, messages, today: localToday(), timeZone: localTimeZone() },
   });
   if (error) {
     let detail = "";
