@@ -348,22 +348,41 @@ export default function TripPage() {
 
   /* Direct human edits to a checklist (#40 companion): add, rename, remove an
      item. Ask makes the same changes as confirmable proposals; here a member
-     just does them. persistToggle's optimistic pattern carries over — rename and
-     remove show instantly and roll back on failure; add waits for the real row
-     (and its server id) before it appears. */
+     just does them, all on persistToggle's optimistic pattern — the change shows
+     instantly and rolls back on failure. Add mints its own id so the optimistic
+     row, the persisted row, and the realtime echo of the insert all share one id
+     and dedupe cleanly through insertItem. */
   async function handleAddItem(entry: ChecklistWithItems, label: string) {
     if (state.status !== "ready") return;
+    let id = crypto.randomUUID();
+    let position = nextItemPosition(entry.items);
+    let now = new Date().toISOString();
+    let optimistic: ChecklistItem = {
+      id,
+      trip_id: getTripId(),
+      checklist_id: entry.checklist.id,
+      label,
+      position,
+      done: false,
+      done_by: null,
+      done_at: null,
+      created_at: now,
+      updated_at: now,
+    };
+    setState((prev) => patchInsert(prev, optimistic));
     try {
       let created = await addItem(
         getSupabase(),
         getTripId(),
         entry.checklist.id,
         label,
-        nextItemPosition(entry.items),
+        position,
+        id,
       );
       setState((prev) => patchInsert(prev, created));
     } catch (error) {
       console.error("GOODTrip add item failed:", error);
+      setState((prev) => patchRemove(prev, id)); // roll back
     }
   }
 

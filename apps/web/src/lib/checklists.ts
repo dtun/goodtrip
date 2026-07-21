@@ -1,4 +1,4 @@
-import type { Checklist, ChecklistItem, UUID } from "@goodtrip/shared";
+import type { Checklist, ChecklistItem, ChecklistItemInsert, UUID } from "@goodtrip/shared";
 import type { GoodtripClient } from "@/lib/supabase";
 
 export type ChecklistWithItems = {
@@ -151,19 +151,22 @@ export async function persistToggle(
   return data;
 }
 
-/** Add a new (unchecked) item to a checklist and return the inserted row. */
+/**
+ * Add a new (unchecked) item to a checklist and return the inserted row.
+ * An optional `id` lets the caller mint the UUID up front so an optimistic row
+ * and its realtime echo share one id (both dedupe through insertItem).
+ */
 export async function addItem(
   supabase: GoodtripClient,
   tripId: UUID,
   checklistId: UUID,
   label: string,
   position: number,
+  id?: UUID,
 ): Promise<ChecklistItem> {
-  let { data, error } = await supabase
-    .from("checklist_items")
-    .insert({ trip_id: tripId, checklist_id: checklistId, label, position })
-    .select()
-    .single();
+  let row: ChecklistItemInsert = { trip_id: tripId, checklist_id: checklistId, label, position };
+  if (id) row.id = id;
+  let { data, error } = await supabase.from("checklist_items").insert(row).select().single();
   if (error) throw error;
   if (!data) throw new Error("Checklist item was not created");
   return data;
