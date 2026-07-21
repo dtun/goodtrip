@@ -165,13 +165,48 @@ export type RemoveItemAction = {
   item_id: UUID;
 };
 
+/**
+ * One change inside a whole-day revision: add a fresh activity, edit an
+ * existing one, or drop one entirely. `activity_id` references a row from the
+ * itinerary context (update/remove only).
+ */
+export type ReviseDayOp =
+  | {
+      op: "add";
+      title: string;
+      time_label?: string | null;
+      location?: string | null;
+      cost?: string | null;
+    }
+  | { op: "update"; activity_id: UUID; changes: UpdateActivityAction["changes"] }
+  | { op: "remove"; activity_id: UUID };
+
+/**
+ * Revise a whole day at once: optionally re-title or re-date it, and add, edit,
+ * or remove several activities together. Used when one disruption cascades
+ * across a day (a weather delay, a flight change, a cancelled tour) so the
+ * whole rework lands as a single confirmation instead of a scatter of cards.
+ */
+export type ReviseDayAction = {
+  type: "revise_day";
+  day_number: number;
+  /** Optional new day title. */
+  title?: string;
+  /** Optional new ISO date, if the day shifts on the calendar. */
+  date?: ISODate;
+  /** One short line explaining why, shown on the card. */
+  summary?: string;
+  ops: ReviseDayOp[];
+};
+
 export type AIAction =
   | AddActivityAction
   | UpdateActivityAction
   | CheckItemAction
   | AddItemAction
   | EditItemAction
-  | RemoveItemAction;
+  | RemoveItemAction
+  | ReviseDayAction;
 
 /** An action awaiting confirmation; id is the model's tool_use id. */
 export type ProposedAction = { id: string; action: AIAction };

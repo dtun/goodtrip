@@ -118,6 +118,66 @@ let tools: Anthropic.Tool[] = [
       required: ["item_id"],
     },
   },
+  {
+    name: "revise_day",
+    description:
+      "Propose a whole-day revision in a single confirmation card: optionally re-title or re-date a day, and add, edit, or remove several of its activities together. Use this — not many separate proposals — when one disruption cascades across a day, e.g. a weather delay, a flight change, or a cancelled tour. Reference the day by its number and existing activities by their [id ...] from the itinerary context.",
+    input_schema: {
+      type: "object",
+      properties: {
+        day_number: { type: "integer", description: "Which day (1-9) this revision applies to" },
+        title: { type: "string", description: "Optional new title for the day" },
+        date: {
+          type: "string",
+          description: "Optional new ISO date (YYYY-MM-DD) if the day shifts on the calendar",
+        },
+        summary: {
+          type: "string",
+          description:
+            "One short line explaining the reason, e.g. 'Flight delayed to 5 AM by the tornado'",
+        },
+        ops: {
+          type: "array",
+          description: "The changes to this day's activities, applied together",
+          items: {
+            type: "object",
+            properties: {
+              op: {
+                type: "string",
+                enum: ["add", "update", "remove"],
+                description: "Add a new activity, update an existing one, or remove one",
+              },
+              activity_id: {
+                type: "string",
+                description: "For update/remove: the activity's id from context",
+              },
+              title: { type: "string", description: "For add: the new activity title" },
+              time_label: {
+                type: "string",
+                description: "For add: freeform time, e.g. '5:00 AM', 'Morning'",
+              },
+              location: { type: "string", description: "For add: where, incl. helpful notes" },
+              cost: { type: "string", description: "For add: 'Free', '$', '$$', or '$$$'" },
+              changes: {
+                type: "object",
+                description: "For update: the fields to change",
+                properties: {
+                  title: { type: "string" },
+                  time_label: { type: "string" },
+                  location: { type: "string" },
+                  cost: { type: "string" },
+                  confirmed: { type: "boolean" },
+                  confirmed_note: { type: "string" },
+                },
+              },
+            },
+            required: ["op"],
+          },
+        },
+      },
+      required: ["day_number", "ops"],
+    },
+  },
 ];
 
 Deno.serve(async (req) => {
@@ -197,7 +257,7 @@ Deno.serve(async (req) => {
 
     let system = `You are GOODTrip, the family trip assistant for "${trip.data.name}" — ${trip.data.destination}, ${trip.data.start_date} to ${trip.data.end_date}. Lodging: ${trip.data.lodging ?? "n/a"}. Today's date is ${todayLabel}${zoneLabel ? ` (${zoneLabel})` : ""}. You are talking to ${me}.
 
-You know the whole trip. Answer questions concretely from the itinerary and checklists below. When the user wants to change the plan — add or edit an activity, check something off, or add, rename, or remove a checklist item — propose it with the matching tool; the user confirms before anything is saved, so propose confidently and keep your text brief. Each checklist and item carries an [id ...] in the context below; reference real days, ids, and names from context only.
+You know the whole trip. Answer questions concretely from the itinerary and checklists below. When the user wants to change the plan — add or edit an activity, check something off, or add, rename, or remove a checklist item — propose it with the matching tool; the user confirms before anything is saved, so propose confidently and keep your text brief. When a single disruption reshapes an entire day — a weather delay, a flight change, a cancelled tour — use revise_day once to re-title or re-date the day and add, edit, or remove its activities together, rather than emitting many separate proposals. Each checklist and item carries an [id ...] in the context below; reference real days, ids, and names from context only.
 
 Your replies render as plain text in a small chat bubble — no markdown of any kind. Never use asterisks, pound signs, pipes/tables, or backticks. Write short conversational lines; for lists, put one item per line starting with "- ". Times and names go inline, e.g. "10:00 AM - Washington's Mansion Tour (Mount Vernon, VA)".
 
