@@ -3,6 +3,7 @@ import { DAYS, TRIP, type Activity, type DayPlan } from "@/lib/trip";
 import { CompassRose } from "@/components/compass-rose";
 import { PrintButton } from "@/components/print-button";
 import { CopyCode } from "@/components/copy-code";
+import { WeatherIcon, weatherLabel } from "@/components/weather-badge";
 
 const MEMBERS_LINE = "Danny · Ellen · Jack · Eva · Elizabeth · Elisha · GG · Papa";
 
@@ -90,8 +91,19 @@ function DaySection({ d }: { d: DayPlan }) {
             {num}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
-              {d.dow} · {d.date}
+            <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
+              <span>
+                {d.dow} · {d.date}
+              </span>
+              <span
+                className="inline-flex items-center gap-1.5 text-gold/80"
+                title={weatherLabel(d.weather)}
+              >
+                <WeatherIcon sky={d.weather.sky} className="h-3.5 w-3.5" />
+                <span className="tracking-[0.1em]">
+                  {d.weather.hi}° / {d.weather.lo}° · {d.weather.summary}
+                </span>
+              </span>
             </p>
             <h3 className="mt-1.5 font-display text-xl leading-tight text-cream sm:text-2xl">
               {d.title}
@@ -192,6 +204,7 @@ export function PrintableItinerary() {
               Day {d.n} · {d.dow} {d.date} — {d.title}
               <span className="font-normal"> ({d.cost})</span>
             </h2>
+            <p className="text-[11px] text-gray-600">Forecast: {weatherLabel(d.weather)}</p>
             <ul className="mt-1 border-l-2 border-gray-300 pl-3">
               {d.activities.map((a, i) => (
                 <li key={i} className="py-0.5 text-[13px] leading-snug">

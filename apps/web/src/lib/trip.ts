@@ -15,6 +15,14 @@ export type Activity = {
   tags?: string[];
 };
 
+/** A day's forecast. `sky` picks the icon; late-July D.C. runs hot and humid. */
+export type Weather = {
+  sky: "sunny" | "partly" | "cloudy" | "storms";
+  summary: string; // short label, e.g. "PM storms"
+  hi: number; // high, °F
+  lo: number; // low, °F
+};
+
 export type DayPlan = {
   n: number;
   dow: string;
@@ -22,6 +30,7 @@ export type DayPlan = {
   title: string;
   cost: string;
   progress: number; // checklist completion %
+  weather: Weather;
   activities: Activity[];
 };
 
@@ -64,6 +73,7 @@ export const DAYS: DayPlan[] = [
     title: "Arrival & Settle In",
     cost: "Free",
     progress: 40,
+    weather: { sky: "sunny", summary: "Hot & clear", hi: 91, lo: 74 },
     activities: [
       {
         time: "10:00 AM",
@@ -100,6 +110,7 @@ export const DAYS: DayPlan[] = [
     title: "Capitol Tour + Ford’s Theatre",
     cost: "Free",
     progress: 75,
+    weather: { sky: "partly", summary: "Partly sunny", hi: 90, lo: 73 },
     activities: [
       {
         time: "10:30 AM",
@@ -134,6 +145,7 @@ export const DAYS: DayPlan[] = [
     title: "Mount Vernon",
     cost: "$$",
     progress: 20,
+    weather: { sky: "storms", summary: "PM storms", hi: 88, lo: 72 },
     activities: [
       {
         time: "10:00 AM",
@@ -186,6 +198,7 @@ export const DAYS: DayPlan[] = [
     title: "Museum of the Bible",
     cost: "$$$",
     progress: 15,
+    weather: { sky: "partly", summary: "Humid", hi: 89, lo: 73 },
     activities: [
       {
         time: "1:00 PM",
@@ -228,6 +241,7 @@ export const DAYS: DayPlan[] = [
     title: "Rest Day + Monument Walk",
     cost: "$$",
     progress: 10,
+    weather: { sky: "sunny", summary: "Sunny", hi: 92, lo: 75 },
     activities: [
       {
         time: "Morning",
@@ -276,6 +290,7 @@ export const DAYS: DayPlan[] = [
     title: "Worship + Holocaust Museum",
     cost: "Free",
     progress: 5,
+    weather: { sky: "storms", summary: "Scattered storms", hi: 87, lo: 71 },
     activities: [
       {
         time: "10:30 AM",
@@ -305,6 +320,7 @@ export const DAYS: DayPlan[] = [
     title: "Museum of American History",
     cost: "Free",
     progress: 5,
+    weather: { sky: "partly", summary: "Partly sunny", hi: 90, lo: 73 },
     activities: [
       {
         time: "10:00 AM",
@@ -342,6 +358,7 @@ export const DAYS: DayPlan[] = [
     title: "National Archives + Dinner",
     cost: "$$$",
     progress: 0,
+    weather: { sky: "sunny", summary: "Hot & clear", hi: 91, lo: 74 },
     activities: [
       {
         time: "1:00 PM",
@@ -373,6 +390,7 @@ export const DAYS: DayPlan[] = [
     title: "Departure Day",
     cost: "Free",
     progress: 0,
+    weather: { sky: "partly", summary: "Partly sunny", hi: 89, lo: 72 },
     activities: [
       {
         time: "Morning",

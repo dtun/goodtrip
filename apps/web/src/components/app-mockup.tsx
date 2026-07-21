@@ -19,6 +19,7 @@ import {
   SignalHigh,
 } from "lucide-react";
 import { CompassRose } from "@/components/compass-rose";
+import { WeatherIcon, weatherLabel } from "@/components/weather-badge";
 import {
   TRIP,
   DAYS,
@@ -193,6 +194,12 @@ function DayList({ onOpen }: { onOpen: (n: number) => void }) {
                 {d.dow} {d.date} · {d.activities.length} activities
                 {confirmed > 0 ? ` · ${confirmed} confirmed` : ""}
               </p>
+              <p className="mt-0.5 flex items-center gap-1 text-[11px] text-[#9A7B1F]">
+                <WeatherIcon sky={d.weather.sky} className="h-3.5 w-3.5" />
+                <span className="text-[#666]">
+                  {d.weather.hi}° / {d.weather.lo}° · {d.weather.summary}
+                </span>
+              </p>
             </div>
             <div className="relative shrink-0">
               <ProgressRing pct={d.progress} />
@@ -216,6 +223,13 @@ function DayDetail({ day }: { day: DayPlan }) {
           Day {day.n} · {day.dow} {day.date}
         </p>
         <h3 className="mt-0.5 font-display text-2xl text-[#111]">{day.title}</h3>
+        <p
+          className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-[#3C3B6E]/8 px-2.5 py-1 text-xs font-medium text-[#3C3B6E]"
+          title={weatherLabel(day.weather)}
+        >
+          <WeatherIcon sky={day.weather.sky} className="h-4 w-4 text-[#9A7B1F]" />
+          {day.weather.hi}° / {day.weather.lo}° · {day.weather.summary}
+        </p>
       </div>
 
       <div className="space-y-2.5">
