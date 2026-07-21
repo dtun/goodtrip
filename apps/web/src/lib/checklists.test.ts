@@ -1,6 +1,13 @@
 import { describe, it, expect } from "vitest";
 import type { Checklist, ChecklistItem } from "@goodtrip/shared";
-import { doneCount, groupChecklists, replaceItem } from "./checklists";
+import {
+  doneCount,
+  groupChecklists,
+  insertItem,
+  nextItemPosition,
+  removeItemFrom,
+  replaceItem,
+} from "./checklists";
 
 let TRIP = "11111111-1111-4111-8111-111111111111";
 
@@ -68,6 +75,48 @@ describe("replaceItem", () => {
     expect(next.byDay.get("d1")?.[0].items[0].done_by).toBe("eva");
     // untouched lists keep their state
     expect(next.global[0].items[0].done).toBe(false);
+  });
+});
+
+describe("insertItem", () => {
+  it("appends to the right checklist, kept in position order", () => {
+    let grouped = groupChecklists(
+      [checklist("clothing", null, 0)],
+      [item("a", "clothing", 0), item("c", "clothing", 2)],
+    );
+    let next = insertItem(grouped, item("b", "clothing", 1));
+    expect(next.global[0].items.map((i) => i.id)).toEqual(["a", "b", "c"]);
+  });
+
+  it("is idempotent by id, so an echoed realtime insert doesn't double up", () => {
+    let grouped = groupChecklists([checklist("clothing", null, 0)], [item("a", "clothing", 0)]);
+    let once = insertItem(grouped, item("b", "clothing", 1));
+    let twice = insertItem(once, { ...item("b", "clothing", 1), label: "renamed" });
+    expect(twice.global[0].items.map((i) => i.id)).toEqual(["a", "b"]);
+    expect(twice.global[0].items[1].label).toBe("renamed");
+  });
+});
+
+describe("removeItemFrom", () => {
+  it("drops the item wherever it lives and leaves the rest", () => {
+    let grouped = groupChecklists(
+      [checklist("clothing", null, 0), checklist("d1-morning", "d1", 0)],
+      [
+        item("shoes", "clothing", 0),
+        item("hat", "clothing", 1),
+        item("sunscreen", "d1-morning", 0),
+      ],
+    );
+    let next = removeItemFrom(grouped, "shoes");
+    expect(next.global[0].items.map((i) => i.id)).toEqual(["hat"]);
+    expect(next.byDay.get("d1")?.[0].items.map((i) => i.id)).toEqual(["sunscreen"]);
+  });
+});
+
+describe("nextItemPosition", () => {
+  it("is one past the highest position, or 0 when empty", () => {
+    expect(nextItemPosition([])).toBe(0);
+    expect(nextItemPosition([item("a", "c", 0), item("b", "c", 3)])).toBe(4);
   });
 });
 

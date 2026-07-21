@@ -80,6 +80,44 @@ let tools: Anthropic.Tool[] = [
       required: ["item_id", "done"],
     },
   },
+  {
+    name: "add_item",
+    description:
+      "Propose adding a new item to an existing checklist. Use when the user wants something added to a packing or to-do list. Reference the checklist by its id from the checklist context.",
+    input_schema: {
+      type: "object",
+      properties: {
+        checklist_id: { type: "string", description: "The target checklist's id from context" },
+        label: { type: "string", description: "The item text, e.g. 'Passport'" },
+      },
+      required: ["checklist_id", "label"],
+    },
+  },
+  {
+    name: "edit_item",
+    description:
+      "Propose renaming an existing checklist item. Reference the item by its id from the checklist context.",
+    input_schema: {
+      type: "object",
+      properties: {
+        item_id: { type: "string", description: "The checklist item's id from context" },
+        label: { type: "string", description: "The new item text" },
+      },
+      required: ["item_id", "label"],
+    },
+  },
+  {
+    name: "remove_item",
+    description:
+      "Propose removing an existing checklist item. Reference the item by its id from the checklist context.",
+    input_schema: {
+      type: "object",
+      properties: {
+        item_id: { type: "string", description: "The checklist item's id from context" },
+      },
+      required: ["item_id"],
+    },
+  },
 ];
 
 Deno.serve(async (req) => {
@@ -144,7 +182,8 @@ Deno.serve(async (req) => {
     let lists = (checklists.data ?? [])
       .map((list) => {
         let day = (days.data ?? []).find((d) => d.id === list.day_id);
-        let scope = day ? `Day ${day.day_number} ${list.title}` : list.title;
+        let name = day ? `Day ${day.day_number} ${list.title}` : list.title;
+        let scope = `${name} [id ${list.id}]`;
         let lines = (items.data ?? [])
           .filter((i) => i.checklist_id === list.id)
           .map(
@@ -158,7 +197,7 @@ Deno.serve(async (req) => {
 
     let system = `You are GOODTrip, the family trip assistant for "${trip.data.name}" — ${trip.data.destination}, ${trip.data.start_date} to ${trip.data.end_date}. Lodging: ${trip.data.lodging ?? "n/a"}. Today's date is ${todayLabel}${zoneLabel ? ` (${zoneLabel})` : ""}. You are talking to ${me}.
 
-You know the whole trip. Answer questions concretely from the itinerary and checklists below. When the user wants to change the plan — add, edit, or check something off — propose it with the matching tool; the user confirms before anything is saved, so propose confidently and keep your text brief. Reference real days, ids, and names from context only.
+You know the whole trip. Answer questions concretely from the itinerary and checklists below. When the user wants to change the plan — add or edit an activity, check something off, or add, rename, or remove a checklist item — propose it with the matching tool; the user confirms before anything is saved, so propose confidently and keep your text brief. Each checklist and item carries an [id ...] in the context below; reference real days, ids, and names from context only.
 
 Your replies render as plain text in a small chat bubble — no markdown of any kind. Never use asterisks, pound signs, pipes/tables, or backticks. Write short conversational lines; for lists, put one item per line starting with "- ". Times and names go inline, e.g. "10:00 AM - Washington's Mansion Tour (Mount Vernon, VA)".
 

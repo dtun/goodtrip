@@ -152,6 +152,7 @@ describe("applyAction / undoChange", () => {
       me,
       { type: "add_activity", day_number: 4, title: "Wharf dinner" },
       itinerary,
+      checklists,
     );
     expect(change).toEqual({
       kind: "added_activity",
@@ -173,6 +174,7 @@ describe("applyAction / undoChange", () => {
       me,
       { type: "update_activity", activity_id: "a1", changes: { time_label: "2:00 PM" } },
       itinerary,
+      checklists,
     )) as Extract<AppliedChange, { kind: "updated_activity" }>;
     // a1 had a null time_label in the itinerary fixture — Undo restores that.
     expect(change.previous).toEqual({ time_label: null });
@@ -192,6 +194,7 @@ describe("applyAction / undoChange", () => {
       me,
       { type: "check_item", item_id: "i1", done: true },
       itinerary,
+      checklists,
     );
     expect(change).toMatchObject({ kind: "checked_item", itemId: "i1", done: true });
 
@@ -199,6 +202,69 @@ describe("applyAction / undoChange", () => {
     let undoUpd = ops.filter((o) => o.table === "checklist_items" && o.verb === "update").at(-1);
     expect(undoUpd?.values).toMatchObject({ done: false, done_by: null });
     expect(undoUpd?.eq).toEqual({ id: "i1" });
+  });
+
+  it("adds a checklist item and undoes by deleting the new row", async () => {
+    let { client, ops } = fakeSupabase({ checklist_items: { id: "item-new" } });
+    let change = await applyAction(
+      client,
+      TRIP,
+      me,
+      { type: "add_item", checklist_id: "c1", label: "Passport" },
+      itinerary,
+      checklists,
+    );
+    expect(change).toEqual({
+      kind: "added_item",
+      itemId: "item-new",
+      label: "Passport",
+      checklistTitle: "Essentials",
+    });
+    // The insert lands at the end of the list (i1 is position 0 → next is 1).
+    let ins = ops.find((o) => o.table === "checklist_items" && o.verb === "insert");
+    expect(ins?.values).toMatchObject({ checklist_id: "c1", label: "Passport", position: 1 });
+
+    await undoChange(client, TRIP, me, change);
+    let del = ops.find((o) => o.table === "checklist_items" && o.verb === "delete");
+    expect(del?.eq).toEqual({ id: "item-new" });
+  });
+
+  it("renames a checklist item and undoes by restoring the old label", async () => {
+    let { client, ops } = fakeSupabase({ checklist_items: { label: "Sunscreen SPF 100+" } });
+    let change = (await applyAction(
+      client,
+      TRIP,
+      me,
+      { type: "edit_item", item_id: "i1", label: "Sunscreen SPF 100+" },
+      itinerary,
+      checklists,
+    )) as Extract<AppliedChange, { kind: "edited_item" }>;
+    expect(change.previousLabel).toBe("Sunscreen SPF 50+");
+
+    await undoChange(client, TRIP, me, change);
+    let upd = ops.filter((o) => o.table === "checklist_items" && o.verb === "update").at(-1);
+    expect(upd?.values).toEqual({ label: "Sunscreen SPF 50+" });
+    expect(upd?.eq).toEqual({ id: "i1" });
+  });
+
+  it("removes a checklist item and undoes by re-creating the exact row", async () => {
+    let { client, ops } = fakeSupabase();
+    let change = await applyAction(
+      client,
+      TRIP,
+      me,
+      { type: "remove_item", item_id: "i1" },
+      itinerary,
+      checklists,
+    );
+    expect(change).toMatchObject({ kind: "removed_item" });
+    let del = ops.find((o) => o.table === "checklist_items" && o.verb === "delete");
+    expect(del?.eq).toEqual({ id: "i1" });
+
+    await undoChange(client, TRIP, me, change);
+    let ins = ops.find((o) => o.table === "checklist_items" && o.verb === "insert");
+    // Same id and label restored, so lingering references survive the round-trip.
+    expect(ins?.values).toMatchObject({ id: "i1", label: "Sunscreen SPF 50+", checklist_id: "c1" });
   });
 });
 
@@ -228,6 +294,29 @@ describe("describeAction", () => {
       checklists,
     );
     expect(text).toBe("Check off “Sunscreen SPF 50+”");
+  });
+
+  it("describes add_item with the target checklist title", () => {
+    let text = describeAction(
+      { type: "add_item", checklist_id: "c1", label: "Passport" },
+      itinerary,
+      checklists,
+    );
+    expect(text).toBe("Add “Passport” to Essentials");
+  });
+
+  it("describes edit_item as a rename of the real label", () => {
+    let text = describeAction(
+      { type: "edit_item", item_id: "i1", label: "Sunscreen SPF 100+" },
+      itinerary,
+      checklists,
+    );
+    expect(text).toBe("Rename “Sunscreen SPF 50+” to “Sunscreen SPF 100+”");
+  });
+
+  it("describes remove_item with the real label", () => {
+    let text = describeAction({ type: "remove_item", item_id: "i1" }, itinerary, checklists);
+    expect(text).toBe("Remove “Sunscreen SPF 50+”");
   });
 
   it("degrades gracefully for unknown ids", () => {
