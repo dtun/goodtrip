@@ -81,7 +81,7 @@ function EditButton({
       type="button"
       onClick={onClick}
       aria-label="Edit checklist"
-      className={`absolute z-10 flex h-8 w-8 items-center justify-center rounded-full border border-cream/15 text-cream-muted transition-colors hover:border-gold/50 hover:text-cream active:bg-cream/10 ${className}`}
+      className={`absolute z-10 flex h-8 w-8 items-center justify-center rounded-md text-cream-muted transition-colors hover:text-cream active:bg-cream/10 ${className}`}
     >
       <Pencil className="h-3.5 w-3.5" aria-hidden />
     </button>
