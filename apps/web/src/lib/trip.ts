@@ -15,22 +15,30 @@ export type Activity = {
   tags?: string[];
 };
 
-/** A day's forecast. `sky` picks the icon; late-July D.C. runs hot and humid. */
+/**
+ * A day's real forecast, fetched at runtime from a weather service and keyed
+ * by the day's `iso` date. `sky` picks the icon. Never hard-coded — a day with
+ * no live data (fetch failed, or the date is beyond the forecast horizon)
+ * simply carries no weather rather than an invented one.
+ */
 export type Weather = {
-  sky: "sunny" | "partly" | "cloudy" | "storms";
-  summary: string; // short label, e.g. "PM storms"
+  sky: "sunny" | "partly" | "cloudy" | "rain" | "storms";
+  summary: string; // short label, e.g. "Thunderstorms"
   hi: number; // high, °F
   lo: number; // low, °F
 };
+
+/** Live forecast keyed by ISO date (YYYY-MM-DD). */
+export type WeatherByDate = Record<string, Weather>;
 
 export type DayPlan = {
   n: number;
   dow: string;
   date: string;
+  iso: string; // ISO date (YYYY-MM-DD) — the weather-lookup key
   title: string;
   cost: string;
   progress: number; // checklist completion %
-  weather: Weather;
   activities: Activity[];
 };
 
@@ -70,10 +78,10 @@ export const DAYS: DayPlan[] = [
     n: 1,
     dow: "Tue",
     date: "Jul 21",
+    iso: "2026-07-21",
     title: "Arrival & Settle In",
     cost: "Free",
     progress: 40,
-    weather: { sky: "sunny", summary: "Hot & clear", hi: 91, lo: 74 },
     activities: [
       {
         time: "10:00 AM",
@@ -107,10 +115,10 @@ export const DAYS: DayPlan[] = [
     n: 2,
     dow: "Wed",
     date: "Jul 22",
+    iso: "2026-07-22",
     title: "Capitol Tour + Ford’s Theatre",
     cost: "Free",
     progress: 75,
-    weather: { sky: "partly", summary: "Partly sunny", hi: 90, lo: 73 },
     activities: [
       {
         time: "10:30 AM",
@@ -142,10 +150,10 @@ export const DAYS: DayPlan[] = [
     n: 3,
     dow: "Thu",
     date: "Jul 23",
+    iso: "2026-07-23",
     title: "Mount Vernon",
     cost: "$$",
     progress: 20,
-    weather: { sky: "storms", summary: "PM storms", hi: 88, lo: 72 },
     activities: [
       {
         time: "10:00 AM",
@@ -195,10 +203,10 @@ export const DAYS: DayPlan[] = [
     n: 4,
     dow: "Fri",
     date: "Jul 24",
+    iso: "2026-07-24",
     title: "Museum of the Bible",
     cost: "$$$",
     progress: 15,
-    weather: { sky: "partly", summary: "Humid", hi: 89, lo: 73 },
     activities: [
       {
         time: "1:00 PM",
@@ -238,10 +246,10 @@ export const DAYS: DayPlan[] = [
     n: 5,
     dow: "Sat",
     date: "Jul 25",
+    iso: "2026-07-25",
     title: "Rest Day + Monument Walk",
     cost: "$$",
     progress: 10,
-    weather: { sky: "sunny", summary: "Sunny", hi: 92, lo: 75 },
     activities: [
       {
         time: "Morning",
@@ -287,10 +295,10 @@ export const DAYS: DayPlan[] = [
     n: 6,
     dow: "Sun",
     date: "Jul 26",
+    iso: "2026-07-26",
     title: "Worship + Holocaust Museum",
     cost: "Free",
     progress: 5,
-    weather: { sky: "storms", summary: "Scattered storms", hi: 87, lo: 71 },
     activities: [
       {
         time: "10:30 AM",
@@ -317,10 +325,10 @@ export const DAYS: DayPlan[] = [
     n: 7,
     dow: "Mon",
     date: "Jul 27",
+    iso: "2026-07-27",
     title: "Museum of American History",
     cost: "Free",
     progress: 5,
-    weather: { sky: "partly", summary: "Partly sunny", hi: 90, lo: 73 },
     activities: [
       {
         time: "10:00 AM",
@@ -355,10 +363,10 @@ export const DAYS: DayPlan[] = [
     n: 8,
     dow: "Tue",
     date: "Jul 28",
+    iso: "2026-07-28",
     title: "National Archives + Dinner",
     cost: "$$$",
     progress: 0,
-    weather: { sky: "sunny", summary: "Hot & clear", hi: 91, lo: 74 },
     activities: [
       {
         time: "1:00 PM",
@@ -387,10 +395,10 @@ export const DAYS: DayPlan[] = [
     n: 9,
     dow: "Wed",
     date: "Jul 29",
+    iso: "2026-07-29",
     title: "Departure Day",
     cost: "Free",
     progress: 0,
-    weather: { sky: "partly", summary: "Partly sunny", hi: 89, lo: 72 },
     activities: [
       {
         time: "Morning",

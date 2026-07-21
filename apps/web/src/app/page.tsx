@@ -12,6 +12,12 @@ import { CompassRose } from "@/components/compass-rose";
 import { AppMockup } from "@/components/app-mockup";
 import { ItineraryTicket, PrintableItinerary } from "@/components/itinerary";
 import { ShareBar } from "@/components/share-bar";
+import { DAYS } from "@/lib/trip";
+import { fetchTripWeather } from "@/lib/weather";
+
+// Refresh the live forecast hourly so real weather appears even if the page
+// was first built without network access.
+export const revalidate = 3600;
 
 const areas = [
   {
@@ -113,7 +119,8 @@ function ActHeader({
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const weather = await fetchTripWeather(DAYS.map((d) => d.iso));
   return (
     <>
       <div className="nightsky relative min-h-screen overflow-hidden font-sans print:hidden">
@@ -239,7 +246,7 @@ export default function Home() {
             />
 
             <div className="mt-16">
-              <ItineraryTicket />
+              <ItineraryTicket weather={weather} />
             </div>
           </section>
 
@@ -259,7 +266,7 @@ export default function Home() {
             />
 
             <div className="mt-16">
-              <AppMockup />
+              <AppMockup weather={weather} />
             </div>
 
             <div className="mt-10 text-center">
@@ -405,7 +412,7 @@ export default function Home() {
       </div>
 
       {/* Plain B/W sheet — only rendered when printing */}
-      <PrintableItinerary />
+      <PrintableItinerary weather={weather} />
     </>
   );
 }

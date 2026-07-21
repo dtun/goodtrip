@@ -1,10 +1,11 @@
-import { Sun, CloudSun, Cloud, CloudLightning } from "lucide-react";
+import { Sun, CloudSun, Cloud, CloudRain, CloudLightning } from "lucide-react";
 import type { Weather } from "@/lib/trip";
 
 const SKY_ICON = {
   sunny: Sun,
   partly: CloudSun,
   cloudy: Cloud,
+  rain: CloudRain,
   storms: CloudLightning,
 } as const;
 
