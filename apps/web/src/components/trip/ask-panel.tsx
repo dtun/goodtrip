@@ -15,7 +15,12 @@ import { localToday } from "@/lib/utils";
 
 type CardStatus = "pending" | "applying" | "applied" | "undoing" | "dismissed" | "failed";
 
-type Card = { proposal: ProposedAction; status: CardStatus; error?: string; applied?: AppliedChange };
+type Card = {
+  proposal: ProposedAction;
+  status: CardStatus;
+  error?: string;
+  applied?: AppliedChange;
+};
 
 type PanelMessage = {
   role: "user" | "assistant";
@@ -32,8 +37,7 @@ function buildSuggestions(itinerary: TripItinerary, checklists: GroupedChecklist
   let out: string[] = [];
 
   let today = localToday();
-  let nextDay =
-    itinerary.days.find(({ day }) => day.date >= today)?.day ?? itinerary.days[0]?.day;
+  let nextDay = itinerary.days.find(({ day }) => day.date >= today)?.day ?? itinerary.days[0]?.day;
   if (nextDay) out.push(`What’s the plan for Day ${nextDay.day_number}?`);
 
   let items = [...checklists.global];
@@ -41,9 +45,7 @@ function buildSuggestions(itinerary: TripItinerary, checklists: GroupedChecklist
   let openItems = items.reduce((n, entry) => n + entry.items.filter((i) => !i.done).length, 0);
   if (openItems > 0) out.push("What do we still need to pack?");
 
-  let unconfirmed = itinerary.days.some(({ activities }) =>
-    activities.some((a) => !a.confirmed),
-  );
+  let unconfirmed = itinerary.days.some(({ activities }) => activities.some((a) => !a.confirmed));
   if (unconfirmed) out.push("Which plans still need booking?");
 
   if (out.length < 3) out.push("Anything fun we haven’t planned yet?");
@@ -158,6 +160,7 @@ export function AskPanel({
         profile,
         card.proposal.action,
         itinerary,
+        checklists,
       );
       setCard(messageIndex, card.proposal.id, { status: "applied", applied, error: undefined });
       await onApplied();

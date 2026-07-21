@@ -22,15 +22,22 @@ import {
   type LinkedEmail,
 } from "@/lib/identity";
 import {
+  addItem,
+  editItemLabel,
   fetchTripChecklists,
+  insertItem,
+  nextItemPosition,
   persistToggle,
+  removeItem,
+  removeItemFrom,
   replaceItem,
+  type ChecklistWithItems,
   type GroupedChecklists,
 } from "@/lib/checklists";
 import { errorMessage } from "@/lib/utils";
 import { Avatar } from "@/components/trip/avatar";
 import { SaveSpotBanner, WelcomeScreen } from "@/components/trip/account";
-import { ChecklistSection } from "@/components/trip/checklist-section";
+import { ChecklistSection, type ChecklistControls } from "@/components/trip/checklist-section";
 import { AskPanel } from "@/components/trip/ask-panel";
 import { CompassRose } from "@/components/compass-rose";
 
@@ -125,6 +132,40 @@ function patchItem(prev: PageState, item: ChecklistItem): PageState {
   };
 }
 
+/** Add a checklist item to whatever state currently holds BootData. */
+function patchInsert(prev: PageState, item: ChecklistItem): PageState {
+  if (prev.status !== "ready" && prev.status !== "claim") return prev;
+  return {
+    ...prev,
+    data: { ...prev.data, checklists: insertItem(prev.data.checklists, item) },
+  };
+}
+
+/** Drop a checklist item from whatever state currently holds BootData. */
+function patchRemove(prev: PageState, itemId: string): PageState {
+  if (prev.status !== "ready" && prev.status !== "claim") return prev;
+  return {
+    ...prev,
+    data: { ...prev.data, checklists: removeItemFrom(prev.data.checklists, itemId) },
+  };
+}
+
+/* Fan a realtime checklist_items change into the matching state patch. Inserts
+   and deletes now flow through too (an item added or removed on another device),
+   not just the checkbox toggles that were the original #38 scope. */
+function patchRealtime(
+  prev: PageState,
+  payload: {
+    eventType: "INSERT" | "UPDATE" | "DELETE";
+    new: Record<string, unknown>;
+    old: Record<string, unknown>;
+  },
+): PageState {
+  if (payload.eventType === "INSERT") return patchInsert(prev, payload.new as ChecklistItem);
+  if (payload.eventType === "DELETE") return patchRemove(prev, (payload.old as ChecklistItem).id);
+  return patchItem(prev, payload.new as ChecklistItem);
+}
+
 function ClaimScreen({
   roster,
   claiming,
@@ -188,20 +229,21 @@ export default function TripPage() {
         : { status: "claim", data, claiming: null },
     );
 
-    // Realtime (#38): remote checklist toggles land without a refresh.
+    // Realtime (#38): remote checklist changes — toggles, adds, edits, and
+    // removes — land without a refresh.
     if (!channelRef.current) {
       channelRef.current = getSupabase()
         .channel(`checklist-items-${getTripId()}`)
         .on(
           "postgres_changes",
           {
-            event: "UPDATE",
+            event: "*",
             schema: "public",
             table: "checklist_items",
             filter: `trip_id=eq.${getTripId()}`,
           },
           (payload) => {
-            setState((prev) => patchItem(prev, payload.new as ChecklistItem));
+            setState((prev) => patchRealtime(prev, payload as Parameters<typeof patchRealtime>[1]));
           },
         )
         .subscribe();
@@ -303,6 +345,56 @@ export default function TripPage() {
       setState((prev) => patchItem(prev, item)); // roll back
     }
   }
+
+  /* Direct human edits to a checklist (#40 companion): add, rename, remove an
+     item. Ask makes the same changes as confirmable proposals; here a member
+     just does them. persistToggle's optimistic pattern carries over — rename and
+     remove show instantly and roll back on failure; add waits for the real row
+     (and its server id) before it appears. */
+  async function handleAddItem(entry: ChecklistWithItems, label: string) {
+    if (state.status !== "ready") return;
+    try {
+      let created = await addItem(
+        getSupabase(),
+        getTripId(),
+        entry.checklist.id,
+        label,
+        nextItemPosition(entry.items),
+      );
+      setState((prev) => patchInsert(prev, created));
+    } catch (error) {
+      console.error("GOODTrip add item failed:", error);
+    }
+  }
+
+  async function handleEditItem(item: ChecklistItem, label: string) {
+    if (state.status !== "ready") return;
+    setState((prev) => patchItem(prev, { ...item, label }));
+    try {
+      let saved = await editItemLabel(getSupabase(), item.id, label);
+      setState((prev) => patchItem(prev, saved));
+    } catch (error) {
+      console.error("GOODTrip rename item failed:", error);
+      setState((prev) => patchItem(prev, item)); // roll back
+    }
+  }
+
+  async function handleRemoveItem(item: ChecklistItem) {
+    if (state.status !== "ready") return;
+    setState((prev) => patchRemove(prev, item.id));
+    try {
+      await removeItem(getSupabase(), item.id);
+    } catch (error) {
+      console.error("GOODTrip remove item failed:", error);
+      setState((prev) => patchInsert(prev, item)); // restore
+    }
+  }
+
+  let checklistControls: ChecklistControls = {
+    onAddItem: handleAddItem,
+    onEditItem: handleEditItem,
+    onRemoveItem: handleRemoveItem,
+  };
 
   let profilesById =
     state.status === "ready" || state.status === "claim"
@@ -448,6 +540,7 @@ export default function TripPage() {
                     entry={entry}
                     profilesById={profilesById}
                     onToggle={handleToggle}
+                    controls={checklistControls}
                   />
                 ))}
               </div>
@@ -499,6 +592,7 @@ export default function TripPage() {
                             profilesById={profilesById}
                             onToggle={handleToggle}
                             heading="summary"
+                            controls={checklistControls}
                           />
                         ))}
                       </div>

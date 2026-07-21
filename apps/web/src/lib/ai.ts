@@ -2,24 +2,34 @@ import type {
   AIAction,
   AIChatResponse,
   ChatTurn,
+  ChecklistItem,
   Profile,
   UpdateActivityAction,
   UUID,
 } from "@goodtrip/shared";
 import type { GoodtripClient } from "@/lib/supabase";
 import type { TripItinerary } from "@/lib/goodtrip";
-import type { GroupedChecklists } from "@/lib/checklists";
+import { nextItemPosition, type GroupedChecklists } from "@/lib/checklists";
 import { localTimeZone, localToday } from "@/lib/utils";
 
 /**
  * The reverse of a confirmed action, captured at apply-time so the card can
- * offer an Undo. add_activity records the new row to delete; update_activity
- * snapshots the pre-edit values; check_item just flips `done` back.
+ * offer an Undo. add_activity/add_item record the new row to delete;
+ * update_activity/edit_item snapshot the pre-edit values; check_item flips
+ * `done` back; remove_item keeps the whole deleted row so Undo can re-create it.
  */
 export type AppliedChange =
   | { kind: "added_activity"; activityId: UUID; title: string; dayNumber: number }
-  | { kind: "updated_activity"; activityId: UUID; title: string; previous: UpdateActivityAction["changes"] }
-  | { kind: "checked_item"; itemId: UUID; label: string; done: boolean };
+  | {
+      kind: "updated_activity";
+      activityId: UUID;
+      title: string;
+      previous: UpdateActivityAction["changes"];
+    }
+  | { kind: "checked_item"; itemId: UUID; label: string; done: boolean }
+  | { kind: "added_item"; itemId: UUID; label: string; checklistTitle: string }
+  | { kind: "edited_item"; itemId: UUID; label: string; previousLabel: string }
+  | { kind: "removed_item"; item: ChecklistItem };
 
 /** Ask the ai-chat edge function; the caller's JWT rides along automatically. */
 export async function sendChat(
@@ -63,6 +73,12 @@ function findItem(checklists: GroupedChecklists, id: UUID) {
   return null;
 }
 
+function findChecklist(checklists: GroupedChecklists, id: UUID) {
+  let all = [...checklists.global];
+  checklists.byDay.forEach((lists) => all.push(...lists));
+  return all.find((entry) => entry.checklist.id === id) ?? null;
+}
+
 /** One human-readable line for a confirmation card. */
 export function describeAction(
   action: AIAction,
@@ -78,6 +94,21 @@ export function describeAction(
     let name = found ? found.activity.title : "an activity";
     let fields = Object.keys(action.changes).join(", ");
     return `Update “${name}” (${fields})`;
+  }
+  if (action.type === "add_item") {
+    let found = findChecklist(checklists, action.checklist_id);
+    let where = found ? ` to ${found.checklist.title}` : "";
+    return `Add “${action.label}”${where}`;
+  }
+  if (action.type === "edit_item") {
+    let found = findItem(checklists, action.item_id);
+    let name = found ? found.item.label : "a checklist item";
+    return `Rename “${name}” to “${action.label}”`;
+  }
+  if (action.type === "remove_item") {
+    let found = findItem(checklists, action.item_id);
+    let name = found ? found.item.label : "a checklist item";
+    return `Remove “${name}”`;
   }
   let found = findItem(checklists, action.item_id);
   let label = found ? found.item.label : "a checklist item";
@@ -108,6 +139,7 @@ export async function applyAction(
   me: Profile,
   action: AIAction,
   itinerary: TripItinerary,
+  checklists: GroupedChecklists,
 ): Promise<AppliedChange> {
   if (action.type === "add_activity") {
     let dayEntry = itinerary.days.find((d) => d.day.day_number === action.day_number);
@@ -166,6 +198,49 @@ export async function applyAction(
     };
   }
 
+  if (action.type === "add_item") {
+    let list = findChecklist(checklists, action.checklist_id);
+    let position = nextItemPosition(list?.items ?? []);
+    let { data, error } = await supabase
+      .from("checklist_items")
+      .insert({
+        trip_id: tripId,
+        checklist_id: action.checklist_id,
+        label: action.label,
+        position,
+      })
+      .select("id")
+      .single();
+    if (error) throw error;
+    if (!data) throw new Error("Checklist item was not created");
+    let title = list?.checklist.title ?? "a checklist";
+    await feed(supabase, tripId, me.id, "added", `${action.label} to ${title}`);
+    return { kind: "added_item", itemId: data.id, label: action.label, checklistTitle: title };
+  }
+
+  if (action.type === "edit_item") {
+    let found = findItem(checklists, action.item_id);
+    let previousLabel = found?.item.label ?? "";
+    let { data, error } = await supabase
+      .from("checklist_items")
+      .update({ label: action.label })
+      .eq("id", action.item_id)
+      .select()
+      .single();
+    if (error) throw error;
+    await feed(supabase, tripId, me.id, "renamed", data?.label ?? action.label);
+    return { kind: "edited_item", itemId: action.item_id, label: action.label, previousLabel };
+  }
+
+  if (action.type === "remove_item") {
+    let found = findItem(checklists, action.item_id);
+    if (!found) throw new Error("That checklist item is no longer here");
+    let { error } = await supabase.from("checklist_items").delete().eq("id", action.item_id);
+    if (error) throw error;
+    await feed(supabase, tripId, me.id, "removed", found.item.label);
+    return { kind: "removed_item", item: found.item };
+  }
+
   let next = action.done
     ? { done: true, done_by: me.id, done_at: new Date().toISOString() }
     : { done: false, done_by: null, done_at: null };
@@ -176,8 +251,19 @@ export async function applyAction(
     .select()
     .single();
   if (error) throw error;
-  await feed(supabase, tripId, me.id, action.done ? "checked off" : "unchecked", data?.label ?? "an item");
-  return { kind: "checked_item", itemId: action.item_id, label: data?.label ?? "an item", done: action.done };
+  await feed(
+    supabase,
+    tripId,
+    me.id,
+    action.done ? "checked off" : "unchecked",
+    data?.label ?? "an item",
+  );
+  return {
+    kind: "checked_item",
+    itemId: action.item_id,
+    label: data?.label ?? "an item",
+    done: action.done,
+  };
 }
 
 /** Reverse a previously-applied change and note the reversal on the feed. */
@@ -204,14 +290,40 @@ export async function undoChange(
     return;
   }
 
+  if (change.kind === "added_item") {
+    let { error } = await supabase.from("checklist_items").delete().eq("id", change.itemId);
+    if (error) throw error;
+    await feed(supabase, tripId, me.id, "removed", `${change.label} from ${change.checklistTitle}`);
+    return;
+  }
+
+  if (change.kind === "edited_item") {
+    let { error } = await supabase
+      .from("checklist_items")
+      .update({ label: change.previousLabel })
+      .eq("id", change.itemId);
+    if (error) throw error;
+    await feed(supabase, tripId, me.id, "renamed", change.previousLabel);
+    return;
+  }
+
+  if (change.kind === "removed_item") {
+    // Re-create the deleted row exactly — same id, so any lingering reference
+    // (and its checked-off state) comes back intact.
+    let { id, trip_id, checklist_id, label, position, done, done_by, done_at } = change.item;
+    let { error } = await supabase
+      .from("checklist_items")
+      .insert({ id, trip_id, checklist_id, label, position, done, done_by, done_at });
+    if (error) throw error;
+    await feed(supabase, tripId, me.id, "added", label);
+    return;
+  }
+
   // Reverse a check by flipping `done` back; clear the doer when un-checking.
   let restored = change.done
     ? { done: false, done_by: null, done_at: null }
     : { done: true, done_by: me.id, done_at: new Date().toISOString() };
-  let { error } = await supabase
-    .from("checklist_items")
-    .update(restored)
-    .eq("id", change.itemId);
+  let { error } = await supabase.from("checklist_items").update(restored).eq("id", change.itemId);
   if (error) throw error;
   await feed(supabase, tripId, me.id, change.done ? "unchecked" : "checked off", change.label);
 }

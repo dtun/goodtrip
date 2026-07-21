@@ -145,7 +145,33 @@ export type CheckItemAction = {
   done: boolean;
 };
 
-export type AIAction = AddActivityAction | UpdateActivityAction | CheckItemAction;
+/** Add a new item to an existing checklist. */
+export type AddItemAction = {
+  type: "add_item";
+  checklist_id: UUID;
+  label: string;
+};
+
+/** Rename an existing checklist item. */
+export type EditItemAction = {
+  type: "edit_item";
+  item_id: UUID;
+  label: string;
+};
+
+/** Remove an existing checklist item. */
+export type RemoveItemAction = {
+  type: "remove_item";
+  item_id: UUID;
+};
+
+export type AIAction =
+  | AddActivityAction
+  | UpdateActivityAction
+  | CheckItemAction
+  | AddItemAction
+  | EditItemAction
+  | RemoveItemAction;
 
 /** An action awaiting confirmation; id is the model's tool_use id. */
 export type ProposedAction = { id: string; action: AIAction };
