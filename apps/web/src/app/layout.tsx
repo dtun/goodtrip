@@ -62,6 +62,9 @@ export let metadata: Metadata = {
 
 export let viewport = {
   themeColor: "#0B0D24",
+  // Let content extend under the notch/home indicator so env(safe-area-inset-*)
+  // resolves — the checklist editor sheet pads itself off the home indicator.
+  viewportFit: "cover" as const,
 };
 
 export default function RootLayout({
