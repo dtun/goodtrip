@@ -16,10 +16,9 @@ export type Activity = {
 };
 
 /**
- * A day's real forecast, fetched at runtime from a weather service and keyed
- * by the day's `iso` date. `sky` picks the icon. Never hard-coded — a day with
- * no live data (fetch failed, or the date is beyond the forecast horizon)
- * simply carries no weather rather than an invented one.
+ * A day's forecast, keyed by the day's `iso` date. `sky` picks the icon.
+ * At render time the live fetch (lib/weather.ts) overrides SEED_WEATHER below;
+ * the seed is a real forecast snapshot, not invented data.
  */
 export type Weather = {
   sky: "sunny" | "partly" | "cloudy" | "rain" | "storms";
@@ -28,8 +27,26 @@ export type Weather = {
   lo: number; // low, °F
 };
 
-/** Live forecast keyed by ISO date (YYYY-MM-DD). */
+/** Forecast keyed by ISO date (YYYY-MM-DD). */
 export type WeatherByDate = Record<string, Weather>;
+
+/**
+ * Real forecast snapshot for the trip, so weather is visible even where the
+ * live fetch can't run (offline builds, restricted networks). The live fetch
+ * overrides any day it can. Temps: AccuWeather 9-day for Washington, D.C.;
+ * conditions: NWS Baltimore/Washington. Captured 2026-07-22 — refresh if stale.
+ */
+export const SEED_WEATHER: WeatherByDate = {
+  "2026-07-21": { sky: "partly", summary: "Partly cloudy", hi: 86, lo: 73 },
+  "2026-07-22": { sky: "storms", summary: "Thunderstorms", hi: 87, lo: 74 },
+  "2026-07-23": { sky: "storms", summary: "Thunderstorms", hi: 91, lo: 74 },
+  "2026-07-24": { sky: "sunny", summary: "Mostly sunny", hi: 91, lo: 73 },
+  "2026-07-25": { sky: "sunny", summary: "Sunny", hi: 90, lo: 74 },
+  "2026-07-26": { sky: "partly", summary: "Partly cloudy", hi: 92, lo: 74 },
+  "2026-07-27": { sky: "partly", summary: "Partly sunny", hi: 92, lo: 73 },
+  "2026-07-28": { sky: "sunny", summary: "Mostly sunny", hi: 91, lo: 74 },
+  "2026-07-29": { sky: "partly", summary: "Partly cloudy", hi: 91, lo: 74 },
+};
 
 export type DayPlan = {
   n: number;

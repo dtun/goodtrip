@@ -12,7 +12,7 @@ import { CompassRose } from "@/components/compass-rose";
 import { AppMockup } from "@/components/app-mockup";
 import { ItineraryTicket, PrintableItinerary } from "@/components/itinerary";
 import { ShareBar } from "@/components/share-bar";
-import { DAYS } from "@/lib/trip";
+import { DAYS, SEED_WEATHER } from "@/lib/trip";
 import { fetchTripWeather } from "@/lib/weather";
 
 // Refresh the live forecast hourly so real weather appears even if the page
@@ -120,7 +120,10 @@ function ActHeader({
 }
 
 export default async function Home() {
-  const weather = await fetchTripWeather(DAYS.map((d) => d.iso));
+  // Live forecast overrides the real snapshot day-by-day; snapshot fills any
+  // day the live fetch couldn't reach (offline build, restricted network).
+  const live = await fetchTripWeather(DAYS.map((d) => d.iso));
+  const weather = { ...SEED_WEATHER, ...live };
   return (
     <>
       <div className="nightsky relative min-h-screen overflow-hidden font-sans print:hidden">
