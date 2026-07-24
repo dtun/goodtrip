@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { CompassRose } from "@/components/compass-rose";
 import { WeatherIcon, weatherLabel } from "@/components/weather-badge";
+import { mapsUrl } from "@/lib/utils";
 import {
   TRIP,
   DAYS,
@@ -129,12 +130,24 @@ function ActivityCard({ a }: { a: Activity }) {
             </p>
           )}
           <p className="mt-1 text-[15px] font-semibold leading-tight text-[#111]">{a.title}</p>
-          {a.location && (
-            <p className="mt-1 flex items-center gap-1 text-xs text-[#666]">
-              <MapPin className="h-3 w-3 shrink-0" />
-              <span className="truncate">{a.location}</span>
-            </p>
-          )}
+          {a.location &&
+            (a.place ? (
+              <a
+                href={mapsUrl(a.place)}
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label={`Open ${a.title} in Maps`}
+                className="mt-1 inline-flex max-w-full items-center gap-1 text-xs font-medium text-[#3C3B6E] underline decoration-[#3C3B6E]/30 underline-offset-2 transition-colors active:text-[#2A2950]"
+              >
+                <MapPin className="h-3 w-3 shrink-0" />
+                <span className="truncate">{a.location}</span>
+              </a>
+            ) : (
+              <p className="mt-1 flex items-center gap-1 text-xs text-[#666]">
+                <MapPin className="h-3 w-3 shrink-0" />
+                <span className="truncate">{a.location}</span>
+              </p>
+            ))}
         </div>
         {a.cost && (
           <span className="shrink-0 rounded-full border border-[#E0E0E0] bg-[#F8F8F8] px-2 py-0.5 text-[11px] font-medium text-[#666]">

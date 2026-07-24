@@ -1,4 +1,4 @@
-import { ExternalLink, Check } from "lucide-react";
+import { ExternalLink, Check, MapPin } from "lucide-react";
 import {
   DAYS,
   TRIP,
@@ -7,6 +7,7 @@ import {
   type Weather,
   type WeatherByDate,
 } from "@/lib/trip";
+import { mapsUrl } from "@/lib/utils";
 import { CompassRose } from "@/components/compass-rose";
 import { PrintButton } from "@/components/print-button";
 import { CopyCode } from "@/components/copy-code";
@@ -50,8 +51,20 @@ function ActivityRow({ a }: { a: Activity }) {
           )}
         </div>
         {a.location && <p className="mt-1 text-xs leading-snug text-cream-muted">{a.location}</p>}
-        {(a.url || a.code || a.confirmed) && (
+        {(a.url || a.code || a.confirmed || a.place) && (
           <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
+            {a.place && (
+              <a
+                href={mapsUrl(a.place)}
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label={`Open ${a.title} in Maps (opens in a new tab)`}
+                className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-gold underline decoration-gold/30 underline-offset-[5px] transition-colors hover:text-gold-bright hover:decoration-gold"
+              >
+                <MapPin className="h-3 w-3" aria-hidden="true" />
+                Map
+              </a>
+            )}
             {a.url && (
               <a
                 href={a.url}

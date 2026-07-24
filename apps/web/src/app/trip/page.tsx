@@ -34,7 +34,7 @@ import {
   type ChecklistWithItems,
   type GroupedChecklists,
 } from "@/lib/checklists";
-import { errorMessage } from "@/lib/utils";
+import { errorMessage, mapsUrl } from "@/lib/utils";
 import { Avatar } from "@/components/trip/avatar";
 import { SaveSpotBanner, WelcomeScreen } from "@/components/trip/account";
 import { ChecklistSection, type ChecklistControls } from "@/components/trip/checklist-section";
@@ -596,6 +596,18 @@ export default function TripPage() {
                             </p>
                             {activity.location && (
                               <p className="mt-1 text-xs text-cream-muted">{activity.location}</p>
+                            )}
+                            {activity.map_query && (
+                              <a
+                                href={mapsUrl(activity.map_query)}
+                                target="_blank"
+                                rel="noreferrer noopener"
+                                aria-label={`Open ${activity.title} in Maps (opens in a new tab)`}
+                                className="mt-1.5 inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-gold underline decoration-gold/30 underline-offset-[4px] transition-colors hover:text-gold-bright hover:decoration-gold"
+                              >
+                                <MapPin className="h-3 w-3" aria-hidden />
+                                Map
+                              </a>
                             )}
                           </div>
                         </li>

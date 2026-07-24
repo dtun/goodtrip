@@ -21,6 +21,16 @@ export function localTimeZone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";
 }
 
+/**
+ * A universal "open in Maps" link for a place name or address. On Apple devices
+ * `maps.apple.com` opens the native Maps app; on Android / desktop it redirects
+ * to Google Maps in the browser — so one link honors whatever Maps app the
+ * person tapping it actually uses.
+ */
+export function mapsUrl(place: string): string {
+  return `https://maps.apple.com/?q=${encodeURIComponent(place)}`;
+}
+
 /* Supabase errors (PostgrestError, AuthError) are often plain objects, so a
    bare String() renders "[object Object]". */
 export function errorMessage(error: unknown): string {

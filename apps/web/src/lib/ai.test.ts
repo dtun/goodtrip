@@ -34,6 +34,7 @@ function activity(id: string, day_id: string, title: string): Activity {
     time_label: null,
     title,
     location: null,
+    map_query: null,
     cost: null,
     confirmed: false,
     confirmed_note: null,

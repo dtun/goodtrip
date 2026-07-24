@@ -30,6 +30,7 @@ function activity(
     time_label,
     title,
     location: null,
+    map_query: null,
     cost: null,
     confirmed: false,
     confirmed_note: null,

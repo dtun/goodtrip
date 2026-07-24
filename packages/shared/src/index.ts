@@ -57,6 +57,9 @@ export type Activity = {
   time_label: string | null;
   title: string;
   location: string | null;
+  /** Maps-searchable name/address; powers the "Map" link. Null when the stop
+      has no fixed place (flights, transit, unscheduled rest). */
+  map_query: string | null;
   cost: string | null;
   confirmed: boolean;
   confirmed_note: string | null;
@@ -243,6 +246,7 @@ export type ActivityInsert = Insert<
   | "position"
   | "time_label"
   | "location"
+  | "map_query"
   | "cost"
   | "confirmed"
   | "confirmed_note"
