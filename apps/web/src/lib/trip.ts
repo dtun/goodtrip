@@ -234,14 +234,12 @@ export const DAYS: DayPlan[] = [
         time: "12:00 PM",
         title: "Megiddo Mosaic",
         location: "Floor 1 lobby · oldest Christian site",
-        place: "Museum of the Bible, 400 4th St SW, Washington, DC 20024",
         cost: "Free",
       },
       {
         time: "Anytime",
         title: "All Creation Sings",
         location: "Immersive worship experience · flexible entry",
-        place: "Museum of the Bible, 400 4th St SW, Washington, DC 20024",
         tags: ["kids"],
       },
       {

@@ -29,12 +29,9 @@ from (
      'George Washington’s Mount Vernon, 3200 Mount Vernon Memorial Hwy, Mount Vernon, VA 22121'),
     ('dddddddd-0000-4000-8000-000000000003'::uuid, 4,
      'Mount Vernon Inn Restaurant, 3200 Mount Vernon Memorial Hwy, Mount Vernon, VA 22121'),
-    -- Day 4 · Museum of the Bible
+    -- Day 4 · Museum of the Bible (one pin on the flagship Dead Sea Scrolls
+    -- exhibit; Megiddo Mosaic and All Creation Sings are inside the same museum)
     ('dddddddd-0000-4000-8000-000000000004'::uuid, 0,
-     'Museum of the Bible, 400 4th St SW, Washington, DC 20024'),
-    ('dddddddd-0000-4000-8000-000000000004'::uuid, 1,
-     'Museum of the Bible, 400 4th St SW, Washington, DC 20024'),
-    ('dddddddd-0000-4000-8000-000000000004'::uuid, 2,
      'Museum of the Bible, 400 4th St SW, Washington, DC 20024'),
     ('dddddddd-0000-4000-8000-000000000004'::uuid, 3,
      'The Wharf, 760 Maine Ave SW, Washington, DC 20024'),
