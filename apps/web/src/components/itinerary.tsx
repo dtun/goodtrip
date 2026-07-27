@@ -30,7 +30,7 @@ function prettyUrl(u: string) {
 
 function costTone(cost?: string) {
   if (!cost || cost === "—") return null;
-  return cost === "Free" ? "text-cream-muted" : "text-gold/90";
+  return cost === "Free" ? "text-espresso-muted" : "text-coral-700";
 }
 
 /* ── The on-screen editorial programme ───────────────────────── */
@@ -39,17 +39,19 @@ function ActivityRow({ a }: { a: Activity }) {
   const tone = costTone(a.cost);
   return (
     <li className="flex gap-4 py-4 first:pt-3">
-      <span className="w-12 shrink-0 pt-1 font-mono text-[11px] uppercase leading-tight tracking-tight text-gold/70">
+      <span className="w-12 shrink-0 pt-1 font-mono text-[11px] uppercase leading-tight tracking-tight text-coral-700">
         {a.time}
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-3">
-          <p className="text-[15px] font-medium leading-snug text-cream">{a.title}</p>
+          <p className="text-[15px] font-semibold leading-snug text-espresso">{a.title}</p>
           {tone && (
             <span className={`shrink-0 font-mono text-[11px] tracking-wide ${tone}`}>{a.cost}</span>
           )}
         </div>
-        {a.location && <p className="mt-1 text-xs leading-snug text-cream-muted">{a.location}</p>}
+        {a.location && (
+          <p className="mt-1 text-xs leading-snug text-espresso-muted">{a.location}</p>
+        )}
         {(a.url || a.code || a.confirmed) && (
           <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
             {a.url && (
@@ -58,7 +60,7 @@ function ActivityRow({ a }: { a: Activity }) {
                 target="_blank"
                 rel="noreferrer noopener"
                 aria-label={`${a.cta ?? "Book"}: ${a.title} (opens in a new tab)`}
-                className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-gold underline decoration-gold/30 underline-offset-[5px] transition-colors hover:text-gold-bright hover:decoration-gold"
+                className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-coral-700 underline decoration-coral/30 underline-offset-[5px] transition-colors hover:decoration-coral"
               >
                 {a.cta ?? "Book"}
                 <ExternalLink className="h-3 w-3" aria-hidden="true" />
@@ -66,7 +68,7 @@ function ActivityRow({ a }: { a: Activity }) {
             )}
             {a.code && <CopyCode code={a.code} />}
             {a.confirmed && (
-              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-gold">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-teal-700">
                 <Check className="h-3 w-3" aria-hidden="true" />
                 {a.confirmedNote ?? "Confirmed"}
               </span>
@@ -85,26 +87,28 @@ function DaySection({ d, w }: { d: DayPlan; w?: Weather }) {
     <section className="sm:flex sm:gap-8">
       {/* desktop numeral rail */}
       <div className="hidden sm:block sm:w-16 sm:shrink-0 sm:pt-1 sm:text-right">
-        <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-gold/50">
+        <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-espresso-muted/70">
           Day
         </span>
-        <span className="block font-display text-[3.25rem] leading-[0.8] text-gold">{num}</span>
+        <span className="block font-display text-[3.25rem] font-extrabold leading-[0.8] text-coral">
+          {num}
+        </span>
       </div>
 
       <div className="min-w-0 flex-1">
         {/* day header — numeral sits inline on mobile */}
-        <div className="flex items-end gap-3 border-b border-gold/15 pb-3">
-          <span className="font-display text-[2.6rem] leading-[0.8] text-gold sm:hidden">
+        <div className="flex items-end gap-3 border-b border-sand-300 pb-3">
+          <span className="font-display text-[2.6rem] font-extrabold leading-[0.8] text-coral sm:hidden">
             {num}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
+            <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[11px] uppercase tracking-[0.2em] text-espresso-muted">
               <span>
                 {d.dow} · {d.date}
               </span>
               {w && (
                 <span
-                  className="inline-flex items-center gap-1.5 text-gold/80"
+                  className="inline-flex items-center gap-1.5 text-teal-700"
                   title={weatherLabel(w)}
                 >
                   <WeatherIcon sky={w.sky} className="h-3.5 w-3.5" />
@@ -114,7 +118,7 @@ function DaySection({ d, w }: { d: DayPlan; w?: Weather }) {
                 </span>
               )}
             </p>
-            <h3 className="mt-1.5 font-display text-xl leading-tight text-cream sm:text-2xl">
+            <h3 className="mt-1.5 font-display text-xl font-bold leading-tight text-espresso sm:text-2xl">
               {d.title}
             </h3>
           </div>
@@ -126,7 +130,7 @@ function DaySection({ d, w }: { d: DayPlan; w?: Weather }) {
             </span>
           )}
         </div>
-        <ul className="divide-y divide-cream/[0.08]">
+        <ul className="divide-y divide-sand-300">
           {d.activities.map((a, i) => (
             <ActivityRow key={i} a={a} />
           ))}
@@ -139,27 +143,27 @@ function DaySection({ d, w }: { d: DayPlan; w?: Weather }) {
 export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="rounded-[1.75rem] border border-gold/20 bg-ink-800/60 px-5 py-10 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)] backdrop-blur sm:px-14 sm:py-14">
+      <div className="rounded-[1.75rem] border border-sand-300 bg-white px-5 py-10 shadow-[0_30px_80px_-40px_rgba(46,38,32,0.3)] sm:px-14 sm:py-14">
         {/* masthead */}
         <header className="text-center">
-          <CompassRose className="mx-auto h-10 w-10 text-gold" />
-          <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.5em] text-gold/70">
+          <CompassRose className="mx-auto h-10 w-10 text-coral" />
+          <p className="mt-5 text-xs font-semibold uppercase tracking-[0.22em] text-coral-700">
             The Itinerary
           </p>
-          <h2 className="mt-4 font-display text-4xl leading-none text-cream sm:text-5xl">
+          <h2 className="mt-3 font-display text-4xl font-extrabold leading-none tracking-tight text-espresso sm:text-5xl">
             {TRIP.destination}
           </h2>
-          <p className="mt-3 font-display text-lg italic text-cream/80">
-            {TRIP.name} · July 21–29, 2026
-          </p>
+          <p className="mt-3 text-lg text-espresso-muted">{TRIP.name} · July 21–29, 2026</p>
         </header>
 
         {/* colophon */}
-        <dl className="mt-9 grid grid-cols-2 gap-y-5 border-y border-gold/15 py-5 text-center sm:grid-cols-4 sm:divide-x sm:divide-gold/15">
+        <dl className="mt-9 grid grid-cols-2 gap-y-5 border-y border-sand-300 py-5 text-center sm:grid-cols-4 sm:divide-x sm:divide-sand-300">
           {COLOPHON.map(([k, v]) => (
             <div key={k} className="px-2">
-              <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/60">{k}</dt>
-              <dd className="mt-1.5 text-sm text-cream">{v}</dd>
+              <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-espresso-muted/80">
+                {k}
+              </dt>
+              <dd className="mt-1.5 text-sm font-semibold text-espresso">{v}</dd>
             </div>
           ))}
         </dl>
@@ -169,10 +173,10 @@ export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
         </div>
 
         {/* ornamental divider */}
-        <div className="my-10 flex items-center justify-center gap-4 text-gold/50 sm:my-12">
-          <span className="h-px w-16 bg-gradient-to-r from-transparent to-gold/40" />
-          <CompassRose className="h-4 w-4 text-gold/60" />
-          <span className="h-px w-16 bg-gradient-to-l from-transparent to-gold/40" />
+        <div className="my-10 flex items-center justify-center gap-4 sm:my-12">
+          <span className="h-px w-16 bg-gradient-to-r from-transparent to-coral/40" />
+          <CompassRose className="h-4 w-4 text-coral/60" />
+          <span className="h-px w-16 bg-gradient-to-l from-transparent to-coral/40" />
         </div>
 
         {/* programme */}
@@ -184,8 +188,8 @@ export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
 
         {/* dateline / livery cheatline */}
         <div className="mt-14 flex items-center gap-3">
-          <span className="h-1 flex-1 rounded-full bg-gradient-to-r from-[#3C3B6E] via-flag to-gold" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-cream-muted">
+          <span className="h-1 flex-1 rounded-full bg-gradient-to-r from-teal via-coral to-sun" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-espresso-muted">
             Have a GOOD trip
           </span>
         </div>

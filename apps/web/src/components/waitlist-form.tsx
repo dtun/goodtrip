@@ -52,13 +52,13 @@ export function WaitlistForm({
   if (status === "done") {
     return (
       <div
-        className={`mx-auto flex max-w-md items-center justify-center gap-2.5 rounded-full border border-gold/40 bg-gold/10 px-6 py-3.5 text-center ${className}`}
+        className={`mx-auto flex max-w-md items-center justify-center gap-2.5 rounded-full border border-teal/30 bg-teal-soft px-6 py-3.5 text-center ${className}`}
         role="status"
       >
-        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gold text-ink">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal text-white">
           <Check className="h-3.5 w-3.5" aria-hidden="true" />
         </span>
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-cream">
+        <p className="text-sm font-semibold text-espresso">
           You&apos;re on the list — we&apos;ll be in touch.
         </p>
       </div>
@@ -85,12 +85,12 @@ export function WaitlistForm({
           }}
           aria-invalid={status === "error"}
           disabled={status === "submitting"}
-          className="min-w-0 flex-1 rounded-full border border-cream/20 bg-ink/60 px-5 py-3 text-sm text-cream placeholder:text-cream-muted/70 transition-colors focus:border-gold focus:outline-none disabled:opacity-60"
+          className="min-w-0 flex-1 rounded-full border border-sand-300 bg-white px-5 py-3 text-sm text-espresso shadow-sm placeholder:text-espresso-muted/60 transition-colors focus:border-coral focus:outline-none disabled:opacity-60"
         />
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-gold-bright disabled:cursor-not-allowed disabled:opacity-70"
+          className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-coral-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-coral-700 disabled:cursor-not-allowed disabled:opacity-70"
         >
           {status === "submitting" ? (
             <>
@@ -109,8 +109,8 @@ export function WaitlistForm({
         </button>
       </div>
       <p
-        className={`mt-2.5 text-center font-mono text-[10px] uppercase tracking-[0.2em] ${
-          status === "error" ? "text-flag" : "text-cream-muted"
+        className={`mt-3 text-center text-sm ${
+          status === "error" ? "font-medium text-coral-700" : "text-espresso-muted"
         }`}
         role={status === "error" ? "alert" : undefined}
       >

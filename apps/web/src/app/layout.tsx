@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Fraunces, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 // next/font loader calls must be assigned to const declarations.
-const display = Fraunces({
+// Plus Jakarta Sans — a friendly, rounded, modern sans for headings.
+const display = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
@@ -61,7 +61,7 @@ export let metadata: Metadata = {
 };
 
 export let viewport = {
-  themeColor: "#0B0D24",
+  themeColor: "#FBF6EF",
   // Let content extend under the notch/home indicator so env(safe-area-inset-*)
   // resolves — the checklist editor sheet pads itself off the home indicator.
   viewportFit: "cover" as const,

@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { Share2, MessageSquare, Mail, Link2, Check } from "lucide-react";
 
 const SITE = "https://goodtrip.info";
-const MESSAGE = "Our DC trip itinerary on GOODTrip — have a GOOD trip:";
-const EMAIL_SUBJECT = "GOODTrip — our DC trip itinerary";
+const MESSAGE = "GOODTrip — the group trip planner that plans with you. Have a GOOD trip:";
+const EMAIL_SUBJECT = "GOODTrip — have a GOOD trip";
 
 const tile =
-  "flex h-11 w-11 items-center justify-center rounded-full border border-cream/15 bg-ink-800/50 text-cream-muted transition-colors hover:border-gold/50 hover:text-gold focus-visible:text-gold";
+  "flex h-11 w-11 items-center justify-center rounded-full border border-sand-300 bg-sand-100 text-espresso-muted transition-colors hover:border-coral/50 hover:text-coral-700 focus-visible:text-coral-700";
 
 export function ShareBar() {
   const [url, setUrl] = useState(SITE);
@@ -44,7 +44,7 @@ export function ShareBar() {
 
   return (
     <div className="flex items-center justify-center gap-2">
-      <span className="mr-1 font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
+      <span className="mr-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso-muted">
         Share
       </span>
 
@@ -77,7 +77,7 @@ export function ShareBar() {
         aria-label={copied ? "Link copied" : "Copy link"}
       >
         {copied ? (
-          <Check className="h-[18px] w-[18px] text-gold" aria-hidden="true" />
+          <Check className="h-[18px] w-[18px] text-teal-700" aria-hidden="true" />
         ) : (
           <Link2 className="h-[18px] w-[18px]" aria-hidden="true" />
         )}
