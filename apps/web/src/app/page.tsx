@@ -16,22 +16,22 @@ const areas = [
   {
     icon: CalendarDays,
     title: "A plan that changes together",
-    body: "Swap a dinner, move an afternoon, add a stop — and everyone's itinerary updates in real time. One living plan the whole group shares.",
+    body: "Swap a dinner, move an afternoon, add a stop — everyone's itinerary updates in real time.",
   },
   {
     icon: ListChecks,
     title: "Packing, handled",
-    body: "Trip-level packing and per-day routines, so nothing gets left behind. Any member checks off any item — one tap, synced to everyone.",
+    body: "Shared packing lists and per-day routines. Check off an item and it syncs to everyone.",
   },
   {
     icon: Sparkles,
     title: "An AI that knows the trip",
-    body: "Ask GOODTrip recaps a day, suggests dinner nearby, or reworks a rained-out afternoon — handling the logistics so you can be in the moment.",
+    body: "Ask GOODTrip to recap a day, find dinner nearby, or rework a rained-out afternoon.",
   },
   {
     icon: Users,
     title: "Everyone on the same page",
-    body: "Destination, dates, and the roster with who's around right now, plus a live feed of what the group is up to. No more group-chat archaeology.",
+    body: "See who's around, what's booked, and what the group's up to — no more group-chat archaeology.",
   },
 ];
 
@@ -133,9 +133,8 @@ export default async function Home() {
               style={{ animationDelay: "0.18s" }}
             >
               The group trip planner that plans <em className="not-italic text-espresso">with</em>{" "}
-              you. Build the itinerary together and change it together — swap a dinner, move an
-              afternoon, and everyone&apos;s plan updates in real time. GOODTrip keeps the group in
-              sync and helps you pack, so you can just show up and enjoy the trip.
+              you. Build it together, change it in real time, and let GOODTrip handle the packing
+              and logistics — so everyone can just show up and enjoy the trip.
             </p>
 
             {/* waitlist capture — the primary action */}
@@ -186,7 +185,7 @@ export default async function Home() {
                   The itinerary, <span className="text-coral">alive.</span>
                 </>
               }
-              intro="Build the plan once, together — then change it together. Everyone sees it update in real time, checks off what's packed, and asks an AI guide that already knows the whole trip. Here's an early look — tap through it."
+              intro="Plan it together, change it in real time, pack from a shared checklist, and ask an AI guide that knows the whole trip. Tap through it."
             />
 
             <div className="mt-14">
@@ -219,7 +218,7 @@ export default async function Home() {
                   What a GOODTrip <span className="text-coral">looks like.</span>
                 </>
               }
-              intro="Here's a real one — nine days in Washington, D.C. for a family of eight. Yours could be any of these: same structure, any destination, any group. Hit print for a plain copy to carry."
+              intro="A real one: nine days in Washington, D.C. for a family of eight. Yours could be any of these — same structure, any destination, any group."
             />
 
             <div className="mx-auto mt-9 flex max-w-3xl flex-wrap justify-center gap-2">
@@ -289,8 +288,7 @@ export default async function Home() {
                 Be first in line.
               </h2>
               <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-espresso-muted">
-                Drop your email and we&apos;ll let you know the moment GOODTrip opens — starting
-                with the web app, iOS right behind it.
+                Drop your email — we&apos;ll tell you the moment GOODTrip opens.
               </p>
               <div className="mt-8">
                 <WaitlistForm source="landing-cta" />
