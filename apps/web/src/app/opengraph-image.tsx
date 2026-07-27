@@ -36,7 +36,7 @@ export default function OpengraphImage() {
             textTransform: "uppercase",
           }}
         >
-          Est. MMXXVI · Washington · D.C.
+          Coming soon · Est. MMXXVI
         </div>
         <svg width="120" height="120" viewBox="0 0 200 200">
           <circle
@@ -101,8 +101,8 @@ export default function OpengraphImage() {
           color: "#A7A189",
         }}
       >
-        <div style={{ display: "flex" }}>Washington, D.C. · America&apos;s 250th Birthday</div>
-        <div style={{ display: "flex", color: "#C9A84C" }}>Jul 21–29, 2026</div>
+        <div style={{ display: "flex" }}>Collaborative AI itineraries for small groups</div>
+        <div style={{ display: "flex", color: "#C9A84C" }}>Join the waitlist</div>
       </div>
     </div>,
     { ...size },

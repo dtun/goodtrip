@@ -103,6 +103,19 @@ export type ActivityFeedEntry = {
 };
 
 /**
+ * A pre-launch waitlist sign-up. Not trip-scoped — the landing page collects
+ * these before anyone has an account, so the public may insert (write-only)
+ * but never read the list. `source` tags where the sign-up came from
+ * (e.g. "landing-hero").
+ */
+export type WaitlistEntry = {
+  id: UUID;
+  email: string;
+  source: string | null;
+  created_at: ISODateTime;
+};
+
+/**
  * The eight seeded family profiles (supabase/seed.sql) share this id prefix —
  * the DC 2026 beta's claimable roster. Devices sign in anonymously with fresh
  * UUIDs, so the prefix cleanly separates family identities from guests.
@@ -261,6 +274,7 @@ export type ChecklistItemInsert = Insert<
   "id" | "created_at" | "updated_at" | "position" | "done" | "done_by" | "done_at"
 >;
 export type ActivityFeedEntryInsert = Insert<ActivityFeedEntry, "id" | "created_at" | "actor_id">;
+export type WaitlistEntryInsert = Insert<WaitlistEntry, "id" | "created_at" | "source">;
 
 /**
  * Database definition for `createClient<Database>()` from @supabase/supabase-js.
@@ -315,6 +329,12 @@ export type Database = {
         Row: ActivityFeedEntry;
         Insert: ActivityFeedEntryInsert;
         Update: Partial<ActivityFeedEntry>;
+        Relationships: [];
+      };
+      waitlist: {
+        Row: WaitlistEntry;
+        Insert: WaitlistEntryInsert;
+        Update: Partial<WaitlistEntry>;
         Relationships: [];
       };
     };

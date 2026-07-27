@@ -12,6 +12,7 @@ import { CompassRose } from "@/components/compass-rose";
 import { AppMockup } from "@/components/app-mockup";
 import { ItineraryTicket, PrintableItinerary } from "@/components/itinerary";
 import { ShareBar } from "@/components/share-bar";
+import { WaitlistForm } from "@/components/waitlist-form";
 import { DAYS } from "@/lib/trip";
 import { fetchTripWeather } from "@/lib/weather";
 
@@ -24,19 +25,19 @@ const areas = [
     icon: CalendarDays,
     code: "01",
     title: "Itinerary",
-    body: "Browse every day, drill into its activities in order, and edit full details. The living plan everyone manages on the road.",
+    body: "Every day of the trip, its activities in order, full details you can edit. One living plan the whole group manages together.",
   },
   {
     icon: ListChecks,
     code: "02",
     title: "Checklists",
-    body: "Trip-level packing and per-day routines. Any member checks or unchecks any item — one tap, synced to everyone.",
+    body: "Trip-level packing and per-day routines. Any member checks or unchecks any item — one tap, synced to everyone instantly.",
   },
   {
     icon: Sparkles,
     code: "03",
     title: "Ask GOODTrip",
-    body: "An AI guide with the whole trip in context. Recaps a day, suggests dinner nearby, and adds it to the plan on your okay.",
+    body: "An AI guide with the whole trip in context. Recaps a day, suggests dinner nearby, reworks a rained-out afternoon — on your okay.",
   },
   {
     icon: Plane,
@@ -46,11 +47,20 @@ const areas = [
   },
 ];
 
+// The example trip's destinations are DC, but GOODTrip is for any small-group
+// trip — these hint at the range without pretending to be real bookings.
+const tripKinds = [
+  "A weekend in Lisbon",
+  "A bachelor party in Nashville",
+  "A family reunion in the Smokies",
+  "Nine days in Washington, D.C.",
+];
+
 const phases = [
   {
     n: "I",
     title: "Foundation",
-    body: "Expo + EAS + TestFlight, Supabase schema & RLS, Apple Sign In, seeded DC trip.",
+    body: "Supabase schema, RLS & Realtime, auth, and a seeded example trip to build against.",
   },
   {
     n: "II",
@@ -69,20 +79,17 @@ const phases = [
   },
   {
     n: "V",
-    title: "Polish",
-    body: "App icon & splash, TestFlight submission, onboarding the crew.",
+    title: "Launch",
+    body: "Web polish, iOS via TestFlight, onboarding — then the waitlist gets in.",
   },
 ];
 
 const stack = [
-  "React Native 0.76",
-  "Expo · EAS",
-  "React Navigation v7",
+  "Next.js",
+  "React Native · Expo",
   "Supabase",
-  "NativeWind v4",
-  "Jotai",
-  "TanStack Query v5",
-  "Apple Sign In",
+  "Realtime + RLS",
+  "TanStack Query",
   "Claude · sonnet-4-6",
 ];
 
@@ -141,17 +148,17 @@ export default async function Home() {
             </span>
           </div>
           <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-[0.2em] text-cream-muted">
-            <Link href="/trip" className="text-gold transition-colors hover:text-gold-bright">
+            <a href="#app" className="hidden transition-colors hover:text-gold sm:inline">
+              How it works
+            </a>
+            <a href="#example" className="hidden transition-colors hover:text-gold sm:inline">
+              Example
+            </a>
+            <Link href="/trip" className="transition-colors hover:text-gold">
               Preview
             </Link>
-            <a href="#trip" className="transition-colors hover:text-gold">
-              Trip
-            </a>
-            <a href="#app" className="hidden transition-colors hover:text-gold sm:inline">
-              App
-            </a>
-            <a href="#tech" className="hidden transition-colors hover:text-gold sm:inline">
-              Tech
+            <a href="#waitlist" className="text-gold transition-colors hover:text-gold-bright">
+              Join
             </a>
           </nav>
         </header>
@@ -160,7 +167,7 @@ export default async function Home() {
           {/* ── Hero ──────────────────────────────────────────── */}
           <section className="relative z-10 mx-auto max-w-4xl px-6 pb-16 pt-16 text-center sm:pt-24">
             <p className="reveal font-mono text-[11px] uppercase tracking-[0.5em] text-gold sm:text-xs">
-              Est. MMXXVI · Washington · D.C.
+              Coming soon · Est. MMXXVI
             </p>
 
             <h1
@@ -184,28 +191,24 @@ export default async function Home() {
               className="reveal mx-auto mt-8 max-w-xl text-[15px] leading-relaxed text-cream-muted sm:text-base"
               style={{ animationDelay: "0.24s" }}
             >
-              A collaborative, AI-assisted travel itinerary for small groups. It turns a structured
-              plan into a shared, living experience — so everyone always knows what&apos;s
-              happening, what&apos;s checked off, and what&apos;s next.
+              A collaborative, AI-assisted travel itinerary for small groups — a road trip, a
+              reunion, a bachelor party, a family holiday. GOODTrip turns a structured plan into a
+              shared, living experience, so everyone always knows what&apos;s happening, what&apos;s
+              checked off, and what&apos;s next.
             </p>
 
-            {/* preview access CTA */}
-            <div
-              className="reveal mt-10 flex flex-col items-center gap-3"
-              style={{ animationDelay: "0.28s" }}
-            >
-              <Link
-                href="/trip"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-gold px-7 py-3 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-gold-bright"
-              >
-                Open the app
-                <ArrowRight
-                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  aria-hidden="true"
-                />
-              </Link>
-              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-cream-muted">
-                Preview access · Live itinerary · No sign-up
+            {/* waitlist capture — the primary action */}
+            <div className="reveal mt-10" style={{ animationDelay: "0.28s" }}>
+              <WaitlistForm source="landing-hero" />
+              <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.25em] text-cream-muted">
+                Or{" "}
+                <Link
+                  href="/trip"
+                  className="text-gold underline decoration-gold/30 underline-offset-[5px] transition-colors hover:text-gold-bright hover:decoration-gold"
+                >
+                  explore a live example trip
+                </Link>{" "}
+                — no sign-up
               </p>
             </div>
 
@@ -215,10 +218,10 @@ export default async function Home() {
               style={{ animationDelay: "0.32s" }}
             >
               {[
-                ["Destination", "Washington, D.C."],
-                ["Dates", "Jul 21–29 ’26"],
-                ["Party", "Family of 8"],
-                ["Platform", "Web preview · iOS next"],
+                ["Status", "Private beta"],
+                ["Platform", "Web now · iOS next"],
+                ["Built for", "Small groups"],
+                ["Price", "Free while in beta"],
               ].map(([k, v]) => (
                 <div key={k} className="bg-ink/40 px-4 py-3">
                   <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/70">
@@ -230,31 +233,11 @@ export default async function Home() {
             </dl>
           </section>
 
-          {/* ════════ ACT I · THE TRIP ════════ */}
-          <section id="trip" className="relative z-10 scroll-mt-20 px-4 py-24 sm:px-6 sm:py-32">
-            <ActHeader
-              index="01"
-              kicker="The Trip"
-              title={
-                <>
-                  Nine days.
-                  <br />
-                  One <span className="text-gold">founding</span> city.
-                </>
-              }
-              intro="One family of eight, in Washington for America’s 250th birthday. This is the plan — the very itinerary the app will run on. Until GOODTrip ships, this page is the source of truth. Hit print for a plain copy to carry."
-            />
-
-            <div className="mt-16">
-              <ItineraryTicket weather={weather} />
-            </div>
-          </section>
-
-          {/* ════════ ACT II · THE APP ════════ */}
+          {/* ════════ ACT I · HOW IT WORKS ════════ */}
           <section id="app" className="relative z-10 scroll-mt-20 px-6 py-24 sm:py-32">
             <ActHeader
-              index="02"
-              kicker="The App"
+              index="01"
+              kicker="How it works"
               title={
                 <>
                   The itinerary,
@@ -262,24 +245,11 @@ export default async function Home() {
                   <span className="text-gold">alive.</span>
                 </>
               }
-              intro="Right now this is a page. Soon it’s in your pocket — the same plan, but live. Everyone sees it update in real time, checks off what’s packed, and asks an AI guide that already knows the whole trip. Here’s an early look — tap through it."
+              intro="Build the plan once, together. Then it travels with you — live in every pocket. Everyone sees it update in real time, checks off what's packed, and asks an AI guide that already knows the whole trip. Here's an early look — tap through it."
             />
 
             <div className="mt-16">
               <AppMockup weather={weather} />
-            </div>
-
-            <div className="mt-10 text-center">
-              <Link
-                href="/trip"
-                className="group inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-gold underline decoration-gold/30 underline-offset-[6px] transition-colors hover:text-gold-bright hover:decoration-gold"
-              >
-                Preview access is live — open the web app
-                <ArrowRight
-                  className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1"
-                  aria-hidden="true"
-                />
-              </Link>
             </div>
 
             {/* hierarchy */}
@@ -322,19 +292,55 @@ export default async function Home() {
             </div>
           </section>
 
-          {/* ════════ ACT III · THE TECH ════════ */}
+          {/* ════════ ACT II · AN EXAMPLE TRIP ════════ */}
+          <section id="example" className="relative z-10 scroll-mt-20 px-4 py-24 sm:px-6 sm:py-32">
+            <ActHeader
+              index="02"
+              kicker="An example trip"
+              title={
+                <>
+                  What a GOODTrip
+                  <br />
+                  <span className="text-gold">looks like.</span>
+                </>
+              }
+              intro="Here's a real one to make it concrete — nine days in Washington, D.C. for a family of eight, over America's 250th birthday. Yours could be any of these. Same structure, any destination, any group. Hit print for a plain copy to carry."
+            />
+
+            {/* range of trips this could be */}
+            <div className="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-2">
+              {tripKinds.map((kind, i) => (
+                <span
+                  key={kind}
+                  className={`rounded-full border px-3.5 py-1.5 font-mono text-[11px] ${
+                    i === tripKinds.length - 1
+                      ? "border-gold/40 bg-gold/10 text-gold"
+                      : "border-cream/15 text-cream/70"
+                  }`}
+                >
+                  {kind}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-14">
+              <ItineraryTicket weather={weather} />
+            </div>
+          </section>
+
+          {/* ════════ ACT III · BUILT IN THE OPEN ════════ */}
           <section id="tech" className="relative z-10 scroll-mt-20 px-6 py-24 sm:py-32">
             <ActHeader
               index="03"
-              kicker="The Tech"
+              kicker="Built in the open"
               title={
                 <>
-                  Built in the
+                  On the way
                   <br />
-                  <span className="text-gold">open.</span>
+                  to <span className="text-gold">launch.</span>
                 </>
               }
-              intro="A React Native app on Supabase, with Claude woven in, shipping to TestFlight in July 2026. One pnpm monorepo, five phases, real-time and offline-first from the start."
+              intro="A web app on Supabase with Claude woven in, and a React Native app close behind. One pnpm monorepo, five phases, real-time and offline-first from the start — shipped issue by issue, in public."
             />
 
             {/* route to v1.0 */}
@@ -392,6 +398,29 @@ export default async function Home() {
               </a>
             </div>
           </section>
+
+          {/* ════════ WAITLIST CTA ════════ */}
+          <section
+            id="waitlist"
+            className="relative z-10 scroll-mt-20 px-6 pb-8 pt-4 text-center sm:pb-16"
+          >
+            <div className="mx-auto max-w-2xl rounded-[1.75rem] border border-gold/25 bg-ink-800/60 px-6 py-14 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.85)] backdrop-blur sm:px-14">
+              <CompassRose className="mx-auto h-10 w-10 text-gold" />
+              <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.5em] text-gold/70">
+                Now boarding
+              </p>
+              <h2 className="mt-4 font-display font-semibold leading-[0.95] tracking-tight text-cream [font-size:clamp(2rem,6vw,3.25rem)]">
+                Be first through the gate.
+              </h2>
+              <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-cream-muted sm:text-base">
+                Drop your email and we&apos;ll let you know the moment GOODTrip opens — starting
+                with the web app, iOS right behind it.
+              </p>
+              <div className="mt-9">
+                <WaitlistForm source="landing-cta" />
+              </div>
+            </div>
+          </section>
         </main>
 
         {/* ── Footer ────────────────────────────────────────── */}
@@ -405,7 +434,7 @@ export default async function Home() {
 
             <p className="mt-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
               <MapPin className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-              GOODTrip · Spec v0.1 · Collaborative AI itineraries
+              GOODTrip · Coming soon · Collaborative AI itineraries
             </p>
           </div>
         </footer>
