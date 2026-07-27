@@ -25,25 +25,25 @@ const areas = [
     icon: CalendarDays,
     code: "01",
     title: "Itinerary",
-    body: "Every day of the trip, its activities in order, full details you can edit. One living plan the whole group manages together.",
+    body: "One living plan the whole group edits together. Swap a dinner, move an afternoon, add a stop — and everyone's itinerary updates in real time.",
   },
   {
     icon: ListChecks,
     code: "02",
     title: "Checklists",
-    body: "Trip-level packing and per-day routines. Any member checks or unchecks any item — one tap, synced to everyone instantly.",
+    body: "Trip-level packing and per-day routines, so nothing gets left behind. Any member checks off any item — one tap, synced to everyone instantly.",
   },
   {
     icon: Sparkles,
     code: "03",
     title: "Ask GOODTrip",
-    body: "An AI guide with the whole trip in context. Recaps a day, suggests dinner nearby, reworks a rained-out afternoon — on your okay.",
+    body: "An AI guide with the whole trip in context. It recaps a day, suggests dinner nearby, reworks a rained-out afternoon — handling the logistics so you can be in the moment.",
   },
   {
     icon: Plane,
     code: "04",
     title: "Trip",
-    body: "Destination, dates, the roster with who's online right now, and a live feed of what the rest of the group is doing.",
+    body: "Destination, dates, the roster with who's online right now, and a live feed of what everyone's doing — so the whole group stays on the same page.",
   },
 ];
 
@@ -192,9 +192,10 @@ export default async function Home() {
               style={{ animationDelay: "0.24s" }}
             >
               A collaborative, AI-assisted travel itinerary for small groups — a road trip, a
-              reunion, a bachelor party, a family holiday. GOODTrip turns a structured plan into a
-              shared, living experience, so everyone always knows what&apos;s happening, what&apos;s
-              checked off, and what&apos;s next.
+              reunion, a bachelor party, a family holiday. Plan it together and change it together:
+              swap a dinner, move an afternoon, and everyone&apos;s itinerary updates in real time.
+              GOODTrip keeps the group in sync and helps you pack — so you can stop managing the
+              trip and just show up, be present, and make the memories.
             </p>
 
             {/* waitlist capture — the primary action */}
@@ -245,7 +246,7 @@ export default async function Home() {
                   <span className="text-gold">alive.</span>
                 </>
               }
-              intro="Build the plan once, together. Then it travels with you — live in every pocket. Everyone sees it update in real time, checks off what's packed, and asks an AI guide that already knows the whole trip. Here's an early look — tap through it."
+              intro="Build the plan once, together — then change it together. Everyone sees it update in real time, checks off what's packed, and asks an AI guide that already knows the whole trip. The coordination runs itself, so you can show up and enjoy the moment. Here's an early look — tap through it."
             />
 
             <div className="mt-16">

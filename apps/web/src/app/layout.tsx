@@ -30,7 +30,7 @@ const siteUrl =
 
 const title = "GOODTrip — Have a GOOD trip.";
 const description =
-  "A collaborative, AI-assisted travel itinerary for small groups — any trip, any place. Plan it once, together; it stays live in every pocket. Coming soon — join the waitlist.";
+  "A collaborative, AI-assisted travel itinerary for small groups. Plan it together and change it in real time, pack with less effort, and let the logistics run themselves — so you can show up and enjoy the trip. Coming soon — join the waitlist.";
 
 export let metadata: Metadata = {
   metadataBase: new URL(siteUrl),
