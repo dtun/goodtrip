@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Share2, MessageSquare, Mail, Link2, Check } from "lucide-react";
 
 const SITE = "https://goodtrip.info";
-const MESSAGE = "GOODTrip — the group trip planner that plans with you. Have a GOOD trip:";
-const EMAIL_SUBJECT = "GOODTrip — have a GOOD trip";
+const MESSAGE = "GOODTrip — the group trip planner that plans with you:";
+const EMAIL_SUBJECT = "GOODTrip";
 
 const tile =
   "flex h-11 w-11 items-center justify-center rounded-full border border-sand-300 bg-sand-100 text-espresso-muted transition-colors hover:border-coral/50 hover:text-coral-700 focus-visible:text-coral-700";

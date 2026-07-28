@@ -28,9 +28,9 @@ const siteUrl =
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : "http://localhost:3000");
 
-const title = "GOODTrip — Have a GOOD trip.";
+const title = "GOODTrip";
 const description =
-  "A collaborative, AI-assisted travel itinerary for small groups. Plan it together and change it in real time, pack with less effort, and let the logistics run themselves — so you can show up and enjoy the trip. Coming soon — join the waitlist.";
+  "A collaborative, AI-assisted travel itinerary for families. Plan it together and change it in real time, pack with less effort, and let the logistics run themselves — so you can show up and enjoy the trip. Coming soon — join the waitlist.";
 
 export let metadata: Metadata = {
   metadataBase: new URL(siteUrl),
