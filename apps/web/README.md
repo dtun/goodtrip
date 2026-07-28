@@ -2,8 +2,10 @@
 
 The GOODTrip web app. Ships in two parts today:
 
-- `/` — the static landing page summarizing the GOODTrip plan and the DC 2026
-  itinerary (printable).
+- `/` — the product landing page: a coming-soon pitch with a waitlist
+  email capture (`POST /api/waitlist` → the `waitlist` table), plus a worked
+  example trip (the DC 2026 itinerary, printable) to show what a GOODTrip
+  looks like.
 - `/trip` — the Phase 1 walking skeleton grown through Phase 2–4: welcome
   screen (returning travelers get a magic sign-in link; new ones enter
   anonymously, spec §4) → claim-a-name → RLS-gated reads via

@@ -19,11 +19,12 @@ let config = {
     },
     extend: {
       fontFamily: {
-        display: ["var(--font-display)", "Georgia", "serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       colors: {
+        // ── Legacy poster palette — still used by the /trip app UI ──
         ink: {
           DEFAULT: "#0B0D24",
           800: "#0E1029",
@@ -38,6 +39,30 @@ let config = {
           bright: "#E6CB78",
         },
         flag: "#B22234",
+
+        // ── Warm-light landing palette ──
+        sand: {
+          DEFAULT: "#FBF6EF", // page background
+          100: "#FFFDF9", // lifted surface
+          200: "#F3EADA", // subtle block / hover
+          300: "#EADFCB", // borders / dividers
+        },
+        espresso: {
+          DEFAULT: "#2E2620", // primary text (warm near-black)
+          muted: "#6E635A", // secondary text
+        },
+        coral: {
+          DEFAULT: "#F26B4E", // primary accent / fills
+          600: "#DE4F30", // buttons (white text passes)
+          700: "#B84327", // accent text on light
+          soft: "#FBE7DF", // tinted surface
+        },
+        teal: {
+          DEFAULT: "#1F9E92", // secondary accent
+          700: "#0F766E", // teal text on light
+          soft: "#E2F1EE",
+        },
+        sun: "#F4A63C", // warm highlight
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

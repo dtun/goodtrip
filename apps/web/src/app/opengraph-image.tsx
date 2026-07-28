@@ -14,9 +14,9 @@ export default function OpengraphImage() {
         flexDirection: "column",
         justifyContent: "space-between",
         padding: "72px 80px",
-        backgroundColor: "#0B0D24",
-        backgroundImage: "linear-gradient(135deg, #11132E 0%, #0B0D24 55%, #160F1C 100%)",
-        color: "#F3EAD8",
+        backgroundColor: "#FBF6EF",
+        backgroundImage: "linear-gradient(135deg, #FEFBF5 0%, #FBF6EF 52%, #FBE9E1 100%)",
+        color: "#2E2620",
         fontFamily: "sans-serif",
       }}
     >
@@ -32,11 +32,12 @@ export default function OpengraphImage() {
           style={{
             fontSize: 24,
             letterSpacing: 10,
-            color: "#C9A84C",
+            color: "#B84327",
             textTransform: "uppercase",
+            fontWeight: 700,
           }}
         >
-          Est. MMXXVI · Washington · D.C.
+          Coming soon
         </div>
         <svg width="120" height="120" viewBox="0 0 200 200">
           <circle
@@ -44,7 +45,7 @@ export default function OpengraphImage() {
             cy="100"
             r="92"
             fill="none"
-            stroke="rgba(201,168,76,0.45)"
+            stroke="rgba(242,107,78,0.4)"
             strokeWidth="2"
           />
           <circle
@@ -52,14 +53,14 @@ export default function OpengraphImage() {
             cy="100"
             r="70"
             fill="none"
-            stroke="rgba(201,168,76,0.28)"
+            stroke="rgba(242,107,78,0.25)"
             strokeWidth="2"
           />
-          <path d="M100 16 L112 100 L100 100 L88 100 Z" fill="#E6CB78" />
-          <path d="M100 184 L112 100 L100 100 L88 100 Z" fill="#C9A84C" />
-          <path d="M16 100 L100 112 L100 100 L100 88 Z" fill="#C9A84C" />
-          <path d="M184 100 L100 112 L100 100 L100 88 Z" fill="#C9A84C" />
-          <circle cx="100" cy="100" r="7" fill="#E6CB78" />
+          <path d="M100 16 L112 100 L100 100 L88 100 Z" fill="#F4A63C" />
+          <path d="M100 184 L112 100 L100 100 L88 100 Z" fill="#F26B4E" />
+          <path d="M16 100 L100 112 L100 100 L100 88 Z" fill="#F26B4E" />
+          <path d="M184 100 L100 112 L100 100 L100 88 Z" fill="#F26B4E" />
+          <circle cx="100" cy="100" r="7" fill="#F4A63C" />
         </svg>
       </div>
 
@@ -74,10 +75,10 @@ export default function OpengraphImage() {
             lineHeight: 1,
           }}
         >
-          <span style={{ color: "#F3EAD8" }}>GOOD</span>
-          <span style={{ color: "#C9A84C" }}>Trip</span>
+          <span style={{ color: "#2E2620" }}>GOOD</span>
+          <span style={{ color: "#F26B4E" }}>Trip</span>
         </div>
-        <div style={{ marginTop: 16, fontSize: 44, fontStyle: "italic", color: "#F3EAD8" }}>
+        <div style={{ marginTop: 16, fontSize: 44, fontWeight: 500, color: "#4A403A" }}>
           Have a GOOD trip.
         </div>
         <div
@@ -86,7 +87,7 @@ export default function OpengraphImage() {
             width: 240,
             height: 8,
             borderRadius: 8,
-            backgroundImage: "linear-gradient(90deg, #B22234, #C9A84C)",
+            backgroundImage: "linear-gradient(90deg, #1F9E92, #F26B4E, #F4A63C)",
           }}
         />
       </div>
@@ -98,11 +99,11 @@ export default function OpengraphImage() {
           alignItems: "center",
           justifyContent: "space-between",
           fontSize: 26,
-          color: "#A7A189",
+          color: "#6E635A",
         }}
       >
-        <div style={{ display: "flex" }}>Washington, D.C. · America&apos;s 250th Birthday</div>
-        <div style={{ display: "flex", color: "#C9A84C" }}>Jul 21–29, 2026</div>
+        <div style={{ display: "flex" }}>Collaborative AI itineraries for small groups</div>
+        <div style={{ display: "flex", color: "#B84327", fontWeight: 600 }}>Join the waitlist</div>
       </div>
     </div>,
     { ...size },

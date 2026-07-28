@@ -38,7 +38,7 @@ import {
 
 type Tab = "itinerary" | "checklists" | "ask" | "trip";
 
-const PRIMARY = "#3C3B6E";
+const PRIMARY = "#0F766E";
 const onlineMembers = MEMBERS.filter((m) => m.online);
 
 /* ── small parts ──────────────────────────────────────────────── */
@@ -105,8 +105,8 @@ function Badge({
   const tones: Record<string, string> = {
     muted: "bg-[#F0F0F0] text-[#666]",
     green: "bg-[#2D6A4F]/12 text-[#2D6A4F]",
-    blue: "bg-[#3C3B6E]/10 text-[#3C3B6E]",
-    gold: "bg-[#C9A84C]/15 text-[#9A7B1F]",
+    blue: "bg-[#0F766E]/10 text-[#0F766E]",
+    gold: "bg-[#F26B4E]/15 text-[#B84327]",
   };
   return (
     <span
@@ -123,7 +123,7 @@ function ActivityCard({ a }: { a: Activity }) {
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           {a.time && (
-            <p className="flex items-center gap-1 font-mono text-[11px] font-medium text-[#3C3B6E]">
+            <p className="flex items-center gap-1 font-mono text-[11px] font-medium text-[#0F766E]">
               <Clock className="h-3 w-3" />
               {a.time}
             </p>
@@ -167,12 +167,12 @@ function ActivityCard({ a }: { a: Activity }) {
 function DayList({ onOpen, weather }: { onOpen: (n: number) => void; weather: WeatherByDate }) {
   return (
     <div className="space-y-3">
-      <div className="rounded-2xl bg-[#3C3B6E] p-4 text-white">
+      <div className="rounded-2xl bg-[#0F766E] p-4 text-white">
         <p className="text-[11px] uppercase tracking-wide text-white/60">{TRIP.name}</p>
         <p className="mt-0.5 font-display text-2xl leading-tight">{TRIP.destination}</p>
         <div className="mt-3 flex items-center justify-between">
           <span className="text-xs text-white/80">{TRIP.dates}</span>
-          <span className="rounded-full bg-[#C9A84C] px-2.5 py-1 font-mono text-[11px] font-semibold text-[#3C3B6E]">
+          <span className="rounded-full bg-[#F26B4E] px-2.5 py-1 font-mono text-[11px] font-semibold text-white">
             {TRIP.countdown}
           </span>
         </div>
@@ -189,7 +189,7 @@ function DayList({ onOpen, weather }: { onOpen: (n: number) => void; weather: We
           >
             <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-[#F8F8F8] leading-none">
               <span className="font-mono text-[9px] text-[#666]">DAY</span>
-              <span className="font-display text-lg text-[#3C3B6E]">{d.n}</span>
+              <span className="font-display text-lg text-[#0F766E]">{d.n}</span>
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[15px] font-semibold text-[#111]">{d.title}</p>
@@ -198,7 +198,7 @@ function DayList({ onOpen, weather }: { onOpen: (n: number) => void; weather: We
                 {confirmed > 0 ? ` · ${confirmed} confirmed` : ""}
               </p>
               {w && (
-                <p className="mt-0.5 flex items-center gap-1 text-[11px] text-[#9A7B1F]">
+                <p className="mt-0.5 flex items-center gap-1 text-[11px] text-[#B84327]">
                   <WeatherIcon sky={w.sky} className="h-3.5 w-3.5" />
                   <span className="text-[#666]">
                     {w.hi}° / {w.lo}° · {w.summary}
@@ -208,7 +208,7 @@ function DayList({ onOpen, weather }: { onOpen: (n: number) => void; weather: We
             </div>
             <div className="relative shrink-0">
               <ProgressRing pct={d.progress} />
-              <span className="absolute inset-0 flex items-center justify-center font-mono text-[9px] font-semibold text-[#3C3B6E]">
+              <span className="absolute inset-0 flex items-center justify-center font-mono text-[9px] font-semibold text-[#0F766E]">
                 {d.progress}
               </span>
             </div>
@@ -230,10 +230,10 @@ function DayDetail({ day, w }: { day: DayPlan; w?: Weather }) {
         <h3 className="mt-0.5 font-display text-2xl text-[#111]">{day.title}</h3>
         {w && (
           <p
-            className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-[#3C3B6E]/8 px-2.5 py-1 text-xs font-medium text-[#3C3B6E]"
+            className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-[#0F766E]/8 px-2.5 py-1 text-xs font-medium text-[#0F766E]"
             title={weatherLabel(w)}
           >
-            <WeatherIcon sky={w.sky} className="h-4 w-4 text-[#9A7B1F]" />
+            <WeatherIcon sky={w.sky} className="h-4 w-4 text-[#B84327]" />
             {w.hi}° / {w.lo}° · {w.summary}
           </p>
         )}
@@ -245,7 +245,7 @@ function DayDetail({ day, w }: { day: DayPlan; w?: Weather }) {
         ))}
       </div>
 
-      <button className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-[#C9A84C] bg-[#C9A84C]/5 py-3 text-sm font-semibold text-[#9A7B1F]">
+      <button className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-[#F26B4E] bg-[#F26B4E]/5 py-3 text-sm font-semibold text-[#B84327]">
         <Plus className="h-4 w-4" />
         Add activity
       </button>
@@ -340,13 +340,13 @@ function Ask() {
         {AI_CONVO.map((m, i) =>
           m.role === "user" ? (
             <div key={i} className="flex justify-end">
-              <p className="max-w-[80%] rounded-2xl rounded-br-md bg-[#3C3B6E] px-3.5 py-2.5 text-sm text-white">
+              <p className="max-w-[80%] rounded-2xl rounded-br-md bg-[#0F766E] px-3.5 py-2.5 text-sm text-white">
                 {m.content}
               </p>
             </div>
           ) : (
             <div key={i} className="flex gap-2">
-              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#3C3B6E] text-[#C9A84C]">
+              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0F766E] text-[#F26B4E]">
                 <CompassRose className="h-5 w-5" />
               </span>
               <p className="max-w-[82%] rounded-2xl rounded-tl-md border border-[#E0E0E0] bg-white px-3.5 py-2.5 text-sm leading-relaxed text-[#222]">
@@ -357,14 +357,14 @@ function Ask() {
         )}
 
         {/* AI action card */}
-        <div className="ml-9 max-w-[82%] overflow-hidden rounded-2xl border border-[#C9A84C]/50 bg-[#C9A84C]/[0.07]">
+        <div className="ml-9 max-w-[82%] overflow-hidden rounded-2xl border border-[#F26B4E]/50 bg-[#F26B4E]/[0.07]">
           <div className="px-3.5 pt-3">
-            <p className="text-xs font-semibold text-[#9A7B1F]">{AI_ACTION.prompt}</p>
+            <p className="text-xs font-semibold text-[#B84327]">{AI_ACTION.prompt}</p>
             <p className="mt-1.5 text-sm font-semibold text-[#111]">{AI_ACTION.title}</p>
             <p className="text-xs text-[#666]">{AI_ACTION.detail}</p>
           </div>
-          <div className="mt-3 flex border-t border-[#C9A84C]/30">
-            <button className="flex-1 border-r border-[#C9A84C]/30 py-2.5 text-sm font-semibold text-[#2D6A4F]">
+          <div className="mt-3 flex border-t border-[#F26B4E]/30">
+            <button className="flex-1 border-r border-[#F26B4E]/30 py-2.5 text-sm font-semibold text-[#2D6A4F]">
               Accept
             </button>
             <button className="flex-1 py-2.5 text-sm font-medium text-[#666]">Dismiss</button>
@@ -377,7 +377,7 @@ function Ask() {
           {AI_SUGGESTIONS.map((s) => (
             <span
               key={s}
-              className="rounded-full border border-[#E0E0E0] bg-white px-2.5 py-1 text-[11px] text-[#3C3B6E]"
+              className="rounded-full border border-[#E0E0E0] bg-white px-2.5 py-1 text-[11px] text-[#0F766E]"
             >
               {s}
             </span>
@@ -386,7 +386,7 @@ function Ask() {
         <div className="flex items-center gap-2 rounded-full border border-[#E0E0E0] bg-white py-1.5 pl-4 pr-1.5">
           <span className="flex-1 text-sm text-[#6E6E6E]">Ask GOODTrip…</span>
           <Mic className="h-4 w-4 text-[#6E6E6E]" />
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3C3B6E] text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0F766E] text-white">
             <Send className="h-4 w-4" />
           </span>
         </div>
@@ -399,8 +399,8 @@ function TripOverview() {
   return (
     <div className="space-y-4">
       <div className="overflow-hidden rounded-2xl border border-[#E0E0E0] bg-white">
-        <div className="relative h-24 bg-gradient-to-br from-[#3C3B6E] to-[#161A3C]">
-          <CompassRose className="absolute -right-4 -top-3 h-24 w-24 text-[#C9A84C] opacity-30" />
+        <div className="relative h-24 bg-gradient-to-br from-[#0F766E] to-[#0B4A44]">
+          <CompassRose className="absolute -right-4 -top-3 h-24 w-24 text-[#F26B4E] opacity-30" />
           <div className="absolute bottom-3 left-4 text-white">
             <p className="font-display text-lg leading-tight">{TRIP.name}</p>
             <p className="text-xs text-white/70">
@@ -438,7 +438,7 @@ function TripOverview() {
               key={i}
               className="flex items-center gap-2 border-b border-[#F0F0F0] px-3.5 py-2.5 text-sm last:border-0"
             >
-              <span className="font-semibold text-[#3C3B6E]">{f.who}</span>
+              <span className="font-semibold text-[#0F766E]">{f.who}</span>
               <span className="text-[#666]">{f.action}</span>
               <span className="min-w-0 flex-1 truncate text-[#111]">{f.target}</span>
               <span className="shrink-0 text-[11px] text-[#6E6E6E]">{f.when}</span>
@@ -501,7 +501,7 @@ export function AppMockup({ weather = {} }: { weather?: WeatherByDate }) {
               {inDetail && (
                 <button
                   onClick={() => setOpenDay(null)}
-                  className="-ml-1 flex h-7 w-7 items-center justify-center rounded-full text-[#3C3B6E] active:bg-[#3C3B6E]/10"
+                  className="-ml-1 flex h-7 w-7 items-center justify-center rounded-full text-[#0F766E] active:bg-[#0F766E]/10"
                   aria-label="Back to itinerary"
                 >
                   <ChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -562,7 +562,7 @@ export function AppMockup({ weather = {} }: { weather?: WeatherByDate }) {
         </div>
       </div>
 
-      <p className="mt-5 text-center font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
+      <p className="mt-5 text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso-muted">
         An early look — tap the tabs ↑
       </p>
     </div>

@@ -1,17 +1,10 @@
 import Link from "next/link";
-import {
-  CalendarDays,
-  ListChecks,
-  Sparkles,
-  Plane,
-  MapPin,
-  ArrowRight,
-  Github,
-} from "lucide-react";
+import { CalendarDays, ListChecks, Sparkles, Users, ArrowRight, Github } from "lucide-react";
 import { CompassRose } from "@/components/compass-rose";
 import { AppMockup } from "@/components/app-mockup";
 import { ItineraryTicket, PrintableItinerary } from "@/components/itinerary";
 import { ShareBar } from "@/components/share-bar";
+import { WaitlistForm } from "@/components/waitlist-form";
 import { DAYS } from "@/lib/trip";
 import { fetchTripWeather } from "@/lib/weather";
 
@@ -22,97 +15,59 @@ export const revalidate = 3600;
 const areas = [
   {
     icon: CalendarDays,
-    code: "01",
-    title: "Itinerary",
-    body: "Browse every day, drill into its activities in order, and edit full details. The living plan everyone manages on the road.",
+    title: "A plan that changes together",
+    body: "Swap a dinner, move an afternoon, add a stop — everyone's itinerary updates in real time.",
   },
   {
     icon: ListChecks,
-    code: "02",
-    title: "Checklists",
-    body: "Trip-level packing and per-day routines. Any member checks or unchecks any item — one tap, synced to everyone.",
+    title: "Packing, handled",
+    body: "Shared packing lists and per-day routines. Check off an item and it syncs to everyone.",
   },
   {
     icon: Sparkles,
-    code: "03",
-    title: "Ask GOODTrip",
-    body: "An AI guide with the whole trip in context. Recaps a day, suggests dinner nearby, and adds it to the plan on your okay.",
+    title: "An AI that knows the trip",
+    body: "Ask GOODTrip to recap a day, find dinner nearby, or rework a rained-out afternoon.",
   },
   {
-    icon: Plane,
-    code: "04",
-    title: "Trip",
-    body: "Destination, dates, the roster with who's online right now, and a live feed of what the rest of the group is doing.",
+    icon: Users,
+    title: "Everyone on the same page",
+    body: "See who's around, what's booked, and what the group's up to — no more group-chat archaeology.",
   },
 ];
 
-const phases = [
-  {
-    n: "I",
-    title: "Foundation",
-    body: "Expo + EAS + TestFlight, Supabase schema & RLS, Apple Sign In, seeded DC trip.",
-  },
-  {
-    n: "II",
-    title: "Core Itinerary",
-    body: "Home, day list, day & activity detail — wired to live activity updates.",
-  },
-  {
-    n: "III",
-    title: "Checklists + Multiplayer",
-    body: "Global & per-day checklists, optimistic toggles, presence, activity feed.",
-  },
-  {
-    n: "IV",
-    title: "AI",
-    body: "ai-chat edge function, chat UI, trip-context injection, one-tap actions.",
-  },
-  {
-    n: "V",
-    title: "Polish",
-    body: "App icon & splash, TestFlight submission, onboarding the crew.",
-  },
+// The example trip is Washington, D.C. — but GOODTrip is for any small-group
+// trip. These hint at the range without pretending to be real bookings.
+const tripKinds = [
+  "A weekend in Lisbon",
+  "A bachelor party in Nashville",
+  "A family reunion in the Smokies",
+  "Nine days in Washington, D.C.",
 ];
 
-const stack = [
-  "React Native 0.76",
-  "Expo · EAS",
-  "React Navigation v7",
-  "Supabase",
-  "NativeWind v4",
-  "Jotai",
-  "TanStack Query v5",
-  "Apple Sign In",
-  "Claude · sonnet-4-6",
-];
+const stack = ["Next.js", "React Native · Expo", "Supabase", "Realtime", "Claude"];
 
-function Cheatline({ className = "" }: { className?: string }) {
-  return <div className={`h-1 rounded-full bg-gradient-to-r from-flag to-gold ${className}`} />;
+function Kicker({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-coral-700">{children}</p>
+  );
 }
 
-function ActHeader({
-  index,
+function SectionHead({
   kicker,
   title,
   intro,
 }: {
-  index: string;
   kicker: string;
   title: React.ReactNode;
   intro: string;
 }) {
   return (
-    <div className="mx-auto max-w-3xl text-center">
-      <div className="flex items-center justify-center gap-3 font-mono text-xs uppercase tracking-[0.4em]">
-        <span className="text-gold">{index}</span>
-        <span className="h-3 w-px bg-flag" />
-        <span className="text-gold/70">{kicker}</span>
-      </div>
-      <h2 className="mt-6 font-display font-semibold leading-[0.95] tracking-tight text-cream [font-size:clamp(2.5rem,7vw,4.5rem)]">
+    <div className="mx-auto max-w-2xl text-center">
+      <Kicker>{kicker}</Kicker>
+      <h2 className="mt-4 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-espresso sm:text-5xl">
         {title}
       </h2>
-      <Cheatline className="mx-auto mt-7 w-24" />
-      <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-cream-muted sm:text-lg">
+      <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-espresso-muted sm:text-lg">
         {intro}
       </p>
     </div>
@@ -123,289 +78,240 @@ export default async function Home() {
   const weather = await fetchTripWeather(DAYS.map((d) => d.iso));
   return (
     <>
-      <div className="nightsky relative min-h-screen overflow-hidden font-sans print:hidden">
-        {/* faint giant compass behind hero */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-40 left-1/2 -z-0 h-[820px] w-[820px] -translate-x-1/2 opacity-[0.5]"
-        >
-          <CompassRose className="spin-slow h-full w-full text-gold" />
-        </div>
-
+      <div className="sunwash relative min-h-screen font-sans text-espresso print:hidden">
         {/* ── Top bar ───────────────────────────────────────── */}
-        <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+        <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <div className="flex items-center gap-2.5">
-            <CompassRose className="h-6 w-6 text-gold" />
-            <span className="font-mono text-sm font-semibold uppercase tracking-[0.25em] text-cream">
+            <CompassRose className="h-6 w-6 text-coral" />
+            <span className="font-display text-lg font-extrabold tracking-tight text-espresso">
               GOODTrip
             </span>
           </div>
-          <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-[0.2em] text-cream-muted">
-            <Link href="/trip" className="text-gold transition-colors hover:text-gold-bright">
+          <nav className="flex items-center gap-2 text-sm font-medium text-espresso-muted sm:gap-6">
+            <a href="#how" className="hidden transition-colors hover:text-espresso sm:inline">
+              How it works
+            </a>
+            <a href="#example" className="hidden transition-colors hover:text-espresso sm:inline">
+              Example
+            </a>
+            <Link href="/trip" className="hidden transition-colors hover:text-espresso sm:inline">
               Preview
             </Link>
-            <a href="#trip" className="transition-colors hover:text-gold">
-              Trip
-            </a>
-            <a href="#app" className="hidden transition-colors hover:text-gold sm:inline">
-              App
-            </a>
-            <a href="#tech" className="hidden transition-colors hover:text-gold sm:inline">
-              Tech
+            <a
+              href="#waitlist"
+              className="rounded-full bg-coral-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-coral-700"
+            >
+              Join the waitlist
             </a>
           </nav>
         </header>
 
         <main id="content">
           {/* ── Hero ──────────────────────────────────────────── */}
-          <section className="relative z-10 mx-auto max-w-4xl px-6 pb-16 pt-16 text-center sm:pt-24">
-            <p className="reveal font-mono text-[11px] uppercase tracking-[0.5em] text-gold sm:text-xs">
-              Est. MMXXVI · Washington · D.C.
-            </p>
+          <section className="mx-auto max-w-3xl px-6 pb-16 pt-12 text-center sm:pt-20">
+            <span className="reveal inline-flex items-center gap-2 rounded-full border border-coral/25 bg-coral-soft px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-coral-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-coral" />
+              Coming soon
+            </span>
 
             <h1
-              className="reveal text-shadow-gold mt-7 font-display font-semibold leading-[0.86] tracking-tight text-cream"
-              style={{ fontSize: "clamp(4rem, 15vw, 11rem)", animationDelay: "0.08s" }}
+              className="reveal mt-7 font-display text-[clamp(3.5rem,13vw,8rem)] font-extrabold leading-[0.9] tracking-tight text-espresso"
+              style={{ animationDelay: "0.06s" }}
             >
-              GOOD
-              <span className="text-gold">Trip</span>
+              GOOD<span className="text-coral">Trip</span>
             </h1>
 
             <p
-              className="reveal mt-4 font-display text-2xl italic text-cream/90 sm:text-3xl"
-              style={{ animationDelay: "0.16s" }}
+              className="reveal mt-3 font-display text-2xl font-medium text-espresso/80 sm:text-3xl"
+              style={{ animationDelay: "0.12s" }}
             >
               Have a GOOD trip.
             </p>
 
-            <Cheatline className="reveal mx-auto mt-7 w-28" />
-
             <p
-              className="reveal mx-auto mt-8 max-w-xl text-[15px] leading-relaxed text-cream-muted sm:text-base"
-              style={{ animationDelay: "0.24s" }}
+              className="reveal mx-auto mt-7 max-w-xl text-base leading-relaxed text-espresso-muted sm:text-lg"
+              style={{ animationDelay: "0.18s" }}
             >
-              A collaborative, AI-assisted travel itinerary for small groups. It turns a structured
-              plan into a shared, living experience — so everyone always knows what&apos;s
-              happening, what&apos;s checked off, and what&apos;s next.
+              The group trip planner that plans <em className="not-italic text-espresso">with</em>{" "}
+              you. Build it together, change it in real time, and let GOODTrip handle the packing
+              and logistics — so everyone can just show up and enjoy the trip.
             </p>
 
-            {/* preview access CTA */}
-            <div
-              className="reveal mt-10 flex flex-col items-center gap-3"
-              style={{ animationDelay: "0.28s" }}
-            >
-              <Link
-                href="/trip"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-gold px-7 py-3 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-ink transition-colors hover:bg-gold-bright"
-              >
-                Open the app
-                <ArrowRight
-                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  aria-hidden="true"
-                />
-              </Link>
-              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-cream-muted">
-                Preview access · Live itinerary · No sign-up
+            {/* waitlist capture — the primary action */}
+            <div className="reveal mt-9" style={{ animationDelay: "0.24s" }}>
+              <WaitlistForm source="landing-hero" />
+              <p className="mt-4 text-sm text-espresso-muted">
+                Or{" "}
+                <Link
+                  href="/trip"
+                  className="font-medium text-coral-700 underline decoration-coral/30 underline-offset-4 transition-colors hover:decoration-coral"
+                >
+                  explore a live example trip
+                </Link>{" "}
+                — no sign-up.
               </p>
             </div>
 
-            {/* boarding-pass meta strip */}
+            {/* quick facts */}
             <dl
-              className="reveal mx-auto mt-12 grid max-w-2xl grid-cols-2 gap-px overflow-hidden rounded-lg border border-gold/25 bg-gold/[0.04] text-left sm:grid-cols-4"
-              style={{ animationDelay: "0.32s" }}
+              className="reveal mx-auto mt-12 grid max-w-2xl grid-cols-2 gap-3 text-left sm:grid-cols-4"
+              style={{ animationDelay: "0.3s" }}
             >
               {[
-                ["Destination", "Washington, D.C."],
-                ["Dates", "Jul 21–29 ’26"],
-                ["Party", "Family of 8"],
-                ["Platform", "Web preview · iOS next"],
+                ["Status", "Private beta"],
+                ["Platform", "Web now · iOS next"],
+                ["Built for", "Small groups"],
+                ["Price", "Free in beta"],
               ].map(([k, v]) => (
-                <div key={k} className="bg-ink/40 px-4 py-3">
-                  <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/70">
+                <div
+                  key={k}
+                  className="rounded-2xl border border-sand-300 bg-sand-100 px-4 py-3 shadow-[0_1px_0_rgba(46,38,32,0.02)]"
+                >
+                  <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-espresso-muted/80">
                     {k}
                   </dt>
-                  <dd className="mt-1 text-sm text-cream">{v}</dd>
+                  <dd className="mt-1 text-sm font-semibold text-espresso">{v}</dd>
                 </div>
               ))}
             </dl>
           </section>
 
-          {/* ════════ ACT I · THE TRIP ════════ */}
-          <section id="trip" className="relative z-10 scroll-mt-20 px-4 py-24 sm:px-6 sm:py-32">
-            <ActHeader
-              index="01"
-              kicker="The Trip"
+          {/* ── How it works ──────────────────────────────────── */}
+          <section id="how" className="scroll-mt-20 px-6 py-20 sm:py-28">
+            <SectionHead
+              kicker="How it works"
               title={
                 <>
-                  Nine days.
-                  <br />
-                  One <span className="text-gold">founding</span> city.
+                  The itinerary, <span className="text-coral">alive.</span>
                 </>
               }
-              intro="One family of eight, in Washington for America’s 250th birthday. This is the plan — the very itinerary the app will run on. Until GOODTrip ships, this page is the source of truth. Hit print for a plain copy to carry."
+              intro="Plan it together, change it in real time, pack from a shared checklist, and ask an AI guide that knows the whole trip. Tap through it."
             />
 
-            <div className="mt-16">
+            <div className="mt-14">
+              <AppMockup weather={weather} />
+            </div>
+
+            {/* four areas */}
+            <div className="mx-auto mt-16 grid max-w-5xl gap-4 sm:grid-cols-2">
+              {areas.map(({ icon: Icon, title, body }) => (
+                <div
+                  key={title}
+                  className="group rounded-3xl border border-sand-300 bg-sand-100 p-6 transition-colors hover:border-coral/40 sm:p-7"
+                >
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-coral-soft text-coral-700 transition-colors group-hover:bg-coral-600 group-hover:text-white">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <h3 className="mt-5 font-display text-xl font-bold text-espresso">{title}</h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-espresso-muted">{body}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* ── An example trip ───────────────────────────────── */}
+          <section id="example" className="scroll-mt-20 px-4 py-20 sm:px-6 sm:py-28">
+            <SectionHead
+              kicker="An example trip"
+              title={
+                <>
+                  What a GOODTrip <span className="text-coral">looks like.</span>
+                </>
+              }
+              intro="A real one: nine days in Washington, D.C. for a family of eight. Yours could be any of these — same structure, any destination, any group."
+            />
+
+            <div className="mx-auto mt-9 flex max-w-3xl flex-wrap justify-center gap-2">
+              {tripKinds.map((kind, i) => (
+                <span
+                  key={kind}
+                  className={`rounded-full border px-3.5 py-1.5 text-sm font-medium ${
+                    i === tripKinds.length - 1
+                      ? "border-coral/40 bg-coral-soft text-coral-700"
+                      : "border-sand-300 bg-sand-100 text-espresso-muted"
+                  }`}
+                >
+                  {kind}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-12">
               <ItineraryTicket weather={weather} />
             </div>
           </section>
 
-          {/* ════════ ACT II · THE APP ════════ */}
-          <section id="app" className="relative z-10 scroll-mt-20 px-6 py-24 sm:py-32">
-            <ActHeader
-              index="02"
-              kicker="The App"
-              title={
-                <>
-                  The itinerary,
-                  <br />
-                  <span className="text-gold">alive.</span>
-                </>
-              }
-              intro="Right now this is a page. Soon it’s in your pocket — the same plan, but live. Everyone sees it update in real time, checks off what’s packed, and asks an AI guide that already knows the whole trip. Here’s an early look — tap through it."
-            />
-
-            <div className="mt-16">
-              <AppMockup weather={weather} />
-            </div>
-
-            <div className="mt-10 text-center">
-              <Link
-                href="/trip"
-                className="group inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-gold underline decoration-gold/30 underline-offset-[6px] transition-colors hover:text-gold-bright hover:decoration-gold"
+          {/* ── Built in the open (compact) ───────────────────── */}
+          <section className="px-6 pb-4 pt-8">
+            <div className="mx-auto max-w-3xl">
+              <a
+                href="https://github.com/dtun/goodtrip"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="group flex items-center justify-between gap-4 rounded-3xl border border-sand-300 bg-sand-100 px-6 py-5 transition-colors hover:border-espresso/25"
               >
-                Preview access is live — open the web app
+                <span className="flex items-center gap-3">
+                  <Github className="h-5 w-5 text-espresso" aria-hidden="true" />
+                  <span>
+                    <span className="block text-sm font-bold text-espresso">Built in the open</span>
+                    <span className="block text-sm text-espresso-muted">
+                      Follow the build at dtun/goodtrip, issue by issue.
+                    </span>
+                  </span>
+                </span>
                 <ArrowRight
-                  className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1"
+                  className="h-5 w-5 shrink-0 text-coral transition-transform group-hover:translate-x-1"
                   aria-hidden="true"
                 />
-              </Link>
-            </div>
-
-            {/* hierarchy */}
-            <div className="mx-auto mt-24 max-w-3xl text-center">
-              <p className="font-mono text-[11px] uppercase tracking-[0.4em] text-gold/70">
-                Opinionated structure
-              </p>
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-3 font-display text-2xl text-cream sm:text-3xl">
-                <span>Trip</span>
-                <ArrowRight className="h-5 w-5 text-gold/70" aria-hidden="true" />
-                <span>Days</span>
-                <ArrowRight className="h-5 w-5 text-gold/70" aria-hidden="true" />
-                <span>Activities</span>
-              </div>
-              <p className="mx-auto mt-5 max-w-md text-sm text-cream-muted">
-                A simple hierarchy, always. Real-time multiplayer, offline-first, AI woven through —
-                not bolted on.
-              </p>
-            </div>
-
-            {/* four areas */}
-            <div className="mx-auto mt-16 max-w-5xl">
-              <div className="grid gap-px overflow-hidden rounded-xl border border-cream/10 bg-cream/10 sm:grid-cols-2">
-                {areas.map(({ icon: Icon, code, title, body }) => (
-                  <div
-                    key={title}
-                    className="group bg-ink-800 p-7 transition-colors hover:bg-ink-700"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-gold/30 bg-gold/10 text-gold transition-colors group-hover:bg-gold group-hover:text-ink">
-                        <Icon className="h-5 w-5" />
-                      </span>
-                      <span className="font-mono text-xs text-cream-muted">{code}</span>
-                    </div>
-                    <h3 className="mt-5 font-display text-xl text-cream">{title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-cream-muted">{body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* ════════ ACT III · THE TECH ════════ */}
-          <section id="tech" className="relative z-10 scroll-mt-20 px-6 py-24 sm:py-32">
-            <ActHeader
-              index="03"
-              kicker="The Tech"
-              title={
-                <>
-                  Built in the
-                  <br />
-                  <span className="text-gold">open.</span>
-                </>
-              }
-              intro="A React Native app on Supabase, with Claude woven in, shipping to TestFlight in July 2026. One pnpm monorepo, five phases, real-time and offline-first from the start."
-            />
-
-            {/* route to v1.0 */}
-            <div className="mx-auto mt-16 max-w-3xl">
-              <ol className="relative space-y-8 border-l border-gold/25 pl-8">
-                {phases.map(({ n, title, body }) => (
-                  <li key={n} className="relative">
-                    <span className="absolute -left-[42px] flex h-7 w-7 items-center justify-center rounded-full border border-flag/50 bg-ink font-mono text-[11px] font-semibold text-gold">
-                      {n}
-                    </span>
-                    <h3 className="font-display text-lg text-cream">
-                      Phase {n} · {title}
-                    </h3>
-                    <p className="mt-1 text-sm text-cream-muted">{body}</p>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* stack */}
-            <div className="mx-auto mt-16 max-w-3xl">
-              <p className="text-center font-mono text-[11px] uppercase tracking-[0.4em] text-gold/70">
-                Built with
-              </p>
-              <div className="mt-6 flex flex-wrap justify-center gap-2">
+              </a>
+              <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {stack.map((item) => (
                   <span
                     key={item}
-                    className="rounded-full border border-cream/15 px-3.5 py-1.5 font-mono text-xs text-cream/80"
+                    className="rounded-full border border-sand-300 px-3 py-1 text-xs font-medium text-espresso-muted"
                   >
                     {item}
                   </span>
                 ))}
               </div>
             </div>
+          </section>
 
-            {/* github callout */}
-            <div className="mx-auto mt-14 max-w-xl">
-              <a
-                href="https://github.com/dtun/goodtrip"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="group flex items-center justify-between gap-4 rounded-2xl border border-cream/12 bg-ink-800/60 px-6 py-5 transition-colors hover:border-gold/40"
-              >
-                <span className="flex items-center gap-3">
-                  <Github className="h-5 w-5 text-cream" />
-                  <span>
-                    <span className="block text-sm font-semibold text-cream">dtun/goodtrip</span>
-                    <span className="block text-xs text-cream-muted">
-                      Follow the build, issue by issue.
-                    </span>
-                  </span>
-                </span>
-                <ArrowRight className="h-5 w-5 text-gold transition-transform group-hover:translate-x-1" />
-              </a>
+          {/* ── Waitlist CTA ──────────────────────────────────── */}
+          <section id="waitlist" className="scroll-mt-20 px-6 py-16 sm:py-20">
+            <div className="mx-auto max-w-2xl overflow-hidden rounded-[2rem] border border-coral/20 bg-gradient-to-b from-coral-soft to-sand-100 px-6 py-14 text-center sm:px-14">
+              <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-coral-700">
+                <CompassRose className="h-5 w-5 text-coral" />
+                Now boarding
+              </span>
+              <h2 className="mt-4 font-display text-3xl font-extrabold leading-tight tracking-tight text-espresso sm:text-4xl">
+                Be first in line.
+              </h2>
+              <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-espresso-muted">
+                Drop your email — we&apos;ll tell you the moment GOODTrip opens.
+              </p>
+              <div className="mt-8">
+                <WaitlistForm source="landing-cta" />
+              </div>
             </div>
           </section>
         </main>
 
         {/* ── Footer ────────────────────────────────────────── */}
-        <footer className="relative z-10 border-t border-cream/10">
-          <Cheatline className="mx-auto w-full max-w-none rounded-none" />
-          <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 py-14 text-center">
-            <CompassRose className="h-8 w-8 text-gold" />
-            <p className="font-display text-xl italic text-cream">Have a GOOD trip.</p>
+        <footer className="border-t border-sand-300">
+          <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-6 py-12 text-center">
+            <div className="flex items-center gap-2.5">
+              <CompassRose className="h-6 w-6 text-coral" />
+              <span className="font-display text-lg font-extrabold tracking-tight text-espresso">
+                GOODTrip
+              </span>
+            </div>
+            <p className="font-display text-lg font-medium text-espresso/80">Have a GOOD trip.</p>
 
             <ShareBar />
 
-            <p className="mt-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-cream-muted">
-              <MapPin className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-              GOODTrip · Spec v0.1 · Collaborative AI itineraries
+            <p className="mt-2 text-xs text-espresso-muted">
+              GOODTrip · Coming soon · Collaborative AI itineraries for small groups
             </p>
           </div>
         </footer>

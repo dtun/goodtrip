@@ -21,11 +21,11 @@ export function CopyCode({ code }: { code: string }) {
       type="button"
       onClick={copy}
       aria-label={copied ? `Copied code ${code}` : `Copy code ${code}`}
-      className="group inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-cream-muted transition-colors hover:border-gold/60 hover:text-cream focus-visible:text-cream"
+      className="group inline-flex items-center gap-1.5 rounded-full border border-sand-300 bg-sand-100 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-espresso-muted transition-colors hover:border-coral/50 hover:text-espresso focus-visible:text-espresso"
     >
-      Code <span className="font-semibold text-gold">{code}</span>
+      Code <span className="font-semibold text-coral-700">{code}</span>
       {copied ? (
-        <Check className="h-3 w-3 text-gold" aria-hidden="true" />
+        <Check className="h-3 w-3 text-teal-700" aria-hidden="true" />
       ) : (
         <Copy
           className="h-3 w-3 opacity-50 transition-opacity group-hover:opacity-100"
