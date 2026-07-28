@@ -35,11 +35,10 @@ const areas = [
   },
 ];
 
-// The example trip is Washington, D.C. — but GOODTrip is for any small-group
+// The example trip is Washington, D.C. — but GOODTrip is for any family
 // trip. These hint at the range without pretending to be real bookings.
 const tripKinds = [
   "A weekend in Lisbon",
-  "A bachelor party in Nashville",
   "A family reunion in the Smokies",
   "Nine days in Washington, D.C.",
 ];
@@ -122,13 +121,6 @@ export default async function Home() {
             </h1>
 
             <p
-              className="reveal mt-3 font-display text-2xl font-medium text-espresso/80 sm:text-3xl"
-              style={{ animationDelay: "0.12s" }}
-            >
-              Have a GOOD trip.
-            </p>
-
-            <p
               className="reveal mx-auto mt-7 max-w-xl text-base leading-relaxed text-espresso-muted sm:text-lg"
               style={{ animationDelay: "0.18s" }}
             >
@@ -160,7 +152,7 @@ export default async function Home() {
               {[
                 ["Status", "Private beta"],
                 ["Platform", "Web now · iOS next"],
-                ["Built for", "Small groups"],
+                ["Built for", "Families"],
                 ["Price", "Free in beta"],
               ].map(([k, v]) => (
                 <div
@@ -302,16 +294,12 @@ export default async function Home() {
           <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-6 py-12 text-center">
             <div className="flex items-center gap-2.5">
               <CompassRose className="h-6 w-6 text-coral" />
-              <span className="font-display text-lg font-extrabold tracking-tight text-espresso">
-                GOODTrip
-              </span>
             </div>
-            <p className="font-display text-lg font-medium text-espresso/80">Have a GOOD trip.</p>
 
             <ShareBar />
 
             <p className="mt-2 text-xs text-espresso-muted">
-              GOODTrip · Coming soon · Collaborative AI itineraries for small groups
+              Coming soon · Collaborative AI itineraries for families
             </p>
           </div>
         </footer>

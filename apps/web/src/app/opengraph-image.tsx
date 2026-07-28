@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "GOODTrip — Have a GOOD trip.";
+export const alt = "GOODTrip";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -78,9 +78,6 @@ export default function OpengraphImage() {
           <span style={{ color: "#2E2620" }}>GOOD</span>
           <span style={{ color: "#F26B4E" }}>Trip</span>
         </div>
-        <div style={{ marginTop: 16, fontSize: 44, fontWeight: 500, color: "#4A403A" }}>
-          Have a GOOD trip.
-        </div>
         <div
           style={{
             marginTop: 28,
@@ -102,7 +99,7 @@ export default function OpengraphImage() {
           color: "#6E635A",
         }}
       >
-        <div style={{ display: "flex" }}>Collaborative AI itineraries for small groups</div>
+        <div style={{ display: "flex" }}>Collaborative AI itineraries for families</div>
         <div style={{ display: "flex", color: "#B84327", fontWeight: 600 }}>Join the waitlist</div>
       </div>
     </div>,

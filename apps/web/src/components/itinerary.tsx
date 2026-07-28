@@ -189,9 +189,6 @@ export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
         {/* dateline / livery cheatline */}
         <div className="mt-14 flex items-center gap-3">
           <span className="h-1 flex-1 rounded-full bg-gradient-to-r from-teal via-coral to-sun" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-espresso-muted">
-            Have a GOOD trip
-          </span>
         </div>
       </div>
     </div>
@@ -246,7 +243,7 @@ export function PrintableItinerary({ weather = {} }: { weather?: WeatherByDate }
       </div>
 
       <footer className="mt-6 border-t border-black pt-2 text-[11px]">
-        GOODTrip · Have a GOOD trip. · goodtrip (DC 2026 Beta)
+        goodtrip (DC 2026 Beta)
       </footer>
     </div>
   );

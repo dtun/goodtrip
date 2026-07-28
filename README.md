@@ -1,8 +1,6 @@
 # GOODTrip
 
-> _Have a GOOD trip._
-
-GOODTrip is a collaborative, AI-assisted travel itinerary app for small groups.
+GOODTrip is a collaborative, AI-assisted travel itinerary app for families.
 It turns a structured trip plan into a shared, living experience — so every
 member of the party always knows what's happening, what's checked off, and
 what's next.
