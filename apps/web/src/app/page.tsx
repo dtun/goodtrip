@@ -291,16 +291,89 @@ export default async function Home() {
 
         {/* ── Footer ────────────────────────────────────────── */}
         <footer className="border-t border-sand-300">
-          <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-6 py-12 text-center">
-            <div className="flex items-center gap-2.5">
-              <CompassRose className="h-6 w-6 text-coral" />
+          <div className="mx-auto max-w-6xl px-6 py-14">
+            <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
+              {/* brand + tagline */}
+              <div className="max-w-xs">
+                <div className="flex items-center gap-2.5">
+                  <CompassRose className="h-6 w-6 text-coral" />
+                  <span className="font-display text-lg font-extrabold tracking-tight text-espresso">
+                    GOODTrip
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-espresso-muted">
+                  Collaborative trip planning for families, without the group-chat chaos.
+                </p>
+                <div className="mt-5">
+                  <ShareBar />
+                </div>
+              </div>
+
+              {/* link columns */}
+              <div className="grid grid-cols-2 gap-10 sm:gap-16">
+                <div>
+                  <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-espresso">
+                    Product
+                  </h3>
+                  <ul className="mt-4 space-y-3 text-sm text-espresso-muted">
+                    <li>
+                      <a href="#how" className="transition-colors hover:text-espresso">
+                        How it works
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#example" className="transition-colors hover:text-espresso">
+                        Example trip
+                      </a>
+                    </li>
+                    <li>
+                      <Link href="/trip" className="transition-colors hover:text-espresso">
+                        Live preview
+                      </Link>
+                    </li>
+                    <li>
+                      <a href="#waitlist" className="transition-colors hover:text-espresso">
+                        Join the waitlist
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-espresso">
+                    Project
+                  </h3>
+                  <ul className="mt-4 space-y-3 text-sm text-espresso-muted">
+                    <li>
+                      <a
+                        href="https://github.com/dtun/goodtrip"
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="transition-colors hover:text-espresso"
+                      >
+                        Built in the open
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="https://github.com/dtun/goodtrip"
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="transition-colors hover:text-espresso"
+                      >
+                        GitHub
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
 
-            <ShareBar />
-
-            <p className="mt-2 text-xs text-espresso-muted">
-              Coming soon · Collaborative AI itineraries for families
-            </p>
+            {/* divider + copyright */}
+            <div className="mt-12 border-t border-sand-300 pt-6">
+              <p className="text-xs text-espresso-muted">
+                © 2026 GOODTrip. All rights reserved.
+              </p>
+            </div>
           </div>
         </footer>
       </div>
