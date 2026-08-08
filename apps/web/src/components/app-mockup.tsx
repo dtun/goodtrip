@@ -139,12 +139,18 @@ function ActivityCard({ a }: { a: Activity }) {
           </span>
         )}
       </div>
-      {(a.confirmed || a.booking || a.tags) && (
+      {(a.confirmed || a.booking || a.suggested || a.tags) && (
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           {a.confirmed && (
             <Badge tone="green">
               <Check className="h-3 w-3" />
               {a.confirmedNote ?? "Confirmed"}
+            </Badge>
+          )}
+          {a.suggested && (
+            <Badge tone="gold">
+              <Sparkles className="h-3 w-3" />
+              Suggested
             </Badge>
           )}
           {a.booking && <Badge tone="blue">Booking</Badge>}
