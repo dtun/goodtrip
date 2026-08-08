@@ -1,10 +1,14 @@
 import { CalendarDays, ListChecks, Sparkles, Users, ArrowRight, Github } from "lucide-react";
 import { CompassRose } from "@/components/compass-rose";
 import { AppMockup } from "@/components/app-mockup";
-import { ItineraryTicket, PrintableItinerary } from "@/components/itinerary";
+import {
+  ExamplePicker,
+  ExampleTripProvider,
+  SelectedPrintableItinerary,
+} from "@/components/example-showcase";
 import { ShareBar } from "@/components/share-bar";
 import { WaitlistForm } from "@/components/waitlist-form";
-import { FEATURED_EXAMPLE_TRIP } from "@/lib/example-trip";
+import { EXAMPLE_TRIPS, FEATURED_EXAMPLE_TRIP } from "@/lib/example-trip";
 import { fetchTripWeather } from "@/lib/weather";
 
 // Refresh the live forecast hourly so real weather appears even if the page
@@ -32,14 +36,6 @@ const areas = [
     title: "Everyone on the same page",
     body: "See who's around, what's booked, and what the group's up to — no more group-chat archaeology.",
   },
-];
-
-// The example trip is Washington, D.C. — but GOODTrip is for any family
-// trip. These hint at the range without pretending to be real bookings.
-const tripKinds = [
-  "A weekend in Lisbon",
-  "A family reunion in the Smokies",
-  "Five days in Washington, D.C.",
 ];
 
 const stack = ["Next.js", "React Native · Expo", "Supabase", "Realtime", "Claude"];
@@ -73,12 +69,19 @@ function SectionHead({
 }
 
 export default async function Home() {
-  const weather = await fetchTripWeather(
-    FEATURED_EXAMPLE_TRIP.days.map((d) => d.iso),
-    FEATURED_EXAMPLE_TRIP.coords,
+  // One forecast per example trip — the picker can show any of them, and each
+  // sits in a different place.
+  const forecasts = await Promise.all(
+    EXAMPLE_TRIPS.map((trip) =>
+      fetchTripWeather(
+        trip.days.map((d) => d.iso),
+        trip.coords,
+      ),
+    ),
   );
+  const weather = Object.fromEntries(EXAMPLE_TRIPS.map((trip, i) => [trip.id, forecasts[i]]));
   return (
-    <>
+    <ExampleTripProvider>
       <div className="sunwash relative min-h-screen font-sans text-espresso print:hidden">
         {/* ── Top bar ───────────────────────────────────────── */}
         <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
@@ -180,7 +183,7 @@ export default async function Home() {
             />
 
             <div className="mt-14">
-              <AppMockup weather={weather} />
+              <AppMockup weather={weather[FEATURED_EXAMPLE_TRIP.id]} />
             </div>
 
             {/* four areas */}
@@ -212,24 +215,7 @@ export default async function Home() {
               intro="Five days in Washington, D.C. for a family of five — a sample trip, built exactly the way a real one is. Yours could be any of these: same structure, any destination, any group."
             />
 
-            <div className="mx-auto mt-9 flex max-w-3xl flex-wrap justify-center gap-2">
-              {tripKinds.map((kind, i) => (
-                <span
-                  key={kind}
-                  className={`rounded-full border px-3.5 py-1.5 text-sm font-medium ${
-                    i === tripKinds.length - 1
-                      ? "border-coral/40 bg-coral-soft text-coral-700"
-                      : "border-sand-300 bg-sand-100 text-espresso-muted"
-                  }`}
-                >
-                  {kind}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-12">
-              <ItineraryTicket trip={FEATURED_EXAMPLE_TRIP} weather={weather} />
-            </div>
+            <ExamplePicker weather={weather} />
           </section>
 
           {/* ── Built in the open (compact) ───────────────────── */}
@@ -305,7 +291,7 @@ export default async function Home() {
       </div>
 
       {/* Plain B/W sheet — only rendered when printing */}
-      <PrintableItinerary trip={FEATURED_EXAMPLE_TRIP} weather={weather} />
-    </>
+      <SelectedPrintableItinerary weather={weather} />
+    </ExampleTripProvider>
   );
 }
