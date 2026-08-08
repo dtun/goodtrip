@@ -60,6 +60,13 @@ describe("ItineraryTicket", () => {
     expect(screen.queryByTitle(/°/)).not.toBeInTheDocument();
   });
 
+  it("marks the assistant's proposals as suggestions", () => {
+    render(<ItineraryTicket trip={TRIP} />);
+    let suggested = ACTIVITIES.filter((a) => a.suggested);
+    expect(suggested.length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/GOODTrip suggests/i).length).toBe(suggested.length);
+  });
+
   it("offers a print action", () => {
     render(<ItineraryTicket trip={TRIP} />);
     expect(screen.getByRole("button", { name: /print/i })).toBeInTheDocument();
@@ -81,6 +88,13 @@ describe("PrintableItinerary", () => {
     for (let activity of ACTIVITIES) {
       expect(container.textContent).toContain(activity.title);
     }
+  });
+
+  it("says which items GOODTrip proposed", () => {
+    let { container } = render(<PrintableItinerary trip={TRIP} />);
+    let suggested = ACTIVITIES.filter((a) => a.suggested);
+    let marks = container.textContent!.match(/suggested by GOODTrip/g) ?? [];
+    expect(marks.length).toBe(suggested.length);
   });
 
   it("spells booking links out as bare urls, since paper has no hyperlinks", () => {

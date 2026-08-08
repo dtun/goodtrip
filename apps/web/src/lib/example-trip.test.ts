@@ -107,8 +107,17 @@ describe.each(EXAMPLE_TRIPS.map((t) => [t.id, t] as const))(
       }
     });
 
-    it("shows the day-list confirmed counter something to count", () => {
+    it("never presents an unaccepted suggestion as already booked", () => {
+      for (let a of activities) {
+        if (a.suggested) {
+          expect(a.confirmed, `${a.title} is both suggested and confirmed`).toBeFalsy();
+        }
+      }
+    });
+
+    it("shows off both confirmations and suggestions", () => {
       expect(activities.some((a) => a.confirmed)).toBe(true);
+      expect(activities.some((a) => a.suggested)).toBe(true);
     });
 
     it("opens on the first day and carries its year", () => {
