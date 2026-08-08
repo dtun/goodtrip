@@ -18,8 +18,8 @@ export type Weather = {
 /** Live forecast keyed by ISO date (YYYY-MM-DD). */
 export type WeatherByDate = Record<string, Weather>;
 
-// Washington, D.C. (National Mall).
-const DC = { latitude: 38.8895, longitude: -77.0353 } as const;
+/** Where to ask for a forecast. */
+export type Coords = { latitude: number; longitude: number };
 
 /**
  * Map a WMO weather code (Open-Meteo's `weather_code`) to our icon + label.
@@ -50,18 +50,18 @@ type OpenMeteoDaily = {
 };
 
 /**
- * Fetch the real forecast for the given ISO dates (YYYY-MM-DD) in D.C.
+ * Fetch the real forecast at `where` for the given ISO dates (YYYY-MM-DD).
  * Returns a map keyed by date; dates with no data are simply absent. Never
  * throws — on any failure it returns an empty map so the UI omits weather
  * rather than showing something invented.
  */
-export async function fetchTripWeather(isoDates: string[]): Promise<WeatherByDate> {
+export async function fetchTripWeather(isoDates: string[], where: Coords): Promise<WeatherByDate> {
   const dates = Array.from(new Set(isoDates)).filter(Boolean).sort();
   if (dates.length === 0) return {};
 
   const params = new URLSearchParams({
-    latitude: String(DC.latitude),
-    longitude: String(DC.longitude),
+    latitude: String(where.latitude),
+    longitude: String(where.longitude),
     daily: "temperature_2m_max,temperature_2m_min,weather_code",
     temperature_unit: "fahrenheit",
     timezone: "America/New_York",
