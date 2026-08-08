@@ -1,5 +1,12 @@
-/* The real DC trip — America's 250th Birthday family trip, Jul 21–29 2026.
-   Shared, hard-coded data that feeds the interactive app mockup. */
+/* The example trip shown on the marketing site.
+ *
+ * Everything here is invented sample data. Nothing in this file describes a
+ * real traveler, booking, or reservation: the landing page is public, so it
+ * gets a trip that *looks* like a real one without being anyone's. Guards in
+ * example-trip.privacy.test.ts fail the build if a personal detail lands here.
+ *
+ * The live app reads the actual trip from Supabase — see lib/goodtrip.ts.
+ */
 
 export type Activity = {
   time?: string;
@@ -14,22 +21,6 @@ export type Activity = {
   cta?: string; // link label, e.g. "Tickets", "Reserve"
   tags?: string[];
 };
-
-/**
- * A day's real forecast, fetched at runtime from a weather service and keyed
- * by the day's `iso` date. `sky` picks the icon. Never hard-coded — a day with
- * no live data (fetch failed, or the date is beyond the forecast horizon)
- * simply carries no weather rather than an invented one.
- */
-export type Weather = {
-  sky: "sunny" | "partly" | "cloudy" | "rain" | "storms";
-  summary: string; // short label, e.g. "Thunderstorms"
-  hi: number; // high, °F
-  lo: number; // low, °F
-};
-
-/** Live forecast keyed by ISO date (YYYY-MM-DD). */
-export type WeatherByDate = Record<string, Weather>;
 
 export type DayPlan = {
   n: number;
@@ -54,7 +45,7 @@ export type ChecklistGroup = {
   items: { text: string; done?: boolean; by?: string }[];
 };
 
-export const TRIP = {
+export const EXAMPLE_TRIP = {
   name: "America's 250th Birthday",
   destination: "Washington, D.C.",
   dates: "Jul 21–29, 2026",
@@ -62,7 +53,7 @@ export const TRIP = {
   hotel: "Residence Inn · 1199 Vermont Ave NW · McPherson Square",
 };
 
-export const MEMBERS: Member[] = [
+export const EXAMPLE_MEMBERS: Member[] = [
   { name: "Danny", initials: "D", color: "#3C3B6E", online: true },
   { name: "Ellen", initials: "E", color: "#B22234" },
   { name: "Jack", initials: "J", color: "#2D6A4F", online: true },
@@ -73,7 +64,7 @@ export const MEMBERS: Member[] = [
   { name: "Papa", initials: "P", color: "#3C6E5A", online: true },
 ];
 
-export const DAYS: DayPlan[] = [
+export const EXAMPLE_DAYS: DayPlan[] = [
   {
     n: 1,
     dow: "Tue",
@@ -424,7 +415,7 @@ export const DAYS: DayPlan[] = [
   },
 ];
 
-export const DAY_CHECKLIST: { text: string; done?: boolean; by?: string }[] = [
+export const EXAMPLE_DAY_CHECKLIST: { text: string; done?: boolean; by?: string }[] = [
   { text: "Sunscreen on everyone", done: true, by: "Eva" },
   { text: "Water bottles filled", done: true, by: "Jack" },
   { text: "Timed-entry tickets confirmed", done: true, by: "Danny" },
@@ -432,7 +423,7 @@ export const DAY_CHECKLIST: { text: string; done?: boolean; by?: string }[] = [
   { text: "Count heads before leaving hotel" },
 ];
 
-export const GLOBAL_CHECKLIST: ChecklistGroup[] = [
+export const EXAMPLE_GLOBAL_CHECKLIST: ChecklistGroup[] = [
   {
     category: "Clothing",
     items: [
@@ -468,7 +459,7 @@ export const GLOBAL_CHECKLIST: ChecklistGroup[] = [
 
 export type ChatMsg = { role: "user" | "assistant"; content: string };
 
-export const AI_CONVO: ChatMsg[] = [
+export const EXAMPLE_AI_CONVO: ChatMsg[] = [
   { role: "user", content: "What’s on the agenda tomorrow?" },
   {
     role: "assistant",
@@ -477,19 +468,19 @@ export const AI_CONVO: ChatMsg[] = [
   },
 ];
 
-export const AI_ACTION = {
+export const EXAMPLE_AI_ACTION = {
   prompt: "Add this to Day 3?",
   title: "Mount Vernon Inn — lunch reservation",
   detail: "1:00 PM · colonial-inspired American",
 };
 
-export const AI_SUGGESTIONS = [
+export const EXAMPLE_AI_SUGGESTIONS = [
   "What do we still need to pack?",
   "Give me a recap of today",
   "Dinner near the National Mall",
 ];
 
-export const FEED = [
+export const EXAMPLE_FEED = [
   { who: "Eva", action: "checked off", target: "Sunscreen on everyone", when: "2m" },
   { who: "Papa", action: "confirmed", target: "Old Ebbitt Grill", when: "18m" },
   { who: "Ellen", action: "added", target: "The Wharf dinner to Day 4", when: "1h" },

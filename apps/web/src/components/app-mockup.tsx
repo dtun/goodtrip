@@ -21,25 +21,24 @@ import {
 import { CompassRose } from "@/components/compass-rose";
 import { WeatherIcon, weatherLabel } from "@/components/weather-badge";
 import {
-  TRIP,
-  DAYS,
-  MEMBERS,
-  DAY_CHECKLIST,
-  GLOBAL_CHECKLIST,
-  AI_CONVO,
-  AI_ACTION,
-  AI_SUGGESTIONS,
-  FEED,
+  EXAMPLE_TRIP,
+  EXAMPLE_DAYS,
+  EXAMPLE_MEMBERS,
+  EXAMPLE_DAY_CHECKLIST,
+  EXAMPLE_GLOBAL_CHECKLIST,
+  EXAMPLE_AI_CONVO,
+  EXAMPLE_AI_ACTION,
+  EXAMPLE_AI_SUGGESTIONS,
+  EXAMPLE_FEED,
   type Activity,
   type DayPlan,
-  type Weather,
-  type WeatherByDate,
-} from "@/lib/trip";
+} from "@/lib/example-trip";
+import type { Weather, WeatherByDate } from "@/lib/weather";
 
 type Tab = "itinerary" | "checklists" | "ask" | "trip";
 
 const PRIMARY = "#0F766E";
-const onlineMembers = MEMBERS.filter((m) => m.online);
+const onlineMembers = EXAMPLE_MEMBERS.filter((m) => m.online);
 
 /* ── small parts ──────────────────────────────────────────────── */
 
@@ -168,17 +167,17 @@ function DayList({ onOpen, weather }: { onOpen: (n: number) => void; weather: We
   return (
     <div className="space-y-3">
       <div className="rounded-2xl bg-[#0F766E] p-4 text-white">
-        <p className="text-[11px] uppercase tracking-wide text-white/60">{TRIP.name}</p>
-        <p className="mt-0.5 font-display text-2xl leading-tight">{TRIP.destination}</p>
+        <p className="text-[11px] uppercase tracking-wide text-white/60">{EXAMPLE_TRIP.name}</p>
+        <p className="mt-0.5 font-display text-2xl leading-tight">{EXAMPLE_TRIP.destination}</p>
         <div className="mt-3 flex items-center justify-between">
-          <span className="text-xs text-white/80">{TRIP.dates}</span>
+          <span className="text-xs text-white/80">{EXAMPLE_TRIP.dates}</span>
           <span className="rounded-full bg-[#F26B4E] px-2.5 py-1 font-mono text-[11px] font-semibold text-white">
-            {TRIP.countdown}
+            {EXAMPLE_TRIP.countdown}
           </span>
         </div>
       </div>
 
-      {DAYS.map((d) => {
+      {EXAMPLE_DAYS.map((d) => {
         const confirmed = d.activities.filter((a) => a.confirmed).length;
         const w = weather[d.iso];
         return (
@@ -253,7 +252,7 @@ function DayDetail({ day, w }: { day: DayPlan; w?: Weather }) {
       <div className="rounded-2xl border border-[#E0E0E0] bg-white p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-[#666]">Day checklist</p>
         <div className="mt-3 space-y-2.5">
-          {DAY_CHECKLIST.map((item, i) => (
+          {EXAMPLE_DAY_CHECKLIST.map((item, i) => (
             <div key={i} className="flex items-center gap-2.5">
               <span
                 className={`flex h-5 w-5 items-center justify-center rounded-md border ${
@@ -279,7 +278,7 @@ function DayDetail({ day, w }: { day: DayPlan; w?: Weather }) {
 }
 
 function Checklists() {
-  const all = GLOBAL_CHECKLIST.flatMap((g) => g.items);
+  const all = EXAMPLE_GLOBAL_CHECKLIST.flatMap((g) => g.items);
   const done = all.filter((i) => i.done).length;
   return (
     <div className="space-y-4">
@@ -298,7 +297,7 @@ function Checklists() {
         </div>
       </div>
 
-      {GLOBAL_CHECKLIST.map((g) => (
+      {EXAMPLE_GLOBAL_CHECKLIST.map((g) => (
         <div key={g.category}>
           <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-[#666]">
             {g.category}
@@ -337,7 +336,7 @@ function Ask() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 space-y-3">
-        {AI_CONVO.map((m, i) =>
+        {EXAMPLE_AI_CONVO.map((m, i) =>
           m.role === "user" ? (
             <div key={i} className="flex justify-end">
               <p className="max-w-[80%] rounded-2xl rounded-br-md bg-[#0F766E] px-3.5 py-2.5 text-sm text-white">
@@ -359,9 +358,9 @@ function Ask() {
         {/* AI action card */}
         <div className="ml-9 max-w-[82%] overflow-hidden rounded-2xl border border-[#F26B4E]/50 bg-[#F26B4E]/[0.07]">
           <div className="px-3.5 pt-3">
-            <p className="text-xs font-semibold text-[#B84327]">{AI_ACTION.prompt}</p>
-            <p className="mt-1.5 text-sm font-semibold text-[#111]">{AI_ACTION.title}</p>
-            <p className="text-xs text-[#666]">{AI_ACTION.detail}</p>
+            <p className="text-xs font-semibold text-[#B84327]">{EXAMPLE_AI_ACTION.prompt}</p>
+            <p className="mt-1.5 text-sm font-semibold text-[#111]">{EXAMPLE_AI_ACTION.title}</p>
+            <p className="text-xs text-[#666]">{EXAMPLE_AI_ACTION.detail}</p>
           </div>
           <div className="mt-3 flex border-t border-[#F26B4E]/30">
             <button className="flex-1 border-r border-[#F26B4E]/30 py-2.5 text-sm font-semibold text-[#2D6A4F]">
@@ -374,7 +373,7 @@ function Ask() {
 
       <div className="mt-3 space-y-2.5">
         <div className="flex flex-wrap gap-1.5">
-          {AI_SUGGESTIONS.map((s) => (
+          {EXAMPLE_AI_SUGGESTIONS.map((s) => (
             <span
               key={s}
               className="rounded-full border border-[#E0E0E0] bg-white px-2.5 py-1 text-[11px] text-[#0F766E]"
@@ -402,21 +401,21 @@ function TripOverview() {
         <div className="relative h-24 bg-gradient-to-br from-[#0F766E] to-[#0B4A44]">
           <CompassRose className="absolute -right-4 -top-3 h-24 w-24 text-[#F26B4E] opacity-30" />
           <div className="absolute bottom-3 left-4 text-white">
-            <p className="font-display text-lg leading-tight">{TRIP.name}</p>
+            <p className="font-display text-lg leading-tight">{EXAMPLE_TRIP.name}</p>
             <p className="text-xs text-white/70">
-              {TRIP.destination} · {TRIP.dates}
+              {EXAMPLE_TRIP.destination} · {EXAMPLE_TRIP.dates}
             </p>
           </div>
         </div>
-        <p className="px-4 py-3 text-xs text-[#666]">{TRIP.hotel}</p>
+        <p className="px-4 py-3 text-xs text-[#666]">{EXAMPLE_TRIP.hotel}</p>
       </div>
 
       <div>
         <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-[#666]">
-          Travelers · {MEMBERS.length}
+          Travelers · {EXAMPLE_MEMBERS.length}
         </p>
         <div className="grid grid-cols-2 gap-2">
-          {MEMBERS.map((m) => (
+          {EXAMPLE_MEMBERS.map((m) => (
             <div
               key={m.name}
               className="flex items-center gap-2.5 rounded-xl border border-[#E0E0E0] bg-white px-3 py-2.5"
@@ -433,7 +432,7 @@ function TripOverview() {
           Recent activity
         </p>
         <div className="overflow-hidden rounded-2xl border border-[#E0E0E0] bg-white">
-          {FEED.map((f, i) => (
+          {EXAMPLE_FEED.map((f, i) => (
             <div
               key={i}
               className="flex items-center gap-2 border-b border-[#F0F0F0] px-3.5 py-2.5 text-sm last:border-0"
@@ -463,7 +462,7 @@ export function AppMockup({ weather = {} }: { weather?: WeatherByDate }) {
   const [tab, setTab] = useState<Tab>("itinerary");
   const [openDay, setOpenDay] = useState<number | null>(null);
 
-  const day = DAYS.find((d) => d.n === openDay) ?? null;
+  const day = EXAMPLE_DAYS.find((d) => d.n === openDay) ?? null;
   const inDetail = tab === "itinerary" && day;
 
   const title = inDetail

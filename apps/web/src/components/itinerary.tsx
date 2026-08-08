@@ -1,12 +1,6 @@
 import { ExternalLink, Check } from "lucide-react";
-import {
-  DAYS,
-  TRIP,
-  type Activity,
-  type DayPlan,
-  type Weather,
-  type WeatherByDate,
-} from "@/lib/trip";
+import { EXAMPLE_DAYS, EXAMPLE_TRIP, type Activity, type DayPlan } from "@/lib/example-trip";
+import type { Weather, WeatherByDate } from "@/lib/weather";
 import { CompassRose } from "@/components/compass-rose";
 import { PrintButton } from "@/components/print-button";
 import { CopyCode } from "@/components/copy-code";
@@ -151,9 +145,9 @@ export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
             The Itinerary
           </p>
           <h2 className="mt-3 font-display text-4xl font-extrabold leading-none tracking-tight text-espresso sm:text-5xl">
-            {TRIP.destination}
+            {EXAMPLE_TRIP.destination}
           </h2>
-          <p className="mt-3 text-lg text-espresso-muted">{TRIP.name} · July 21–29, 2026</p>
+          <p className="mt-3 text-lg text-espresso-muted">{EXAMPLE_TRIP.name} · July 21–29, 2026</p>
         </header>
 
         {/* colophon */}
@@ -181,7 +175,7 @@ export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
 
         {/* programme */}
         <div className="space-y-12">
-          {DAYS.map((d) => (
+          {EXAMPLE_DAYS.map((d) => (
             <DaySection key={d.n} d={d} w={weather[d.iso]} />
           ))}
         </div>
@@ -203,12 +197,12 @@ export function PrintableItinerary({ weather = {} }: { weather?: WeatherByDate }
       <header className="border-b-2 border-black pb-3">
         <h1 className="text-2xl font-bold">Washington, D.C.</h1>
         <p className="text-sm">America’s 250th Birthday Family Trip · July 21–29, 2026</p>
-        <p className="mt-1 text-xs">{TRIP.hotel.replace(/ · /g, " — ")}</p>
+        <p className="mt-1 text-xs">{EXAMPLE_TRIP.hotel.replace(/ · /g, " — ")}</p>
         <p className="text-xs">{MEMBERS_LINE.replace(/ · /g, ", ")}</p>
       </header>
 
       <div className="mt-4 space-y-4">
-        {DAYS.map((d) => {
+        {EXAMPLE_DAYS.map((d) => {
           const w = weather[d.iso];
           return (
             <section key={d.n} className="break-inside-avoid">
