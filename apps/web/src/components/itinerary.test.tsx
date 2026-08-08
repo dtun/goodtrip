@@ -1,42 +1,42 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { ItineraryTicket, PrintableItinerary } from "./itinerary";
-import { EXAMPLE_DAYS, EXAMPLE_TRIP } from "@/lib/example-trip";
+import { FEATURED_EXAMPLE_TRIP as TRIP } from "@/lib/example-trip";
 import type { WeatherByDate } from "@/lib/weather";
 
 /* The ticket and the print sheet are the two places the example itinerary
    reaches the public. These assert against the data rather than against
    literal copy, so rewriting the example can't quietly drop a day. */
 
-let ACTIVITIES = EXAMPLE_DAYS.flatMap((d) => d.activities);
+let ACTIVITIES = TRIP.days.flatMap((d) => d.activities);
 
 function forecast(): WeatherByDate {
-  return { [EXAMPLE_DAYS[0].iso]: { sky: "rain", summary: "Showers", hi: 61, lo: 48 } };
+  return { [TRIP.days[0].iso]: { sky: "rain", summary: "Showers", hi: 61, lo: 48 } };
 }
 
 describe("ItineraryTicket", () => {
   it("heads the ticket with the trip", () => {
-    render(<ItineraryTicket />);
-    expect(screen.getByRole("heading", { name: EXAMPLE_TRIP.destination })).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(EXAMPLE_TRIP.name))).toBeInTheDocument();
+    render(<ItineraryTicket trip={TRIP} />);
+    expect(screen.getByRole("heading", { name: TRIP.destination })).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(TRIP.name))).toBeInTheDocument();
   });
 
   it("renders every day, headed by its title", () => {
-    render(<ItineraryTicket />);
-    for (let day of EXAMPLE_DAYS) {
+    render(<ItineraryTicket trip={TRIP} />);
+    for (let day of TRIP.days) {
       expect(screen.getByRole("heading", { name: day.title, level: 3 })).toBeInTheDocument();
     }
   });
 
   it("renders every activity", () => {
-    render(<ItineraryTicket />);
+    render(<ItineraryTicket trip={TRIP} />);
     for (let activity of ACTIVITIES) {
       expect(screen.getAllByText(activity.title).length).toBeGreaterThan(0);
     }
   });
 
   it("opens booking links in a new tab without leaking the referrer", () => {
-    render(<ItineraryTicket />);
+    render(<ItineraryTicket trip={TRIP} />);
     let linked = ACTIVITIES.filter((a) => a.url);
     expect(linked.length).toBeGreaterThan(0);
     for (let activity of linked) {
@@ -50,31 +50,31 @@ describe("ItineraryTicket", () => {
   });
 
   it("shows a forecast only for the days that have one", () => {
-    render(<ItineraryTicket weather={forecast()} />);
+    render(<ItineraryTicket trip={TRIP} weather={forecast()} />);
     expect(screen.getByTitle("61° / 48° · Showers")).toBeInTheDocument();
     expect(screen.getAllByTitle(/·/).length).toBe(1);
   });
 
   it("omits weather entirely when the forecast is unavailable", () => {
-    render(<ItineraryTicket />);
+    render(<ItineraryTicket trip={TRIP} />);
     expect(screen.queryByTitle(/°/)).not.toBeInTheDocument();
   });
 
   it("offers a print action", () => {
-    render(<ItineraryTicket />);
+    render(<ItineraryTicket trip={TRIP} />);
     expect(screen.getByRole("button", { name: /print/i })).toBeInTheDocument();
   });
 });
 
 describe("PrintableItinerary", () => {
   it("titles the sheet with the destination and trip", () => {
-    render(<PrintableItinerary />);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(EXAMPLE_TRIP.destination);
+    render(<PrintableItinerary trip={TRIP} />);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(TRIP.destination);
   });
 
   it("prints every day with its number and every activity", () => {
-    let { container } = render(<PrintableItinerary />);
-    for (let day of EXAMPLE_DAYS) {
+    let { container } = render(<PrintableItinerary trip={TRIP} />);
+    for (let day of TRIP.days) {
       let heading = screen.getByRole("heading", { level: 2, name: new RegExp(`Day ${day.n}\\b`) });
       expect(heading).toHaveTextContent(day.title);
     }
@@ -84,7 +84,7 @@ describe("PrintableItinerary", () => {
   });
 
   it("spells booking links out as bare urls, since paper has no hyperlinks", () => {
-    let { container } = render(<PrintableItinerary />);
+    let { container } = render(<PrintableItinerary trip={TRIP} />);
     let linked = ACTIVITIES.find((a) => a.url)!;
     let bare = linked
       .url!.replace(/^https:\/\//, "")

@@ -21,9 +21,7 @@ import {
 import { CompassRose } from "@/components/compass-rose";
 import { WeatherIcon, weatherLabel } from "@/components/weather-badge";
 import {
-  EXAMPLE_TRIP,
-  EXAMPLE_DAYS,
-  EXAMPLE_MEMBERS,
+  FEATURED_EXAMPLE_TRIP,
   EXAMPLE_DAY_CHECKLIST,
   EXAMPLE_GLOBAL_CHECKLIST,
   EXAMPLE_AI_CONVO,
@@ -38,7 +36,7 @@ import type { Weather, WeatherByDate } from "@/lib/weather";
 type Tab = "itinerary" | "checklists" | "ask" | "trip";
 
 const PRIMARY = "#0F766E";
-const onlineMembers = EXAMPLE_MEMBERS.filter((m) => m.online);
+const onlineMembers = FEATURED_EXAMPLE_TRIP.members.filter((m) => m.online);
 
 /* ── small parts ──────────────────────────────────────────────── */
 
@@ -167,17 +165,21 @@ function DayList({ onOpen, weather }: { onOpen: (n: number) => void; weather: We
   return (
     <div className="space-y-3">
       <div className="rounded-2xl bg-[#0F766E] p-4 text-white">
-        <p className="text-[11px] uppercase tracking-wide text-white/60">{EXAMPLE_TRIP.name}</p>
-        <p className="mt-0.5 font-display text-2xl leading-tight">{EXAMPLE_TRIP.destination}</p>
+        <p className="text-[11px] uppercase tracking-wide text-white/60">
+          {FEATURED_EXAMPLE_TRIP.name}
+        </p>
+        <p className="mt-0.5 font-display text-2xl leading-tight">
+          {FEATURED_EXAMPLE_TRIP.destination}
+        </p>
         <div className="mt-3 flex items-center justify-between">
-          <span className="text-xs text-white/80">{EXAMPLE_TRIP.dates}</span>
+          <span className="text-xs text-white/80">{FEATURED_EXAMPLE_TRIP.dates}</span>
           <span className="rounded-full bg-[#F26B4E] px-2.5 py-1 font-mono text-[11px] font-semibold text-white">
-            {EXAMPLE_TRIP.countdown}
+            {FEATURED_EXAMPLE_TRIP.countdown}
           </span>
         </div>
       </div>
 
-      {EXAMPLE_DAYS.map((d) => {
+      {FEATURED_EXAMPLE_TRIP.days.map((d) => {
         const confirmed = d.activities.filter((a) => a.confirmed).length;
         const w = weather[d.iso];
         return (
@@ -401,21 +403,21 @@ function TripOverview() {
         <div className="relative h-24 bg-gradient-to-br from-[#0F766E] to-[#0B4A44]">
           <CompassRose className="absolute -right-4 -top-3 h-24 w-24 text-[#F26B4E] opacity-30" />
           <div className="absolute bottom-3 left-4 text-white">
-            <p className="font-display text-lg leading-tight">{EXAMPLE_TRIP.name}</p>
+            <p className="font-display text-lg leading-tight">{FEATURED_EXAMPLE_TRIP.name}</p>
             <p className="text-xs text-white/70">
-              {EXAMPLE_TRIP.destination} · {EXAMPLE_TRIP.dates}
+              {FEATURED_EXAMPLE_TRIP.destination} · {FEATURED_EXAMPLE_TRIP.dates}
             </p>
           </div>
         </div>
-        <p className="px-4 py-3 text-xs text-[#666]">{EXAMPLE_TRIP.hotel}</p>
+        <p className="px-4 py-3 text-xs text-[#666]">{FEATURED_EXAMPLE_TRIP.hotel}</p>
       </div>
 
       <div>
         <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-[#666]">
-          Travelers · {EXAMPLE_MEMBERS.length}
+          Travelers · {FEATURED_EXAMPLE_TRIP.members.length}
         </p>
         <div className="grid grid-cols-2 gap-2">
-          {EXAMPLE_MEMBERS.map((m) => (
+          {FEATURED_EXAMPLE_TRIP.members.map((m) => (
             <div
               key={m.name}
               className="flex items-center gap-2.5 rounded-xl border border-[#E0E0E0] bg-white px-3 py-2.5"
@@ -462,7 +464,7 @@ export function AppMockup({ weather = {} }: { weather?: WeatherByDate }) {
   const [tab, setTab] = useState<Tab>("itinerary");
   const [openDay, setOpenDay] = useState<number | null>(null);
 
-  const day = EXAMPLE_DAYS.find((d) => d.n === openDay) ?? null;
+  const day = FEATURED_EXAMPLE_TRIP.days.find((d) => d.n === openDay) ?? null;
   const inDetail = tab === "itinerary" && day;
 
   const title = inDetail

@@ -1,134 +1,158 @@
 import { describe, it, expect } from "vitest";
 import {
   EXAMPLE_AI_CONVO,
-  EXAMPLE_DAYS,
   EXAMPLE_DAY_CHECKLIST,
   EXAMPLE_FEED,
   EXAMPLE_GLOBAL_CHECKLIST,
-  EXAMPLE_MEMBERS,
-  EXAMPLE_TRIP,
+  EXAMPLE_TRIPS,
+  FEATURED_EXAMPLE_TRIP,
+  type ExampleTrip,
 } from "./example-trip";
 
-/* The example trip is hand-written sample data, so nothing but a test keeps it
-   coherent. These pin the invariants the landing page renders against —
+/* The example trips are hand-written sample data, so nothing but a test keeps
+   them coherent. These pin the invariants the landing page renders against —
    contiguous days, labels that agree with their dates, costs from a fixed
-   vocabulary, attributions that name a real traveler — so the content can be
-   rewritten freely without the itinerary quietly going crooked. */
+   vocabulary, attributions that name a real traveler — so a trip can be
+   rewritten, or a new one added to the picker, without the itinerary quietly
+   going crooked. */
 
 let COSTS = ["Free", "$", "$$", "$$$"];
-let MEMBER_NAMES = EXAMPLE_MEMBERS.map((m) => m.name);
-let ACTIVITIES = EXAMPLE_DAYS.flatMap((d) => d.activities);
 
 /** Midnight local, so a YYYY-MM-DD never slips a day through UTC. */
 function atMidnight(iso: string): Date {
   return new Date(`${iso}T00:00:00`);
 }
 
-describe("EXAMPLE_DAYS", () => {
-  it("numbers the days 1..n with no gaps", () => {
-    expect(EXAMPLE_DAYS.map((d) => d.n)).toEqual(EXAMPLE_DAYS.map((_, i) => i + 1));
+function activitiesOf(trip: ExampleTrip) {
+  return trip.days.flatMap((d) => d.activities);
+}
+
+describe("EXAMPLE_TRIPS", () => {
+  it("gives every trip a unique id and picker label", () => {
+    expect(new Set(EXAMPLE_TRIPS.map((t) => t.id)).size).toBe(EXAMPLE_TRIPS.length);
+    expect(new Set(EXAMPLE_TRIPS.map((t) => t.pill)).size).toBe(EXAMPLE_TRIPS.length);
   });
 
-  it("runs on consecutive calendar dates", () => {
-    let dayMs = 86_400_000;
-    let gaps = EXAMPLE_DAYS.slice(1).map(
-      (d, i) => (atMidnight(d.iso).getTime() - atMidnight(EXAMPLE_DAYS[i].iso).getTime()) / dayMs,
-    );
-    expect(gaps.every((g) => g === 1)).toBe(true);
-  });
-
-  it("labels each day with the weekday and date its iso actually falls on", () => {
-    for (let d of EXAMPLE_DAYS) {
-      let when = atMidnight(d.iso);
-      expect(d.dow).toBe(when.toLocaleDateString("en-US", { weekday: "short" }));
-      expect(d.date).toBe(when.toLocaleDateString("en-US", { month: "short", day: "numeric" }));
-    }
-  });
-
-  it("keeps checklist progress a percentage", () => {
-    for (let d of EXAMPLE_DAYS) {
-      expect(Number.isInteger(d.progress)).toBe(true);
-      expect(d.progress).toBeGreaterThanOrEqual(0);
-      expect(d.progress).toBeLessThanOrEqual(100);
-    }
-  });
-
-  it("gives every day a title and at least one activity", () => {
-    for (let d of EXAMPLE_DAYS) {
-      expect(d.title.trim()).not.toBe("");
-      expect(d.activities.length).toBeGreaterThan(0);
-    }
-  });
-
-  it("draws every cost from the price vocabulary the UI styles", () => {
-    let costs = [...EXAMPLE_DAYS.map((d) => d.cost), ...ACTIVITIES.map((a) => a.cost)];
-    for (let cost of costs) {
-      if (cost === undefined) continue;
-      expect(COSTS).toContain(cost);
-    }
+  it("includes the trip the phone mockup demonstrates", () => {
+    expect(EXAMPLE_TRIPS).toContain(FEATURED_EXAMPLE_TRIP);
   });
 });
 
-describe("example activities", () => {
-  it("gives every activity a title", () => {
-    for (let a of ACTIVITIES) expect(a.title.trim()).not.toBe("");
-  });
+describe.each(EXAMPLE_TRIPS.map((t) => [t.id, t] as const))(
+  "the %s example trip",
+  (_id: string, trip: ExampleTrip) => {
+    let activities = activitiesOf(trip);
+    let memberNames = trip.members.map((m) => m.name);
 
-  it("links out over https only", () => {
-    for (let a of ACTIVITIES) {
-      if (!a.url) continue;
-      expect(a.url.startsWith("https://")).toBe(true);
-    }
-  });
+    it("numbers the days 1..n with no gaps", () => {
+      expect(trip.days.map((d) => d.n)).toEqual(trip.days.map((_, i) => i + 1));
+    });
 
-  it("labels every outbound link with a call to action", () => {
-    // ActivityRow falls back to "Book", which is wrong for an info link.
-    for (let a of ACTIVITIES) {
-      if (!a.url) continue;
-      expect(a.cta, `${a.title} links out without a cta`).toBeTruthy();
-    }
-  });
+    it("runs on consecutive calendar dates", () => {
+      let dayMs = 86_400_000;
+      let gaps = trip.days
+        .slice(1)
+        .map(
+          (d, i) => (atMidnight(d.iso).getTime() - atMidnight(trip.days[i].iso).getTime()) / dayMs,
+        );
+      expect(gaps.every((g) => g === 1)).toBe(true);
+    });
 
-  it("shows the day-list confirmed counter something to count", () => {
-    expect(ACTIVITIES.some((a) => a.confirmed)).toBe(true);
-  });
-});
+    it("labels each day with the weekday and date its iso actually falls on", () => {
+      for (let d of trip.days) {
+        let when = atMidnight(d.iso);
+        expect(d.dow).toBe(when.toLocaleDateString("en-US", { weekday: "short" }));
+        expect(d.date).toBe(when.toLocaleDateString("en-US", { month: "short", day: "numeric" }));
+      }
+    });
 
-describe("EXAMPLE_TRIP", () => {
-  it("opens on the first day and carries its year", () => {
-    expect(EXAMPLE_TRIP.dates.startsWith(EXAMPLE_DAYS[0].date)).toBe(true);
-    expect(EXAMPLE_TRIP.dates).toContain(EXAMPLE_DAYS[0].iso.slice(0, 4));
-  });
+    it("keeps checklist progress a percentage", () => {
+      for (let d of trip.days) {
+        expect(Number.isInteger(d.progress)).toBe(true);
+        expect(d.progress).toBeGreaterThanOrEqual(0);
+        expect(d.progress).toBeLessThanOrEqual(100);
+      }
+    });
 
-  it("names a destination and a place to stay", () => {
-    expect(EXAMPLE_TRIP.destination.trim()).not.toBe("");
-    expect(EXAMPLE_TRIP.name.trim()).not.toBe("");
-    expect(EXAMPLE_TRIP.hotel.trim()).not.toBe("");
-  });
-});
+    it("gives every day a title and at least one activity", () => {
+      for (let d of trip.days) {
+        expect(d.title.trim()).not.toBe("");
+        expect(d.activities.length).toBeGreaterThan(0);
+      }
+    });
 
-describe("EXAMPLE_MEMBERS", () => {
-  it("has no duplicate names or initials", () => {
-    expect(new Set(MEMBER_NAMES).size).toBe(EXAMPLE_MEMBERS.length);
-    expect(new Set(EXAMPLE_MEMBERS.map((m) => m.initials)).size).toBe(EXAMPLE_MEMBERS.length);
-  });
+    it("draws every cost from the price vocabulary the UI styles", () => {
+      for (let cost of [...trip.days.map((d) => d.cost), ...activities.map((a) => a.cost)]) {
+        if (cost === undefined) continue;
+        expect(COSTS).toContain(cost);
+      }
+    });
 
-  it("gives every avatar a hex color", () => {
-    for (let m of EXAMPLE_MEMBERS) expect(m.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
-  });
+    it("gives every activity a title", () => {
+      for (let a of activities) expect(a.title.trim()).not.toBe("");
+    });
 
-  it("has someone online for the header avatar stack", () => {
-    expect(EXAMPLE_MEMBERS.filter((m) => m.online).length).toBeGreaterThanOrEqual(3);
-  });
-});
+    it("links out over https, always with a call to action", () => {
+      // ActivityRow falls back to "Book", which is wrong for an info link.
+      for (let a of activities) {
+        if (!a.url) continue;
+        expect(a.url.startsWith("https://")).toBe(true);
+        expect(a.cta, `${a.title} links out without a cta`).toBeTruthy();
+      }
+    });
 
-describe("example checklists", () => {
+    it("says what a confirmed activity is confirmed by", () => {
+      for (let a of activities) {
+        if (a.confirmed) expect(a.confirmedNote, `${a.title} is confirmed silently`).toBeTruthy();
+      }
+    });
+
+    it("shows the day-list confirmed counter something to count", () => {
+      expect(activities.some((a) => a.confirmed)).toBe(true);
+    });
+
+    it("opens on the first day and carries its year", () => {
+      expect(trip.dates.startsWith(trip.days[0].date)).toBe(true);
+      expect(trip.dates).toContain(trip.days[0].iso.slice(0, 4));
+      expect(trip.datesLong).toContain(trip.days[0].iso.slice(0, 4));
+    });
+
+    it("names a destination, a billing, and a place to stay", () => {
+      expect(trip.destination.trim()).not.toBe("");
+      expect(trip.name.trim()).not.toBe("");
+      expect(trip.hotel.trim()).not.toBe("");
+      expect(trip.lodging.trim()).not.toBe("");
+      expect(trip.transit.trim()).not.toBe("");
+    });
+
+    it("points the forecast at real coordinates", () => {
+      expect(Math.abs(trip.coords.latitude)).toBeLessThanOrEqual(90);
+      expect(Math.abs(trip.coords.longitude)).toBeLessThanOrEqual(180);
+    });
+
+    it("has no duplicate traveler names or initials", () => {
+      expect(new Set(memberNames).size).toBe(trip.members.length);
+      expect(new Set(trip.members.map((m) => m.initials)).size).toBe(trip.members.length);
+    });
+
+    it("gives every avatar a hex color", () => {
+      for (let m of trip.members) expect(m.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
+    });
+
+    it("has enough travelers online to fill the header avatar stack", () => {
+      expect(trip.members.filter((m) => m.online).length).toBeGreaterThanOrEqual(3);
+    });
+  },
+);
+
+describe("the featured trip's checklists", () => {
   let items = [...EXAMPLE_DAY_CHECKLIST, ...EXAMPLE_GLOBAL_CHECKLIST.flatMap((g) => g.items)];
+  let memberNames = FEATURED_EXAMPLE_TRIP.members.map((m) => m.name);
 
   it("attributes checked items to a traveler on the trip", () => {
     for (let item of items) {
       if (!item.by) continue;
-      expect(MEMBER_NAMES).toContain(item.by);
+      expect(memberNames).toContain(item.by);
     }
   });
 
@@ -167,8 +191,7 @@ describe("EXAMPLE_AI_CONVO", () => {
 
 describe("EXAMPLE_FEED", () => {
   it("credits each entry to a traveler or to GOODTrip itself", () => {
-    for (let entry of EXAMPLE_FEED) {
-      expect([...MEMBER_NAMES, "GOODTrip"]).toContain(entry.who);
-    }
+    let names = [...FEATURED_EXAMPLE_TRIP.members.map((m) => m.name), "GOODTrip"];
+    for (let entry of EXAMPLE_FEED) expect(names).toContain(entry.who);
   });
 });
