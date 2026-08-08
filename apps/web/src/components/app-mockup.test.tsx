@@ -5,11 +5,9 @@ import { AppMockup } from "./app-mockup";
 import {
   EXAMPLE_AI_CONVO,
   EXAMPLE_AI_SUGGESTIONS,
-  EXAMPLE_DAYS,
   EXAMPLE_FEED,
   EXAMPLE_GLOBAL_CHECKLIST,
-  EXAMPLE_MEMBERS,
-  EXAMPLE_TRIP,
+  FEATURED_EXAMPLE_TRIP as TRIP,
 } from "@/lib/example-trip";
 
 /* The phone mockup is the landing page's interactive demo. These cover the
@@ -23,15 +21,15 @@ function openTab(name: RegExp) {
 describe("AppMockup", () => {
   it("opens on the itinerary, listing every day", async () => {
     render(<AppMockup />);
-    expect(screen.getByText(EXAMPLE_TRIP.destination)).toBeInTheDocument();
-    for (let day of EXAMPLE_DAYS) {
+    expect(screen.getByText(TRIP.destination)).toBeInTheDocument();
+    for (let day of TRIP.days) {
       expect(screen.getByText(day.title)).toBeInTheDocument();
     }
   });
 
   it("drills into a day and back out again", async () => {
     render(<AppMockup />);
-    let day = EXAMPLE_DAYS[1];
+    let day = TRIP.days[1];
 
     await userEvent.click(screen.getByText(day.title));
     expect(screen.getByText(`Day ${day.n} · ${day.dow} ${day.date}`)).toBeInTheDocument();
@@ -40,7 +38,7 @@ describe("AppMockup", () => {
     }
 
     await userEvent.click(screen.getByRole("button", { name: /back to itinerary/i }));
-    expect(screen.getByText(EXAMPLE_DAYS[0].title)).toBeInTheDocument();
+    expect(screen.getByText(TRIP.days[0].title)).toBeInTheDocument();
     expect(screen.queryByText(`Day ${day.n} · ${day.dow} ${day.date}`)).not.toBeInTheDocument();
   });
 
@@ -73,9 +71,9 @@ describe("AppMockup", () => {
     render(<AppMockup />);
     await openTab(/^trip$/i);
 
-    expect(screen.getByText(`Travelers · ${EXAMPLE_MEMBERS.length}`)).toBeInTheDocument();
+    expect(screen.getByText(`Travelers · ${TRIP.members.length}`)).toBeInTheDocument();
     // Names recur in the feed below the roster, so presence is the assertion.
-    for (let member of EXAMPLE_MEMBERS) {
+    for (let member of TRIP.members) {
       expect(screen.getAllByText(member.name).length).toBeGreaterThan(0);
     }
     for (let entry of EXAMPLE_FEED) {
@@ -92,11 +90,11 @@ describe("AppMockup", () => {
 
   it("returns to the day list when the tab changes", async () => {
     render(<AppMockup />);
-    await userEvent.click(screen.getByText(EXAMPLE_DAYS[0].title));
+    await userEvent.click(screen.getByText(TRIP.days[0].title));
     await openTab(/^trip$/i);
     await openTab(/itinerary/i);
 
-    for (let day of EXAMPLE_DAYS) {
+    for (let day of TRIP.days) {
       expect(within(screen.getByText(day.title)).queryByText(day.title)).toBeDefined();
     }
     expect(screen.queryByRole("button", { name: /back to itinerary/i })).not.toBeInTheDocument();
