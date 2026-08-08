@@ -295,11 +295,337 @@ const DC_TRIP: ExampleTrip = {
   days: DC_DAYS,
 };
 
+/* ── A weekend in Lisbon ─────────────────────────────────────── */
+
+const LISBON_MEMBERS: Member[] = [
+  { name: "Rosa", initials: "R", color: "#B22234", online: true },
+  { name: "Theo", initials: "T", color: "#2D6A4F", online: true },
+  { name: "Ines", initials: "I", color: "#C9A84C", online: true },
+  { name: "Bea", initials: "B", color: "#4C5BC9" },
+];
+
+const LISBON_DAYS: DayPlan[] = [
+  {
+    n: 1,
+    dow: "Fri",
+    date: "May 14",
+    iso: "2027-05-14",
+    title: "Landing & the Alfama",
+    cost: "$$",
+    progress: 55,
+    activities: [
+      {
+        time: "11:00 AM",
+        title: "Land and find the apartment",
+        location: "Bags first, walking second",
+      },
+      {
+        time: "1:00 PM",
+        title: "Lunch at the Time Out Market",
+        location: "Every stall, one table",
+        cost: "$$",
+        url: "https://www.timeoutmarket.com/lisboa/en/",
+        cta: "See stalls",
+      },
+      {
+        time: "3:30 PM",
+        title: "Ride Tram 28 end to end",
+        location: "Board early if you want a seat",
+        cost: "$",
+        url: "https://www.carris.pt/",
+        cta: "Fares",
+        tags: ["kids"],
+      },
+      {
+        time: "7:30 PM",
+        title: "Sunset from a miradouro",
+        location: "Portas do Sol · GOODTrip found it ten minutes uphill",
+        cost: "Free",
+        suggested: true,
+        tags: ["kids"],
+      },
+    ],
+  },
+  {
+    n: 2,
+    dow: "Sat",
+    date: "May 15",
+    iso: "2027-05-15",
+    title: "Belém",
+    cost: "$$",
+    progress: 30,
+    activities: [
+      {
+        time: "9:30 AM",
+        title: "Jerónimos Monastery",
+        location: "Go at opening — the queue doubles by eleven",
+        cost: "$$",
+        confirmed: true,
+        confirmedNote: "Tickets held",
+        url: "https://www.mosteirojeronimos.gov.pt/",
+        cta: "Tickets",
+        tags: ["history"],
+      },
+      {
+        time: "11:30 AM",
+        title: "Belém Tower",
+        location: "Across the gardens, along the water",
+        cost: "$",
+        url: "https://www.torrebelem.gov.pt/",
+        cta: "Tickets",
+        tags: ["history"],
+      },
+      {
+        time: "1:00 PM",
+        title: "Pastéis de Belém",
+        location: "The original bakery · expect a line",
+        cost: "$",
+        tags: ["kids"],
+      },
+      {
+        time: "4:00 PM",
+        title: "Back to the apartment to rest",
+        location: "Feet up before a late dinner",
+      },
+      {
+        time: "8:00 PM",
+        title: "Fado in the old town",
+        location: "Late seating, as it should be",
+        cost: "$$",
+        booking: true,
+      },
+    ],
+  },
+  {
+    n: 3,
+    dow: "Sun",
+    date: "May 16",
+    iso: "2027-05-16",
+    title: "Oceanário & home",
+    cost: "$$",
+    progress: 10,
+    activities: [
+      {
+        time: "10:00 AM",
+        title: "Oceanário de Lisboa",
+        location: "Book the first slot and beat the crowd",
+        cost: "$$",
+        confirmed: true,
+        confirmedNote: "Timed entry held",
+        url: "https://www.oceanario.pt/en/",
+        cta: "Tickets",
+        tags: ["kids"],
+      },
+      {
+        time: "1:00 PM",
+        title: "Last lunch by the water",
+        location: "Parque das Nações",
+        cost: "$$",
+      },
+      {
+        time: "3:00 PM",
+        title: "Head to the airport",
+        location: "Metro from Oriente · about twenty minutes",
+        url: "https://www.carris.pt/",
+        cta: "Transit",
+      },
+    ],
+  },
+];
+
+const LISBON_TRIP: ExampleTrip = {
+  id: "lisbon",
+  pill: "A weekend in Lisbon",
+  name: "Tiles & Custard Tarts",
+  destination: "Lisbon, Portugal",
+  dates: "May 14–16, 2027",
+  datesLong: "May 14–16, 2027",
+  countdown: "12 days to go",
+  hotel: "Apartment in the Alfama · up the hill from the tram stop",
+  lodging: "Alfama",
+  transit: "Tram 28",
+  coords: { latitude: 38.7223, longitude: -9.1393 },
+  members: LISBON_MEMBERS,
+  days: LISBON_DAYS,
+};
+
+/* ── A family reunion in the Smokies ─────────────────────────── */
+
+const SMOKIES_MEMBERS: Member[] = [
+  { name: "Hank", initials: "H", color: "#3C3B6E", online: true },
+  { name: "Dot", initials: "D", color: "#B22234" },
+  { name: "Wes", initials: "W", color: "#2D6A4F", online: true },
+  { name: "Cora", initials: "C", color: "#C9A84C" },
+  { name: "Junie", initials: "J", color: "#4C5BC9", online: true },
+  { name: "Rae", initials: "R", color: "#B7791F" },
+  { name: "Gramps", initials: "G", color: "#6E3C5A" },
+];
+
+const SMOKIES_DAYS: DayPlan[] = [
+  {
+    n: 1,
+    dow: "Thu",
+    date: "Oct 7",
+    iso: "2027-10-07",
+    title: "Everyone arrives",
+    cost: "$",
+    progress: 50,
+    activities: [
+      {
+        time: "Afternoon",
+        title: "Cars in, groceries in",
+        location: "Whoever lands first starts the chili",
+      },
+      {
+        time: "5:00 PM",
+        title: "First round on the porch",
+        location: "Nobody drives again today",
+        cost: "Free",
+      },
+      {
+        time: "7:00 PM",
+        title: "Everybody at one long table",
+        location: "Seven of us, one pot",
+        cost: "$",
+      },
+    ],
+  },
+  {
+    n: 2,
+    dow: "Fri",
+    date: "Oct 8",
+    iso: "2027-10-08",
+    title: "Cades Cove",
+    cost: "Free",
+    progress: 35,
+    activities: [
+      {
+        time: "7:30 AM",
+        title: "Cades Cove loop at dawn",
+        location: "Go early — the loop clogs by nine",
+        cost: "Free",
+        confirmed: true,
+        confirmedNote: "Cars assigned",
+        url: "https://www.nps.gov/grsm/planyourvisit/cadescove.htm",
+        cta: "Loop info",
+        tags: ["outdoors"],
+      },
+      {
+        time: "11:00 AM",
+        title: "Sugarlands Visitor Center",
+        location: "Maps, junior ranger books, and a bathroom",
+        cost: "Free",
+        url: "https://www.nps.gov/grsm/planyourvisit/visitorcenters.htm",
+        cta: "Hours",
+        tags: ["kids"],
+      },
+      {
+        time: "2:00 PM",
+        title: "A waterfall the little ones can finish",
+        location: "Short, shaded, and mostly flat",
+        cost: "Free",
+        url: "https://www.nps.gov/grsm/planyourvisit/index.htm",
+        cta: "Trails",
+        tags: ["kids", "outdoors"],
+      },
+      {
+        time: "6:00 PM",
+        title: "Cards and leftovers at the cabin",
+        location: "No driving after dark",
+      },
+    ],
+  },
+  {
+    n: 3,
+    dow: "Sat",
+    date: "Oct 9",
+    iso: "2027-10-09",
+    title: "Dollywood or downtown",
+    cost: "$$$",
+    progress: 20,
+    activities: [
+      {
+        time: "9:00 AM",
+        title: "Dollywood",
+        location: "The whole day, if the weather holds",
+        cost: "$$$",
+        confirmed: true,
+        confirmedNote: "Tickets held for the group",
+        url: "https://www.dollywood.com/",
+        cta: "Tickets",
+        tags: ["kids"],
+      },
+      {
+        time: "Anytime",
+        title: "Downtown Gatlinburg for whoever skips the park",
+        location: "Split up, meet back for dinner",
+        cost: "$",
+        url: "https://www.gatlinburg.com/",
+        cta: "What's on",
+      },
+      {
+        time: "7:00 PM",
+        title: "Reunion photo before dinner",
+        location: "GOODTrip flagged golden hour on the porch",
+        cost: "Free",
+        suggested: true,
+        tags: ["kids"],
+      },
+    ],
+  },
+  {
+    n: 4,
+    dow: "Sun",
+    date: "Oct 10",
+    iso: "2027-10-10",
+    title: "Slow goodbye",
+    cost: "Free",
+    progress: 0,
+    activities: [
+      {
+        time: "Morning",
+        title: "Pancakes and packing",
+        location: "Strip the beds, split the leftovers",
+      },
+      {
+        time: "11:00 AM",
+        title: "One last overlook",
+        location: "Newfound Gap on the way out",
+        cost: "Free",
+        url: "https://www.nps.gov/grsm/index.htm",
+        cta: "Park info",
+        tags: ["outdoors"],
+      },
+      {
+        time: "1:00 PM",
+        title: "Cars go separate ways",
+        location: "Text the group when everyone is home",
+      },
+    ],
+  },
+];
+
+const SMOKIES_TRIP: ExampleTrip = {
+  id: "smokies",
+  pill: "A family reunion in the Smokies",
+  name: "The Cousins Reunion",
+  destination: "Great Smoky Mountains",
+  dates: "Oct 7–10, 2027",
+  datesLong: "October 7–10, 2027",
+  countdown: "45 days to go",
+  hotel: "Rented cabin · fifteen minutes from the park gate",
+  lodging: "Cabin",
+  transit: "Two rental cars",
+  coords: { latitude: 35.7143, longitude: -83.5102 },
+  members: SMOKIES_MEMBERS,
+  days: SMOKIES_DAYS,
+};
+
 /** The trip the phone mockup demonstrates, and the picker's default. */
 export const FEATURED_EXAMPLE_TRIP = DC_TRIP;
 
 /** Every trip the example picker can show. */
-export const EXAMPLE_TRIPS: ExampleTrip[] = [FEATURED_EXAMPLE_TRIP];
+export const EXAMPLE_TRIPS: ExampleTrip[] = [LISBON_TRIP, SMOKIES_TRIP, FEATURED_EXAMPLE_TRIP];
 
 /* The checklists, assistant transcript, and activity feed below belong to the
    featured trip — they are what the phone mockup demonstrates. The picker only
