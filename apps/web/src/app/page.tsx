@@ -1,4 +1,4 @@
-import { CalendarDays, ListChecks, Sparkles, Users, ArrowRight, Github } from "lucide-react";
+import { Lightbulb, Shuffle, Sparkles, Users, ArrowRight, Github } from "lucide-react";
 import { CompassRose } from "@/components/compass-rose";
 import { AppMockup } from "@/components/app-mockup";
 import {
@@ -17,24 +17,24 @@ export const revalidate = 3600;
 
 const areas = [
   {
-    icon: CalendarDays,
-    title: "A plan that changes together",
-    body: "Swap a dinner, move an afternoon, add a stop — everyone's itinerary updates in real time.",
-  },
-  {
-    icon: ListChecks,
-    title: "Packing, handled",
-    body: "Shared packing lists and per-day routines. Check off an item and it syncs to everyone.",
-  },
-  {
     icon: Sparkles,
-    title: "An AI that knows the trip",
-    body: "Ask GOODTrip to recap a day, find dinner nearby, or rework a rained-out afternoon.",
+    title: "Chat with your itinerary",
+    body: "Ask what's on tomorrow, what's still unbooked, or where to eat near the museum. GOODTrip has read the whole plan, so you never explain it twice.",
+  },
+  {
+    icon: Lightbulb,
+    title: "Suggestions, not surprises",
+    body: "It proposes a stop, a dinner, a rainy-day swap. Every idea stays marked as a suggestion until somebody accepts it.",
+  },
+  {
+    icon: Shuffle,
+    title: "Change it as you go",
+    body: "Move an afternoon, swap a dinner, drop the stop that isn't working. The day reshapes around it and the packing list keeps up.",
   },
   {
     icon: Users,
-    title: "Everyone on the same page",
-    body: "See who's around, what's booked, and what the group's up to — no more group-chat archaeology.",
+    title: "Multiplayer from the first tap",
+    body: "No owner, no read-only guests. Everyone plans, checks things off, and edits the same live itinerary — no more group-chat archaeology.",
   },
 ];
 
@@ -127,8 +127,8 @@ export default async function Home() {
               style={{ animationDelay: "0.18s" }}
             >
               The group trip planner that plans <em className="not-italic text-espresso">with</em>{" "}
-              you. Build it together, change it in real time, and let GOODTrip handle the packing
-              and logistics — so everyone can just show up and enjoy the trip.
+              you. Chat with your itinerary, take the suggestions worth taking, change whatever
+              isn&rsquo;t working — and everyone sees it the moment you do.
             </p>
 
             {/* waitlist capture — the primary action */}
@@ -176,10 +176,10 @@ export default async function Home() {
               kicker="How it works"
               title={
                 <>
-                  The itinerary, <span className="text-coral">alive.</span>
+                  The itinerary that <span className="text-coral">talks back.</span>
                 </>
               }
-              intro="Plan it together, change it in real time, pack from a shared checklist, and ask an AI guide that knows the whole trip. Tap through it."
+              intro="Ask it anything about the trip. Take the suggestions that fit, change the ones that don't, and watch everyone else's plan move with yours. Tap through it."
             />
 
             <div className="mt-14">
@@ -206,13 +206,13 @@ export default async function Home() {
           {/* ── An example trip ───────────────────────────────── */}
           <section id="example" className="scroll-mt-20 px-4 py-20 sm:px-6 sm:py-28">
             <SectionHead
-              kicker="An example trip"
+              kicker="Example trips"
               title={
                 <>
                   What a GOODTrip <span className="text-coral">looks like.</span>
                 </>
               }
-              intro="Five days in Washington, D.C. for a family of five — a sample trip, built exactly the way a real one is. Yours could be any of these: same structure, any destination, any group."
+              intro="Three sample trips, built exactly the way a real one is — things booked, things still open, and a few GOODTrip suggested. Pick one and read it end to end."
             />
 
             <ExamplePicker weather={weather} />
