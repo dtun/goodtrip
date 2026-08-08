@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { fetchTripWeather } from "./weather";
 
+// Deliberately not the example trip's city: the client should ask wherever
+// the caller points it, with no destination of its own.
+let LISBON = { latitude: 38.7223, longitude: -9.1393 };
+
 /* The forecast is best-effort: a day with no live data carries no weather
    rather than an invented one, and no failure mode is allowed to take the
    landing page down with it. These pin both halves — the request we send and
@@ -38,13 +42,13 @@ afterEach(() => {
 
 describe("fetchTripWeather", () => {
   it("asks for nothing when there are no dates", async () => {
-    expect(await fetchTripWeather([])).toEqual({});
+    expect(await fetchTripWeather([], LISBON)).toEqual({});
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("asks Open-Meteo for the range the trip spans, in Fahrenheit", async () => {
     fetchMock.mockResolvedValue(daily([]));
-    await fetchTripWeather(["2027-04-11", "2027-04-09", "2027-04-13"]);
+    await fetchTripWeather(["2027-04-11", "2027-04-09", "2027-04-13"], LISBON);
 
     let url = requestedUrl();
     expect(url.origin + url.pathname).toBe("https://api.open-meteo.com/v1/forecast");
@@ -56,9 +60,18 @@ describe("fetchTripWeather", () => {
     );
   });
 
+  it("asks at the coordinates it is given, not a built-in city", async () => {
+    fetchMock.mockResolvedValue(daily([]));
+    await fetchTripWeather(["2027-04-09"], LISBON);
+
+    let url = requestedUrl();
+    expect(url.searchParams.get("latitude")).toBe("38.7223");
+    expect(url.searchParams.get("longitude")).toBe("-9.1393");
+  });
+
   it("collapses duplicate and empty dates before asking", async () => {
     fetchMock.mockResolvedValue(daily([]));
-    await fetchTripWeather(["2027-04-10", "2027-04-10", "", "2027-04-09"]);
+    await fetchTripWeather(["2027-04-10", "2027-04-10", "", "2027-04-09"], LISBON);
 
     expect(requestedUrl().searchParams.get("start_date")).toBe("2027-04-09");
     expect(requestedUrl().searchParams.get("end_date")).toBe("2027-04-10");
@@ -66,7 +79,7 @@ describe("fetchTripWeather", () => {
 
   it("revalidates hourly rather than on every render", async () => {
     fetchMock.mockResolvedValue(daily([]));
-    await fetchTripWeather(["2027-04-09"]);
+    await fetchTripWeather(["2027-04-09"], LISBON);
     expect(fetchMock.mock.calls[0][1]).toEqual({ next: { revalidate: 3600 } });
   });
 
@@ -78,7 +91,7 @@ describe("fetchTripWeather", () => {
       ]),
     );
 
-    expect(await fetchTripWeather(["2027-04-09", "2027-04-10"])).toEqual({
+    expect(await fetchTripWeather(["2027-04-09", "2027-04-10"], LISBON)).toEqual({
       "2027-04-09": { sky: "partly", summary: "Partly cloudy", hi: 61, lo: 48 },
       "2027-04-10": { sky: "rain", summary: "Rain", hi: 59, lo: 44 },
     });
@@ -106,7 +119,7 @@ describe("fetchTripWeather", () => {
       daily(bands.map(([code], i) => [dates[i], 60, 40, code] as [string, number, number, number])),
     );
 
-    let out = await fetchTripWeather(dates);
+    let out = await fetchTripWeather(dates, LISBON);
     for (let [i, [, sky, summary]] of bands.entries()) {
       expect(out[dates[i]], `code ${bands[i][0]}`).toMatchObject({ sky, summary });
     }
@@ -125,22 +138,22 @@ describe("fetchTripWeather", () => {
       }),
     });
 
-    let out = await fetchTripWeather(["2027-04-09", "2027-04-10"]);
+    let out = await fetchTripWeather(["2027-04-09", "2027-04-10"], LISBON);
     expect(Object.keys(out)).toEqual(["2027-04-09"]);
   });
 
   it("returns nothing when the service refuses", async () => {
     fetchMock.mockResolvedValue({ ok: false, status: 429, json: async () => ({}) });
-    expect(await fetchTripWeather(["2027-04-09"])).toEqual({});
+    expect(await fetchTripWeather(["2027-04-09"], LISBON)).toEqual({});
   });
 
   it("returns nothing when the payload is missing its daily block", async () => {
     fetchMock.mockResolvedValue({ ok: true, json: async () => ({ error: true }) });
-    expect(await fetchTripWeather(["2027-04-09"])).toEqual({});
+    expect(await fetchTripWeather(["2027-04-09"], LISBON)).toEqual({});
   });
 
   it("returns nothing when the network is down", async () => {
     fetchMock.mockRejectedValue(new Error("ENOTFOUND"));
-    expect(await fetchTripWeather(["2027-04-09"])).toEqual({});
+    expect(await fetchTripWeather(["2027-04-09"], LISBON)).toEqual({});
   });
 });
