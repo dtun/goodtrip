@@ -40,7 +40,7 @@ const areas = [
 const tripKinds = [
   "A weekend in Lisbon",
   "A family reunion in the Smokies",
-  "Nine days in Washington, D.C.",
+  "Five days in Washington, D.C.",
 ];
 
 const stack = ["Next.js", "React Native · Expo", "Supabase", "Realtime", "Claude"];
@@ -210,7 +210,7 @@ export default async function Home() {
                   What a GOODTrip <span className="text-coral">looks like.</span>
                 </>
               }
-              intro="A real one: nine days in Washington, D.C. for a family of eight. Yours could be any of these — same structure, any destination, any group."
+              intro="Five days in Washington, D.C. for a family of five — a sample trip, built exactly the way a real one is. Yours could be any of these: same structure, any destination, any group."
             />
 
             <div className="mx-auto mt-9 flex max-w-3xl flex-wrap justify-center gap-2">
