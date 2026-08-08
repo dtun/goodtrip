@@ -21,6 +21,8 @@ export type Activity = {
   confirmed?: boolean;
   confirmedNote?: string;
   booking?: boolean;
+  /** Proposed by GOODTrip and not yet accepted — rendered as a suggestion. */
+  suggested?: boolean;
   url?: string; // booking / info link
   code?: string; // discount code — never set on the example trip, see the guard
   cta?: string; // link label, e.g. "Tickets", "Reserve"
@@ -102,6 +104,8 @@ const DC_DAYS: DayPlan[] = [
         title: "First look at the Mall",
         location: "Washington Monument · a ten-minute walk",
         cost: "Free",
+        url: "https://www.nps.gov/wamo/index.htm",
+        cta: "Hours",
       },
       {
         time: "8:00 PM",
@@ -147,8 +151,9 @@ const DC_DAYS: DayPlan[] = [
       {
         time: "5:00 PM",
         title: "Ice cream run",
-        location: "Two blocks over",
+        location: "Two blocks over · GOODTrip spotted it near the hotel",
         cost: "$",
+        suggested: true,
         tags: ["kids"],
       },
     ],
@@ -182,6 +187,9 @@ const DC_DAYS: DayPlan[] = [
         title: "Tidal Basin walk",
         location: "Cherry blossoms, if the timing holds",
         cost: "Free",
+        suggested: true,
+        url: "https://www.nps.gov/subjects/cherryblossom/index.htm",
+        cta: "Bloom watch",
         tags: ["kids"],
       },
       {
@@ -209,7 +217,7 @@ const DC_DAYS: DayPlan[] = [
         cost: "$",
         confirmed: true,
         confirmedNote: "Timed entry booked",
-        url: "https://www.archives.gov/dc/visit",
+        url: "https://visit.archives.gov/",
         cta: "Timed entry",
         tags: ["history"],
       },
@@ -222,8 +230,9 @@ const DC_DAYS: DayPlan[] = [
       {
         time: "2:30 PM",
         title: "National Portrait Gallery",
-        location: "Open late — the rainy-day backup",
+        location: "Open late — GOODTrip's rainy-day backup",
         cost: "Free",
+        suggested: true,
         url: "https://npg.si.edu/visit",
         cta: "Hours",
         tags: ["museum"],
@@ -233,6 +242,8 @@ const DC_DAYS: DayPlan[] = [
         title: "Walk the waterfront",
         location: "Boardwalk, boats, and a bench",
         cost: "Free",
+        url: "https://www.wharfdc.com/",
+        cta: "The Wharf",
       },
     ],
   },
@@ -261,6 +272,8 @@ const DC_DAYS: DayPlan[] = [
         time: "2:30 PM",
         title: "Head to the airport",
         location: "Metro to the terminal · about forty minutes",
+        url: "https://www.wmata.com/",
+        cta: "Metro",
       },
     ],
   },
@@ -345,9 +358,9 @@ export const EXAMPLE_AI_CONVO: ChatMsg[] = [
 ];
 
 export const EXAMPLE_AI_ACTION = {
-  prompt: "Add this to Day 3?",
-  title: "Tidal Basin walk",
-  detail: "4:00 PM · cherry blossoms, if the timing holds",
+  prompt: "Add this to Day 4?",
+  title: "Sunset from the Kennedy Center terrace",
+  detail: "7:00 PM · free rooftop view over the river",
 };
 
 export const EXAMPLE_AI_SUGGESTIONS = [
@@ -359,11 +372,6 @@ export const EXAMPLE_AI_SUGGESTIONS = [
 export const EXAMPLE_FEED = [
   { who: "Priya", action: "checked off", target: "Sunscreen on everyone", when: "2m" },
   { who: "Nana", action: "confirmed", target: "National Archives timed entry", when: "18m" },
-  { who: "Jordan", action: "added", target: "Tidal Basin walk to Day 3", when: "1h" },
-  {
-    who: "GOODTrip",
-    action: "suggestion accepted",
-    target: "Air & Space timed passes",
-    when: "2h",
-  },
+  { who: "GOODTrip", action: "suggested", target: "Ice cream run on Day 2", when: "1h" },
+  { who: "Jordan", action: "accepted", target: "Tidal Basin walk", when: "2h" },
 ];
