@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { CalendarDays, ListChecks, Sparkles, Users, ArrowRight, Github } from "lucide-react";
 import { CompassRose } from "@/components/compass-rose";
 import { AppMockup } from "@/components/app-mockup";
@@ -93,9 +92,6 @@ export default async function Home() {
             <a href="#example" className="hidden transition-colors hover:text-espresso sm:inline">
               Example
             </a>
-            <Link href="/trip" className="hidden transition-colors hover:text-espresso sm:inline">
-              Preview
-            </Link>
             <a
               href="#waitlist"
               className="rounded-full bg-coral-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-coral-700"
@@ -134,12 +130,12 @@ export default async function Home() {
               <WaitlistForm source="landing-hero" />
               <p className="mt-4 text-sm text-espresso-muted">
                 Or{" "}
-                <Link
-                  href="/trip"
+                <a
+                  href="#example"
                   className="font-medium text-coral-700 underline decoration-coral/30 underline-offset-4 transition-colors hover:decoration-coral"
                 >
-                  explore a live example trip
-                </Link>{" "}
+                  explore an example trip
+                </a>{" "}
                 — no sign-up.
               </p>
             </div>
