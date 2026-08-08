@@ -3,7 +3,20 @@
 // up its real forecast. There is no hard-coded fallback: if the fetch fails or
 // a date falls outside the forecast horizon, that day carries no weather.
 
-import type { Weather, WeatherByDate } from "./trip";
+/**
+ * A day's forecast, keyed by the day's ISO date. `sky` picks the icon. Never
+ * hard-coded — a day with no live data (fetch failed, or the date is beyond
+ * the forecast horizon) simply carries no weather rather than an invented one.
+ */
+export type Weather = {
+  sky: "sunny" | "partly" | "cloudy" | "rain" | "storms";
+  summary: string; // short label, e.g. "Thunderstorms"
+  hi: number; // high, °F
+  lo: number; // low, °F
+};
+
+/** Live forecast keyed by ISO date (YYYY-MM-DD). */
+export type WeatherByDate = Record<string, Weather>;
 
 // Washington, D.C. (National Mall).
 const DC = { latitude: 38.8895, longitude: -77.0353 } as const;
