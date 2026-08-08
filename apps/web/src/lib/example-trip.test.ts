@@ -28,6 +28,10 @@ function activitiesOf(trip: ExampleTrip) {
 }
 
 describe("EXAMPLE_TRIPS", () => {
+  it("offers more than one trip to look at", () => {
+    expect(EXAMPLE_TRIPS.length).toBeGreaterThan(1);
+  });
+
   it("gives every trip a unique id and picker label", () => {
     expect(new Set(EXAMPLE_TRIPS.map((t) => t.id)).size).toBe(EXAMPLE_TRIPS.length);
     expect(new Set(EXAMPLE_TRIPS.map((t) => t.pill)).size).toBe(EXAMPLE_TRIPS.length);
