@@ -26,16 +26,20 @@ describe("the example trip carries no personal detail", () => {
   it("advertises no booking or discount codes", () => {
     // A code on a public page is either somebody's real record locator or a
     // fabricated offer against a real vendor. The example trip has neither.
-    let coded = exampleTrip.EXAMPLE_DAYS.flatMap((d) => d.activities).filter((a) => a.code);
+    let coded = exampleTrip.EXAMPLE_TRIPS.flatMap((t) => t.days)
+      .flatMap((d) => d.activities)
+      .filter((a) => a.code);
     expect(coded.map((a) => a.title)).toEqual([]);
   });
 
   it("describes lodging without pinning it to a real address", () => {
-    expect(exampleTrip.EXAMPLE_TRIP.hotel).not.toMatch(STREET_ADDRESS);
+    for (let trip of exampleTrip.EXAMPLE_TRIPS) {
+      expect(trip.hotel, trip.id).not.toMatch(STREET_ADDRESS);
+    }
   });
 
   it("names travelers only by a first name or nickname", () => {
-    for (let member of exampleTrip.EXAMPLE_MEMBERS) {
+    for (let member of exampleTrip.EXAMPLE_TRIPS.flatMap((t) => t.members)) {
       expect(member.name.trim().split(/\s+/).length, `${member.name} reads as a full name`).toBe(1);
     }
   });
