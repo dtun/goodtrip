@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Home from "./page";
+import { EXAMPLE_TRIPS } from "@/lib/example-trip";
 import { assertRedacted } from "@/test/redaction";
 
 // The landing page fetches a live forecast at build time; the page's job here
@@ -32,6 +33,20 @@ describe("the landing page", () => {
   it("carries no personal detail anywhere on the page", async () => {
     let { container } = await renderHome();
     assertRedacted("the landing page", container.textContent ?? "");
+  });
+
+  it("leads with the collaboration story, not a feature list", async () => {
+    await renderHome();
+    for (let promise of [/chat with your itinerary/i, /suggestions/i, /multiplayer/i]) {
+      expect(screen.getByRole("heading", { name: promise })).toBeInTheDocument();
+    }
+  });
+
+  it("offers every example trip in the picker", async () => {
+    await renderHome();
+    for (let trip of EXAMPLE_TRIPS) {
+      expect(screen.getByRole("button", { name: trip.pill })).toBeInTheDocument();
+    }
   });
 
   it("offers the waitlist as the primary action", async () => {
