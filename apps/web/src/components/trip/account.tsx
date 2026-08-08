@@ -53,8 +53,8 @@ export function WelcomeScreen({
 
       {sentTo ? (
         <p className="mt-6 rounded-xl border border-gold/25 bg-gold/10 px-4 py-4 text-sm text-cream-muted">
-          Sign-in link sent to <span className="text-cream">{sentTo}</span>. Open it on this
-          device and you&rsquo;ll land back here as yourself.
+          Sign-in link sent to <span className="text-cream">{sentTo}</span>. Open it on this device
+          and you&rsquo;ll land back here as yourself.
         </p>
       ) : (
         <>
@@ -158,8 +158,7 @@ export function SaveSpotBanner({
     if (!justLinked) return null;
     return (
       <p className="mt-4 rounded-xl border border-gold/25 bg-gold/10 px-4 py-3 text-xs text-cream-muted">
-        Spot saved — sign in as <span className="text-cream">{linked.email}</span> from any
-        device.
+        Spot saved — sign in as <span className="text-cream">{linked.email}</span> from any device.
       </p>
     );
   }

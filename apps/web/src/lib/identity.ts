@@ -91,10 +91,7 @@ export async function linkEmail(
   redirectTo: string,
 ): Promise<LinkedEmail> {
   let email = normalizeEmail(rawEmail);
-  let { data, error } = await supabase.auth.updateUser(
-    { email },
-    { emailRedirectTo: redirectTo },
-  );
+  let { data, error } = await supabase.auth.updateUser({ email }, { emailRedirectTo: redirectTo });
   if (error) throw error;
   // With email confirmations off the project auto-confirms instantly (no
   // email is sent); with them on, the address sits in new_email as pending.
