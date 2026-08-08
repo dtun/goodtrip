@@ -15,7 +15,7 @@ function membersLine(trip: ExampleTrip) {
 function colophon(trip: ExampleTrip): [string, string][] {
   return [
     ["Dates", trip.dates],
-    ["Party", `Family of ${trip.members.length}`],
+    ["Party", `Party of ${trip.members.length}`],
     ["Lodging", trip.lodging],
     ["Transit", trip.transit],
   ];
