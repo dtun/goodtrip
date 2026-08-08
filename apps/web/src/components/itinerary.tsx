@@ -1,4 +1,4 @@
-import { ExternalLink, Check } from "lucide-react";
+import { ExternalLink, Check, Sparkles } from "lucide-react";
 import type { Activity, DayPlan, ExampleTrip } from "@/lib/example-trip";
 import type { Weather, WeatherByDate } from "@/lib/weather";
 import { CompassRose } from "@/components/compass-rose";
@@ -52,7 +52,7 @@ function ActivityRow({ a }: { a: Activity }) {
         {a.location && (
           <p className="mt-1 text-xs leading-snug text-espresso-muted">{a.location}</p>
         )}
-        {(a.url || a.code || a.confirmed) && (
+        {(a.url || a.code || a.confirmed || a.suggested) && (
           <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
             {a.url && (
               <a
@@ -71,6 +71,12 @@ function ActivityRow({ a }: { a: Activity }) {
               <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-teal-700">
                 <Check className="h-3 w-3" aria-hidden="true" />
                 {a.confirmedNote ?? "Confirmed"}
+              </span>
+            )}
+            {a.suggested && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-coral-soft px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-coral-700">
+                <Sparkles className="h-3 w-3" aria-hidden="true" />
+                GOODTrip suggests
               </span>
             )}
           </div>
@@ -241,6 +247,7 @@ export function PrintableItinerary({
                     {a.location ? `, ${a.location}` : ""}
                     {a.cost && a.cost !== "—" ? ` (${a.cost})` : ""}
                     {a.confirmed && a.confirmedNote ? ` — ${a.confirmedNote}` : ""}
+                    {a.suggested ? " — suggested by GOODTrip" : ""}
                     {a.url ? (
                       <span className="text-gray-600">
                         {" "}
