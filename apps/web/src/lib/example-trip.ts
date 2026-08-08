@@ -50,20 +50,26 @@ export type ChecklistGroup = {
   items: { text: string; done?: boolean; by?: string }[];
 };
 
-export const EXAMPLE_TRIP = {
-  name: "Cherry Blossom Week",
-  destination: "Washington, D.C.",
-  dates: "Apr 9–13, 2027",
-  datesLong: "April 9–13, 2027",
-  countdown: "30 days to go",
-  hotel: "Downtown hotel · two blocks from the Metro",
-  lodging: "Downtown", // colophon short form
-  transit: "Metro Center",
-  /** Where to ask for the forecast — the destination, not a fixed city. */
-  coords: { latitude: 38.8895, longitude: -77.0353 },
+/** A complete example trip: its billing, its party, and its days. */
+export type ExampleTrip = {
+  id: string;
+  /** Pill label in the example picker, e.g. "A weekend in Lisbon". */
+  pill: string;
+  name: string;
+  destination: string;
+  dates: string; // short form for the colophon, e.g. "Apr 9\u201313, 2027"
+  datesLong: string; // masthead form, e.g. "April 9\u201313, 2027"
+  countdown: string;
+  hotel: string;
+  lodging: string; // colophon short form
+  transit: string;
+  /** Where to ask for the forecast \u2014 the destination, not a fixed city. */
+  coords: { latitude: number; longitude: number };
+  members: Member[];
+  days: DayPlan[];
 };
 
-export const EXAMPLE_MEMBERS: Member[] = [
+const DC_MEMBERS: Member[] = [
   { name: "Alex", initials: "A", color: "#3C3B6E", online: true },
   { name: "Jordan", initials: "J", color: "#B22234" },
   { name: "Priya", initials: "P", color: "#2D6A4F", online: true },
@@ -71,7 +77,7 @@ export const EXAMPLE_MEMBERS: Member[] = [
   { name: "Nana", initials: "N", color: "#6E3C5A" },
 ];
 
-export const EXAMPLE_DAYS: DayPlan[] = [
+const DC_DAYS: DayPlan[] = [
   {
     n: 1,
     dow: "Fri",
@@ -259,6 +265,32 @@ export const EXAMPLE_DAYS: DayPlan[] = [
     ],
   },
 ];
+
+const DC_TRIP: ExampleTrip = {
+  id: "dc",
+  pill: "Five days in Washington, D.C.",
+  name: "Cherry Blossom Week",
+  destination: "Washington, D.C.",
+  dates: "Apr 9–13, 2027",
+  datesLong: "April 9–13, 2027",
+  countdown: "30 days to go",
+  hotel: "Downtown hotel · two blocks from the Metro",
+  lodging: "Downtown",
+  transit: "Metro Center",
+  coords: { latitude: 38.8895, longitude: -77.0353 },
+  members: DC_MEMBERS,
+  days: DC_DAYS,
+};
+
+/** The trip the phone mockup demonstrates, and the picker's default. */
+export const FEATURED_EXAMPLE_TRIP = DC_TRIP;
+
+/** Every trip the example picker can show. */
+export const EXAMPLE_TRIPS: ExampleTrip[] = [FEATURED_EXAMPLE_TRIP];
+
+/* The checklists, assistant transcript, and activity feed below belong to the
+   featured trip — they are what the phone mockup demonstrates. The picker only
+   swaps the printed itinerary, which needs days and a party, not these. */
 
 export const EXAMPLE_DAY_CHECKLIST: { text: string; done?: boolean; by?: string }[] = [
   { text: "Sunscreen on everyone", done: true, by: "Priya" },

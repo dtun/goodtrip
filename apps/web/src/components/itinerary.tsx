@@ -1,11 +1,5 @@
 import { ExternalLink, Check } from "lucide-react";
-import {
-  EXAMPLE_DAYS,
-  EXAMPLE_MEMBERS,
-  EXAMPLE_TRIP,
-  type Activity,
-  type DayPlan,
-} from "@/lib/example-trip";
+import type { Activity, DayPlan, ExampleTrip } from "@/lib/example-trip";
 import type { Weather, WeatherByDate } from "@/lib/weather";
 import { CompassRose } from "@/components/compass-rose";
 import { PrintButton } from "@/components/print-button";
@@ -14,14 +8,18 @@ import { WeatherIcon, weatherLabel } from "@/components/weather-badge";
 
 // Derived, not restated: the masthead can't drift from the trip it describes,
 // and a roster change can't leave a stale name on a public page.
-const MEMBERS_LINE = EXAMPLE_MEMBERS.map((m) => m.name).join(" · ");
+function membersLine(trip: ExampleTrip) {
+  return trip.members.map((m) => m.name).join(" · ");
+}
 
-const COLOPHON: [string, string][] = [
-  ["Dates", EXAMPLE_TRIP.dates],
-  ["Party", `Family of ${EXAMPLE_MEMBERS.length}`],
-  ["Lodging", EXAMPLE_TRIP.lodging],
-  ["Transit", EXAMPLE_TRIP.transit],
-];
+function colophon(trip: ExampleTrip): [string, string][] {
+  return [
+    ["Dates", trip.dates],
+    ["Party", `Family of ${trip.members.length}`],
+    ["Lodging", trip.lodging],
+    ["Transit", trip.transit],
+  ];
+}
 
 function prettyUrl(u: string) {
   return u
@@ -142,7 +140,13 @@ function DaySection({ d, w }: { d: DayPlan; w?: Weather }) {
   );
 }
 
-export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
+export function ItineraryTicket({
+  trip,
+  weather = {},
+}: {
+  trip: ExampleTrip;
+  weather?: WeatherByDate;
+}) {
   return (
     <div className="mx-auto max-w-3xl">
       <div className="rounded-[1.75rem] border border-sand-300 bg-white px-5 py-10 shadow-[0_30px_80px_-40px_rgba(46,38,32,0.3)] sm:px-14 sm:py-14">
@@ -153,16 +157,16 @@ export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
             The Itinerary
           </p>
           <h2 className="mt-3 font-display text-4xl font-extrabold leading-none tracking-tight text-espresso sm:text-5xl">
-            {EXAMPLE_TRIP.destination}
+            {trip.destination}
           </h2>
           <p className="mt-3 text-lg text-espresso-muted">
-            {EXAMPLE_TRIP.name} · {EXAMPLE_TRIP.datesLong}
+            {trip.name} · {trip.datesLong}
           </p>
         </header>
 
         {/* colophon */}
         <dl className="mt-9 grid grid-cols-2 gap-y-5 border-y border-sand-300 py-5 text-center sm:grid-cols-4 sm:divide-x sm:divide-sand-300">
-          {COLOPHON.map(([k, v]) => (
+          {colophon(trip).map(([k, v]) => (
             <div key={k} className="px-2">
               <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-espresso-muted/80">
                 {k}
@@ -185,7 +189,7 @@ export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
 
         {/* programme */}
         <div className="space-y-12">
-          {EXAMPLE_DAYS.map((d) => (
+          {trip.days.map((d) => (
             <DaySection key={d.n} d={d} w={weather[d.iso]} />
           ))}
         </div>
@@ -201,20 +205,26 @@ export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
 
 /* ── Plain black-and-white printable sheet ───────────────────── */
 
-export function PrintableItinerary({ weather = {} }: { weather?: WeatherByDate }) {
+export function PrintableItinerary({
+  trip,
+  weather = {},
+}: {
+  trip: ExampleTrip;
+  weather?: WeatherByDate;
+}) {
   return (
     <div className="hidden bg-white px-10 py-8 text-black print:block">
       <header className="border-b-2 border-black pb-3">
-        <h1 className="text-2xl font-bold">{EXAMPLE_TRIP.destination}</h1>
+        <h1 className="text-2xl font-bold">{trip.destination}</h1>
         <p className="text-sm">
-          {EXAMPLE_TRIP.name} · {EXAMPLE_TRIP.datesLong}
+          {trip.name} · {trip.datesLong}
         </p>
-        <p className="mt-1 text-xs">{EXAMPLE_TRIP.hotel.replace(/ · /g, " — ")}</p>
-        <p className="text-xs">{MEMBERS_LINE.replace(/ · /g, ", ")}</p>
+        <p className="mt-1 text-xs">{trip.hotel.replace(/ · /g, " — ")}</p>
+        <p className="text-xs">{membersLine(trip).replace(/ · /g, ", ")}</p>
       </header>
 
       <div className="mt-4 space-y-4">
-        {EXAMPLE_DAYS.map((d) => {
+        {trip.days.map((d) => {
           const w = weather[d.iso];
           return (
             <section key={d.n} className="break-inside-avoid">
