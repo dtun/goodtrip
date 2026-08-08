@@ -1,18 +1,26 @@
 import { ExternalLink, Check } from "lucide-react";
-import { EXAMPLE_DAYS, EXAMPLE_TRIP, type Activity, type DayPlan } from "@/lib/example-trip";
+import {
+  EXAMPLE_DAYS,
+  EXAMPLE_MEMBERS,
+  EXAMPLE_TRIP,
+  type Activity,
+  type DayPlan,
+} from "@/lib/example-trip";
 import type { Weather, WeatherByDate } from "@/lib/weather";
 import { CompassRose } from "@/components/compass-rose";
 import { PrintButton } from "@/components/print-button";
 import { CopyCode } from "@/components/copy-code";
 import { WeatherIcon, weatherLabel } from "@/components/weather-badge";
 
-const MEMBERS_LINE = "Danny · Ellen · Jack · Eva · Elizabeth · Elisha · GG · Papa";
+// Derived, not restated: the masthead can't drift from the trip it describes,
+// and a roster change can't leave a stale name on a public page.
+const MEMBERS_LINE = EXAMPLE_MEMBERS.map((m) => m.name).join(" · ");
 
 const COLOPHON: [string, string][] = [
-  ["Dates", "Jul 21–29 ’26"],
-  ["Party", "Family of 8"],
-  ["Lodging", "Residence Inn"],
-  ["Transit", "McPherson Sq"],
+  ["Dates", EXAMPLE_TRIP.dates],
+  ["Party", `Family of ${EXAMPLE_MEMBERS.length}`],
+  ["Lodging", EXAMPLE_TRIP.lodging],
+  ["Transit", EXAMPLE_TRIP.transit],
 ];
 
 function prettyUrl(u: string) {
@@ -147,7 +155,9 @@ export function ItineraryTicket({ weather = {} }: { weather?: WeatherByDate }) {
           <h2 className="mt-3 font-display text-4xl font-extrabold leading-none tracking-tight text-espresso sm:text-5xl">
             {EXAMPLE_TRIP.destination}
           </h2>
-          <p className="mt-3 text-lg text-espresso-muted">{EXAMPLE_TRIP.name} · July 21–29, 2026</p>
+          <p className="mt-3 text-lg text-espresso-muted">
+            {EXAMPLE_TRIP.name} · {EXAMPLE_TRIP.datesLong}
+          </p>
         </header>
 
         {/* colophon */}
@@ -195,8 +205,10 @@ export function PrintableItinerary({ weather = {} }: { weather?: WeatherByDate }
   return (
     <div className="hidden bg-white px-10 py-8 text-black print:block">
       <header className="border-b-2 border-black pb-3">
-        <h1 className="text-2xl font-bold">Washington, D.C.</h1>
-        <p className="text-sm">America’s 250th Birthday Family Trip · July 21–29, 2026</p>
+        <h1 className="text-2xl font-bold">{EXAMPLE_TRIP.destination}</h1>
+        <p className="text-sm">
+          {EXAMPLE_TRIP.name} · {EXAMPLE_TRIP.datesLong}
+        </p>
         <p className="mt-1 text-xs">{EXAMPLE_TRIP.hotel.replace(/ · /g, " — ")}</p>
         <p className="text-xs">{MEMBERS_LINE.replace(/ · /g, ", ")}</p>
       </header>
@@ -237,7 +249,7 @@ export function PrintableItinerary({ weather = {} }: { weather?: WeatherByDate }
       </div>
 
       <footer className="mt-6 border-t border-black pt-2 text-[11px]">
-        goodtrip (DC 2026 Beta)
+        goodtrip · example itinerary
       </footer>
     </div>
   );
