@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ItineraryTicket, PrintableItinerary } from "./itinerary";
 import { AppMockup } from "./app-mockup";
-import { FEATURED_EXAMPLE_TRIP as TRIP } from "@/lib/example-trip";
+import { EXAMPLE_TRIPS, FEATURED_EXAMPLE_TRIP as TRIP } from "@/lib/example-trip";
 import { assertRedacted } from "@/test/redaction";
 
 /* The data guard in lib/example-trip.privacy.test.ts only sees the data
@@ -12,15 +12,22 @@ import { assertRedacted } from "@/test/redaction";
    reintroduce a real detail the data no longer holds. */
 
 describe("the public marketing surfaces carry no personal detail", () => {
-  it("keeps the itinerary ticket clean", () => {
-    let { container } = render(<ItineraryTicket trip={TRIP} />);
-    assertRedacted("the itinerary ticket", container.textContent ?? "");
-  });
+  // Every trip the picker can reach, not just the featured one.
+  it.each(EXAMPLE_TRIPS.map((t) => [t.id, t] as const))(
+    "keeps the %s itinerary ticket clean",
+    (id, trip) => {
+      let { container } = render(<ItineraryTicket trip={trip} />);
+      assertRedacted(`the ${id} itinerary ticket`, container.textContent ?? "");
+    },
+  );
 
-  it("keeps the printable itinerary clean", () => {
-    let { container } = render(<PrintableItinerary trip={TRIP} />);
-    assertRedacted("the printable itinerary", container.textContent ?? "");
-  });
+  it.each(EXAMPLE_TRIPS.map((t) => [t.id, t] as const))(
+    "keeps the %s print sheet clean",
+    (id, trip) => {
+      let { container } = render(<PrintableItinerary trip={trip} />);
+      assertRedacted(`the ${id} print sheet`, container.textContent ?? "");
+    },
+  );
 
   it("keeps every screen of the app mockup clean", async () => {
     let { container } = render(<AppMockup />);
