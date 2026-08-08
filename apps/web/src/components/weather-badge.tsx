@@ -1,5 +1,5 @@
 import { Sun, CloudSun, Cloud, CloudRain, CloudLightning } from "lucide-react";
-import type { Weather } from "@/lib/trip";
+import type { Weather } from "@/lib/weather";
 
 const SKY_ICON = {
   sunny: Sun,

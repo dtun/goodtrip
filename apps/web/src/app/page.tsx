@@ -5,7 +5,7 @@ import { AppMockup } from "@/components/app-mockup";
 import { ItineraryTicket, PrintableItinerary } from "@/components/itinerary";
 import { ShareBar } from "@/components/share-bar";
 import { WaitlistForm } from "@/components/waitlist-form";
-import { DAYS } from "@/lib/trip";
+import { EXAMPLE_DAYS } from "@/lib/example-trip";
 import { fetchTripWeather } from "@/lib/weather";
 
 // Refresh the live forecast hourly so real weather appears even if the page
@@ -74,7 +74,7 @@ function SectionHead({
 }
 
 export default async function Home() {
-  const weather = await fetchTripWeather(DAYS.map((d) => d.iso));
+  const weather = await fetchTripWeather(EXAMPLE_DAYS.map((d) => d.iso));
   return (
     <>
       <div className="sunwash relative min-h-screen font-sans text-espresso print:hidden">
