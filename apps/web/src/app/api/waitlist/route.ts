@@ -7,6 +7,9 @@ export const dynamic = "force-dynamic";
 
 type Body = { email?: unknown; source?: unknown };
 
+/** Postgres unique_violation — here, an email already on the list. */
+const DUPLICATE_EMAIL = "23505";
+
 /**
  * POST /api/waitlist — add an email to the pre-launch waitlist.
  *
@@ -46,14 +49,18 @@ export async function POST(request: Request) {
     auth: { persistSession: false },
   });
 
-  // ignoreDuplicates → INSERT ... ON CONFLICT (email) DO NOTHING, so a repeat
-  // sign-up is a no-op success rather than a unique-violation error. Works with
-  // an INSERT-only RLS policy (no read-back needed).
-  const { error } = await supabase
-    .from("waitlist")
-    .upsert({ email, source }, { onConflict: "email", ignoreDuplicates: true });
+  // Plain INSERT, deliberately not `.upsert()`. Under RLS, Postgres evaluates
+  // an ON CONFLICT insert against a SELECT policy — it has to read back the row
+  // it just proposed — and that applies to DO NOTHING (what `ignoreDuplicates`
+  // asks for) as much as DO UPDATE, whether or not anything actually conflicts.
+  // `waitlist` is write-only by design: an INSERT policy and no SELECT policy.
+  // So every upsert was rejected with 42501 "new row violates row-level
+  // security policy" and not one sign-up was stored. A repeat sign-up instead
+  // surfaces as a unique violation on `email` — the success case, since they
+  // are already on the list.
+  const { error } = await supabase.from("waitlist").insert({ email, source });
 
-  if (error) {
+  if (error && error.code !== DUPLICATE_EMAIL) {
     console.error("[waitlist] insert failed:", error.message);
     return Response.json(
       { ok: false, error: "Something went wrong. Please try again." },
