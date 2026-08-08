@@ -81,6 +81,15 @@ describe("AppMockup", () => {
     }
   });
 
+  it("badges a suggested activity inside its day", async () => {
+    render(<AppMockup />);
+    let day = TRIP.days.find((d) => d.activities.some((a) => a.suggested))!;
+    await userEvent.click(screen.getByText(day.title));
+
+    let expected = day.activities.filter((a) => a.suggested).length;
+    expect(screen.getAllByText("Suggested").length).toBe(expected);
+  });
+
   it("marks the open tab for assistive tech", async () => {
     render(<AppMockup />);
     await openTab(/checklists/i);
