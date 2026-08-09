@@ -1,32 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Share2, MessageSquare, Mail, Link2, Check } from "lucide-react";
+import { Share2, Link2, Check } from "lucide-react";
 
 const SITE = "https://goodtrip.info";
 const MESSAGE = "GOODTrip — the group trip planner that plans with you:";
-const EMAIL_SUBJECT = "GOODTrip";
 
 const tile =
   "flex h-11 w-11 items-center justify-center rounded-full border border-sand-300 bg-sand-100 text-espresso-muted transition-colors hover:border-coral/50 hover:text-coral-700 focus-visible:text-coral-700";
 
+/**
+ * Two ways to pass the page on: the OS share sheet, and a copied link.
+ *
+ * There are no per-network tiles because the share sheet already lists every
+ * app the visitor has installed — X, Bluesky, Threads and the rest — so one
+ * button covers all of them on the devices where resharing actually happens.
+ */
 export function ShareBar() {
   const [url, setUrl] = useState(SITE);
+  const [canShare, setCanShare] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  /* Both of these read the browser, which the server render doesn't have, so
+     they're resolved after mount rather than inline. Desktop browsers have no
+     navigator.share at all: checking during render would either mismatch
+     hydration or — worse — leave desktop with a "Share…" button that silently
+     did the same thing as the copy button next to it. Starting false means the
+     server and the first client render agree, and the tile appears only on the
+     browsers that can honour it. */
   useEffect(() => {
-    if (typeof window !== "undefined") setUrl(window.location.href);
+    setUrl(window.location.href);
+    setCanShare(typeof navigator.share === "function");
   }, []);
 
   async function nativeShare() {
-    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-      try {
-        await navigator.share({ title: "GOODTrip", text: MESSAGE, url });
-      } catch {
-        /* user dismissed — no-op */
-      }
-    } else {
-      copyLink();
+    try {
+      await navigator.share({ title: "GOODTrip", text: MESSAGE, url });
+    } catch {
+      /* user dismissed — no-op */
     }
   }
 
@@ -40,35 +51,17 @@ export function ShareBar() {
     }
   }
 
-  const body = `${MESSAGE}\n\n${url}`;
-
   return (
     <div className="flex items-center justify-center gap-2">
       <span className="mr-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso-muted">
         Share
       </span>
 
-      <button type="button" onClick={nativeShare} className={tile} aria-label="Share…">
-        <Share2 className="h-[18px] w-[18px]" aria-hidden="true" />
-      </button>
-
-      <a
-        href={`sms:?&body=${encodeURIComponent(body)}`}
-        className={tile}
-        aria-label="Share via Messages"
-      >
-        <MessageSquare className="h-[18px] w-[18px]" aria-hidden="true" />
-      </a>
-
-      <a
-        href={`mailto:?subject=${encodeURIComponent(
-          EMAIL_SUBJECT,
-        )}&body=${encodeURIComponent(body)}`}
-        className={tile}
-        aria-label="Share by email"
-      >
-        <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
-      </a>
+      {canShare && (
+        <button type="button" onClick={nativeShare} className={tile} aria-label="Share…">
+          <Share2 className="h-[18px] w-[18px]" aria-hidden="true" />
+        </button>
+      )}
 
       <button
         type="button"
