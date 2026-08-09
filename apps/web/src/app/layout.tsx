@@ -37,14 +37,14 @@ export let metadata: Metadata = {
   title,
   description,
   applicationName: "GOODTrip",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicons/favicon-32x32.png", type: "image/png", sizes: "32x32" },
-      { url: "/favicons/favicon-16x16.png", type: "image/png", sizes: "16x16" },
-    ],
-    apple: "/apple-touch-icon/apple-touch-icon-180x180.png",
-  },
+  // No `icons` block here on purpose. App-router *file* conventions —
+  // app/favicon.ico, app/icon.png, app/apple-icon.png — take precedence over
+  // this config, so the two cannot be mixed: whatever is declared here is
+  // silently dropped the moment a convention file exists. It did, and it was:
+  // production shipped a lone <link rel="icon" href="/favicon.ico">, and the
+  // apple-touch icon this block pointed at never reached the page at all.
+  // The convention files are now the single source of truth, and Next derives
+  // the correct type/sizes attributes from the files themselves.
   openGraph: {
     type: "website",
     siteName: "GOODTrip",
