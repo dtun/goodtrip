@@ -28,9 +28,23 @@ const siteUrl =
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : "http://localhost:3000");
 
-const title = "GOODTrip";
+// The page title leads with the brand, because that is what someone types into
+// a search box once they already know the name. The social title drops it: the
+// card already carries the wordmark and og:site_name says GOODTrip underneath,
+// so spending the headline slot on the name too would say it three times and
+// the value none.
+const title = "GOODTrip — Ask your itinerary anything.";
+const socialTitle = "Ask your itinerary anything.";
+
+// Deliberately the same promise the card makes, in the same order. On Bluesky
+// and Threads this description is rendered directly beneath the image, so a
+// mismatch reads as two different products stacked on top of each other.
+//
+// It no longer ends in "Coming soon" for the same reason the card doesn't:
+// announcing there is nothing to see yet, before anyone has decided to look,
+// only ever costs clicks. The page itself is honest about the waitlist.
 const description =
-  "A collaborative, AI-assisted travel itinerary for families. Plan it together and change it in real time, pack with less effort, and let the logistics run themselves — so you can show up and enjoy the trip. Coming soon — join the waitlist.";
+  "Move dinner, pack for rain, replan a washed-out afternoon — GOODTrip knows the trip, the group, and what everyone already booked.";
 
 export let metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -48,14 +62,14 @@ export let metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "GOODTrip",
-    title,
+    title: socialTitle,
     description,
     url: "/",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title,
+    title: socialTitle,
     description,
   },
 };
