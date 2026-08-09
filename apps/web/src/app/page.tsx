@@ -100,7 +100,7 @@ export default async function Home() {
             </a>
             <a
               href="#waitlist"
-              className="rounded-full bg-coral-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-coral-700"
+              className="rounded-full bg-coral-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-coral-800"
             >
               Join the waitlist
             </a>
@@ -119,7 +119,7 @@ export default async function Home() {
               className="reveal mt-7 font-display text-[clamp(3.5rem,13vw,8rem)] font-extrabold leading-[0.9] tracking-tight text-espresso"
               style={{ animationDelay: "0.06s" }}
             >
-              GOOD<span className="text-coral">Trip</span>
+              GOOD<span className="text-coral-700">Trip</span>
             </h1>
 
             <p
@@ -161,7 +161,7 @@ export default async function Home() {
                   key={k}
                   className="rounded-2xl border border-sand-300 bg-sand-100 px-4 py-3 shadow-[0_1px_0_rgba(46,38,32,0.02)]"
                 >
-                  <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-espresso-muted/80">
+                  <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-espresso-muted">
                     {k}
                   </dt>
                   <dd className="mt-1 text-sm font-semibold text-espresso">{v}</dd>
@@ -176,7 +176,7 @@ export default async function Home() {
               kicker="How it works"
               title={
                 <>
-                  The itinerary that <span className="text-coral">talks back.</span>
+                  The itinerary that <span className="text-coral-700">talks back.</span>
                 </>
               }
               intro="Ask it anything about the trip. Take the suggestions that fit, change the ones that don't, and watch everyone else's plan move with yours. Tap through it."
@@ -193,7 +193,7 @@ export default async function Home() {
                   key={title}
                   className="group rounded-3xl border border-sand-300 bg-sand-100 p-6 transition-colors hover:border-coral/40 sm:p-7"
                 >
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-coral-soft text-coral-700 transition-colors group-hover:bg-coral-600 group-hover:text-white">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-coral-soft text-coral-700 transition-colors group-hover:bg-coral-700 group-hover:text-white">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <h3 className="mt-5 font-display text-xl font-bold text-espresso">{title}</h3>
@@ -209,7 +209,7 @@ export default async function Home() {
               kicker="Example trips"
               title={
                 <>
-                  What a GOODTrip <span className="text-coral">looks like.</span>
+                  What a GOODTrip <span className="text-coral-700">looks like.</span>
                 </>
               }
               intro="Three sample trips, built exactly the way a real one is — things booked, things still open, and a few GOODTrip suggested. Pick one and read it end to end."

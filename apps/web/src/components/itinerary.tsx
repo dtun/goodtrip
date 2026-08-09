@@ -93,10 +93,10 @@ function DaySection({ d, w }: { d: DayPlan; w?: Weather }) {
     <section className="sm:flex sm:gap-8">
       {/* desktop numeral rail */}
       <div className="hidden sm:block sm:w-16 sm:shrink-0 sm:pt-1 sm:text-right">
-        <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-espresso-muted/70">
+        <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-espresso-muted">
           Day
         </span>
-        <span className="block font-display text-[3.25rem] font-extrabold leading-[0.8] text-coral">
+        <span className="block font-display text-[3.25rem] font-extrabold leading-[0.8] text-coral-700">
           {num}
         </span>
       </div>
@@ -104,7 +104,7 @@ function DaySection({ d, w }: { d: DayPlan; w?: Weather }) {
       <div className="min-w-0 flex-1">
         {/* day header — numeral sits inline on mobile */}
         <div className="flex items-end gap-3 border-b border-sand-300 pb-3">
-          <span className="font-display text-[2.6rem] font-extrabold leading-[0.8] text-coral sm:hidden">
+          <span className="font-display text-[2.6rem] font-extrabold leading-[0.8] text-coral-700 sm:hidden">
             {num}
           </span>
           <div className="min-w-0 flex-1">
@@ -174,7 +174,7 @@ export function ItineraryTicket({
         <dl className="mt-9 grid grid-cols-2 gap-y-5 border-y border-sand-300 py-5 text-center sm:grid-cols-4 sm:divide-x sm:divide-sand-300">
           {colophon(trip).map(([k, v]) => (
             <div key={k} className="px-2">
-              <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-espresso-muted/80">
+              <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-espresso-muted">
                 {k}
               </dt>
               <dd className="mt-1.5 text-sm font-semibold text-espresso">{v}</dd>
