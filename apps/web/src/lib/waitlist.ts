@@ -7,8 +7,9 @@ export function normalizeEmail(raw: string): string {
   return raw.trim().toLowerCase();
 }
 
-// Deliberately forgiving: one @, a dotted domain, no spaces. The real gate is
-// the confirmation email at launch, not a perfect RFC 5322 regex.
+// Deliberately forgiving: one @, a dotted domain, no spaces. Nothing here sends
+// mail, so there is no confirmation step to lean on — but a typo costs one dead
+// row at launch, while a strict RFC 5322 regex turns away real addresses today.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Whether `raw` looks like an email worth storing (checked after normalizing). */

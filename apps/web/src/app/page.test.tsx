@@ -53,4 +53,18 @@ describe("the landing page", () => {
     await renderHome();
     expect(screen.getAllByRole("button", { name: /join the waitlist/i }).length).toBeGreaterThan(0);
   });
+
+  it("never promises an unsubscribe it has no way to honor", async () => {
+    let { container } = await renderHome();
+    expect(container.textContent).not.toMatch(/unsubscribe/i);
+  });
+
+  // The hero and the closing CTA are separate entry points; a visitor can sign
+  // up from either without ever scrolling past the other, so the note travels
+  // with the form rather than sitting once on the page.
+  it("puts the privacy note beside every sign-up form", async () => {
+    await renderHome();
+    let forms = screen.getAllByRole("button", { name: /join the waitlist/i });
+    expect(screen.getAllByText(/never sold, never shared/i)).toHaveLength(forms.length);
+  });
 });
