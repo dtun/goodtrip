@@ -6,6 +6,25 @@ import { isValidEmail } from "@/lib/waitlist";
 
 type Status = "idle" | "submitting" | "done" | "error";
 
+/* What we tell someone before they hand over an address, kept to what this
+ * repo can actually do.
+ *
+ * Nothing here sends mail. The waitlist is a plain Supabase table — no email
+ * provider, no confirmation, no list to unsubscribe from — so the old line's
+ * "Unsubscribe anytime" offered a mechanism that does not exist. One
+ * announcement at launch is the entire plan, so that is what the promise says;
+ * "the only one we'll send" is also why an unsubscribe link is moot rather than
+ * missing.
+ *
+ * The privacy line names the two columns the API route writes (`email` and
+ * `source`, see app/api/waitlist/route.ts) so nobody has to guess what joining
+ * costs them. It is one sentence rather than a paragraph precisely so it can
+ * ride along with every copy of the form — the landing page renders two, and a
+ * visitor can sign up from either without passing the other.
+ */
+const PROMISE = "One email when GOODTrip opens — that's the only one we'll send.";
+const PRIVACY = "We keep just your address and which form it came from — never sold, never shared.";
+
 /**
  * Email capture for the pre-launch waitlist. Posts to /api/waitlist and swaps
  * to a confirmation state in place. `source` tags where the sign-up came from
@@ -114,8 +133,11 @@ export function WaitlistForm({
         }`}
         role={status === "error" ? "alert" : undefined}
       >
-        {status === "error" ? error : "No spam · One email when it's ready · Unsubscribe anytime"}
+        {status === "error" ? error : PROMISE}
       </p>
+      {/* Stays put while the line above swaps to a validation error — the data
+          promise is not conditional on the form being happy. */}
+      <p className="mt-1.5 text-center text-xs text-espresso-muted/80">{PRIVACY}</p>
     </form>
   );
 }

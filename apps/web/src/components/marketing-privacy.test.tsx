@@ -1,8 +1,9 @@
-import { describe, it } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ItineraryTicket, PrintableItinerary } from "./itinerary";
 import { AppMockup } from "./app-mockup";
+import { WaitlistForm } from "./waitlist-form";
 import { EXAMPLE_TRIPS, FEATURED_EXAMPLE_TRIP as TRIP } from "@/lib/example-trip";
 import { assertRedacted } from "@/test/redaction";
 
@@ -44,5 +45,38 @@ describe("the public marketing surfaces carry no personal detail", () => {
       await userEvent.click(screen.getByRole("button", { name: tab }));
       assertRedacted(`app mockup, ${tab.source} tab`, container.textContent ?? "");
     }
+  });
+});
+
+/* The other half of the same concern: not what the page reveals about a real
+   trip, but what it promises a stranger about their own address. Nothing in
+   this repo can send mail, so every claim the form makes has to be one a plain
+   Supabase table can keep on its own. */
+
+describe("the waitlist form promises only what it can deliver", () => {
+  it("never offers an unsubscribe, because there is no list to leave", () => {
+    let { container } = render(<WaitlistForm source="test" />);
+    expect(container.textContent).not.toMatch(/unsubscribe|opt[\s-]?out/i);
+  });
+
+  it("says how much mail to expect", () => {
+    render(<WaitlistForm source="test" />);
+    expect(screen.getByText(/one email when goodtrip opens/i)).toBeInTheDocument();
+  });
+
+  it("names what is stored and where it stays", () => {
+    render(<WaitlistForm source="test" />);
+    let note = screen.getByText(/never sold, never shared/i);
+    expect(note).toHaveTextContent(/your address/i);
+    expect(note).toHaveTextContent(/which form/i);
+  });
+
+  it("keeps the privacy note up while the promise shows a validation error", async () => {
+    render(<WaitlistForm source="test" />);
+    await userEvent.type(screen.getByLabelText(/email address/i), "not-an-email");
+    await userEvent.click(screen.getByRole("button", { name: /join the waitlist/i }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(/valid email address/i);
+    expect(screen.getByText(/never sold, never shared/i)).toBeInTheDocument();
   });
 });
