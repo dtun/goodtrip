@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join } from "node:path";
 import manifest from "./manifest";
 
@@ -59,10 +60,37 @@ describe("the icon pipeline", () => {
     expect(metadata.icons).toBeUndefined();
   });
 
-  it.each(["favicon.ico", "icon.png", "apple-icon.png"])(
-    "ships app/%s so Next emits a link for it",
-    (file) => {
-      expect(existsSync(join(appDir, file))).toBe(true);
-    },
-  );
+  it.each(["favicon.ico", "apple-icon.png"])("ships app/%s so Next emits a link for it", (file) => {
+    expect(existsSync(join(appDir, file))).toBe(true);
+  });
+});
+
+describe("the icons are ours", () => {
+  /* The previous pass fixed the plumbing and got the cargo wrong. Two
+     favicon.ico files existed — one the create-next-app scaffold left behind,
+     one generated from the 🧭 emoji by emojico — and they were told apart by
+     byte size and embedded resolutions rather than by looking at them. The
+     bigger file won, so the site shipped Vercel's triangle in every browser
+     tab, and the real icon was deleted as a duplicate.
+
+     Asserting a file merely *exists* cannot catch that. These check identity. */
+
+  // create-next-app's default favicon.ico, pinned so it can never come back.
+  const NEXT_DEFAULT_FAVICON_SHA256 =
+    "2b8ad2d33455a8f736fc3a8ebf8f0bdea8848ad4c0db48a2833bd0f9cd775932";
+
+  const sha256 = (path: string) => createHash("sha256").update(readFileSync(path)).digest("hex");
+
+  it("does not ship the scaffold's favicon", () => {
+    expect(sha256(join(appDir, "favicon.ico"))).not.toBe(NEXT_DEFAULT_FAVICON_SHA256);
+  });
+
+  it("serves the same artwork to iOS as the emojico set in public/", () => {
+    // app/apple-icon.png is a copy of the 180 emojico generated. If they ever
+    // drift, one of the two was replaced without the other, and the site is
+    // wearing two different faces.
+    expect(sha256(join(appDir, "apple-icon.png"))).toBe(
+      sha256(join(publicDir, "apple-touch-icon", "apple-touch-icon-180x180.png")),
+    );
+  });
 });
