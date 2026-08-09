@@ -47,22 +47,26 @@ let config = {
           200: "#F3EADA", // subtle block / hover
           300: "#EADFCB", // borders / dividers
         },
+        // Each entry is tagged fill / text / both. "text" means it clears
+        // WCAG AA (4.5:1) as body text on sand; "fill" means it only clears
+        // the 3:1 non-text bar and must never be used as a text color.
         espresso: {
-          DEFAULT: "#2E2620", // primary text (warm near-black)
-          muted: "#6E635A", // secondary text
+          DEFAULT: "#2E2620", // both — primary text (warm near-black), 13.8:1 on sand
+          muted: "#6E635A", // text — secondary text, 5.4:1 on sand. Do not dim with /80 etc.
         },
         coral: {
-          DEFAULT: "#F26B4E", // primary accent / fills
-          600: "#DE4F30", // buttons (white text passes)
-          700: "#B84327", // accent text on light
-          soft: "#FBE7DF", // tinted surface
+          DEFAULT: "#F26B4E", // fill only — 2.8:1 on sand, fails even large text
+          600: "#DE4F30", // fill only — 4.0:1 under white, short of AA for body text
+          700: "#B84327", // both — accent text on light (5.1:1), white on it 5.4:1
+          800: "#93351F", // fill — pressed/hover under coral-700, white on it 7.6:1
+          soft: "#FBE7DF", // fill — tinted surface (carries coral-700 at 4.6:1)
         },
         teal: {
-          DEFAULT: "#1F9E92", // secondary accent
-          700: "#0F766E", // teal text on light
-          soft: "#E2F1EE",
+          DEFAULT: "#1F9E92", // fill only — 3.1:1 on sand, 3.3:1 under white
+          700: "#0F766E", // both — teal text on light (5.1:1), white on it 5.5:1
+          soft: "#E2F1EE", // fill — tinted surface (carries teal-700 at 4.7:1)
         },
-        sun: "#F4A63C", // warm highlight
+        sun: "#F4A63C", // fill only — 1.9:1 on sand, never legible as text
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
