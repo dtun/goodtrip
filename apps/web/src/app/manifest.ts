@@ -17,7 +17,9 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "GOODTrip",
     short_name: "GOODTrip",
-    description: "A collaborative, AI-assisted travel itinerary for families.",
+    // The same hook the social card and the meta description lead with. This
+    // was the last place still carrying the old category-label copy.
+    description: "Ask your itinerary anything.",
     start_url: "/",
     // The landing page is the whole site today, but /trip is a real app screen
     // behind it — standalone is the right shell for where this is heading.
@@ -26,18 +28,21 @@ export default function manifest(): MetadataRoute.Manifest {
     // page's own base colour, so the launch splash matches the first paint.
     background_color: "#FBF6EF",
     theme_color: "#FBF6EF",
+    // The emojico set exactly as generated, at the sizes it actually renders.
+    // 180 is the largest it produces, which is short of the 192 Android likes,
+    // but this is a landing page with no service worker and so no install
+    // prompt — Chrome scales the 180 for a home-screen shortcut and nobody
+    // notices. Upscaling to fake a 192 would only ship a soft icon, and
+    // inventing new artwork would put a second compass in the world.
     icons: [
       {
-        src: "/icons/icon-192.png",
-        sizes: "192x192",
+        src: "/favicons/favicon-48x48.png",
+        sizes: "48x48",
         type: "image/png",
       },
       {
-        // 256 is the largest size the source artwork genuinely contains — the
-        // favicon.ico these were derived from tops out there. Upscaling to the
-        // customary 512 would only produce a soft icon, so we ship what's real.
-        src: "/icons/icon-256.png",
-        sizes: "256x256",
+        src: "/apple-touch-icon/apple-touch-icon-180x180.png",
+        sizes: "180x180",
         type: "image/png",
       },
     ],
